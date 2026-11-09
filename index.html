@@ -210,6 +210,9 @@ h3.sub{font-size:13px;color:var(--muted);letter-spacing:.06em}
 .evcard.sc2 .sc-art{background:linear-gradient(135deg,#3b1d4a,#e2733a)}.evcard.sc3 .sc-art{background:linear-gradient(135deg,#1a2233,#b23a2a)}
 .dgbig{width:132px;height:132px;flex:none;filter:drop-shadow(0 6px 14px #0008)}
 .dgmid{width:92px;height:92px;flex:none;filter:drop-shadow(0 4px 10px #0008)}
+.sp-g{gap:3px}.sp-g .ic{width:18px;height:18px}
+.rcard.coinc .cart{background:radial-gradient(circle at 50% 35%,#fff6d6,#e9d6a6)}
+.tabs .hprev{outline:2px dashed #ffe08a;outline-offset:2px}
 .dgpick{display:flex;gap:12px;align-items:center;margin-top:8px}.dgpick .note{margin:0}
 .rail #vcbtn{position:relative}.rail .vcnt{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;border-radius:8px;background:#2fae5a;color:#fff;font:700 10px/16px system-ui;font-style:normal;text-align:center}
 .rail .vcnt:empty{display:none}.rail #vcbtn.von{background:#2fae5a;color:#fff;border-color:#bff5cf}.rail #vcbtn.vmute{background:#a33;border-color:#f6b}
@@ -224,6 +227,7 @@ h3.sub{font-size:13px;color:var(--muted);letter-spacing:.06em}
 @keyframes tpin{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}10%{transform:translate(-50%,-50%) scale(1.08);opacity:1}16%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
 .ic.sm{width:15px;height:15px;vertical-align:-3px}.ic.lg{width:36px;height:36px}
 .banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:60%}
+.banner.open{flex-direction:column;align-items:stretch;max-width:min(86%,360px);background:#0009;padding:6px;border-radius:14px;z-index:6}.banner .bmore{justify-content:center;background:#1d3550e6;color:#ffe08a}
 @media (max-width:600px){.banner{top:auto;bottom:74px;max-width:94%}}
 .bchip{display:flex;align-items:center;gap:5px;background:#000b;border:1px solid var(--line);border-radius:99px;padding:4px 10px 4px 6px;font-size:13px;font-weight:700}
 .barb{display:inline-flex;gap:2px}.barb i{width:7px;height:10px;border-radius:2px;background:#ffffff30}.barb i.on{background:var(--bad)}
@@ -2554,7 +2558,7 @@ function render(){
 
 // ---------- Lobby ----------
 let cfg={seats:[{kind:'me'},{kind:'open'},{kind:'bot',level:1,persona:'random'},{kind:'none'}],dice:'random',timer:0,speed:false,friendly:true,tasks:true,ck:false,rpg:{k:true,ev:true,goals:true},hero:'warrior'};
-const heroChips=(sel,attr)=>`<div class="tabs">${Object.entries(HEROES).map(([k,h])=>{const lk=h.lock&&!unlocked(prof(),'hero',k);return `<button ${attr}="${k}" aria-pressed="${sel===k}" ${lk?`disabled title="Unlock at level ${UNL.find(u=>u[2]===k)[0]}"`:''}>${ico(h.i)} ${h.n}${lk?' 🔒':''}</button>`}).join('')}</div><div class="dgpick">${ico(HEROES[sel].i,'dgbig')}<p class="note"><b>${HEROES[sel].n}</b>, ${HEROES[sel].par}<br>✦ ${HEROES[sel].pw}<br>✖ ${HEROES[sel].wk}</p></div>`;
+const heroChips=(sel,attr)=>{const pv=ui.hprev&&HEROES[ui.hprev]?ui.hprev:sel;return `<div class="tabs">${Object.entries(HEROES).map(([k,h])=>{const lk=h.lock&&!unlocked(prof(),'hero',k);return `<button ${attr}="${k}" class="${pv===k&&pv!==sel?'hprev':''}" aria-pressed="${sel===k}" ${lk?`disabled title="Unlock at level ${UNL.find(u=>u[2]===k)[0]}"`:''}>${ico(h.i)} ${h.n}${lk?' 🔒':''}</button>`}).join('')}</div><div class="dgpick">${ico(HEROES[pv].i,'dgbig')}<p class="note"><b>${HEROES[pv].n}</b>, ${HEROES[pv].par}<br>✦ ${HEROES[pv].pw}<br>✖ ${HEROES[pv].wk}<br>${pv===sel?'<span class="tag">✓ Chosen</span>':`<button class="btn sm pri" ${attr}="${pv}">Choose ${HEROES[pv].n}</button> <i>or tap it again</i>`}</p></div>`};
 const seg=(key,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button data-cfg="${key}" data-v="${v}" aria-pressed="${String(cfg[key])===String(v)}">${l}</button>`).join('')}</div>`;
 async function loadHist(){                                   // local games + shared online history
   let h=LS.get('st-hist',[]);
@@ -2695,7 +2699,7 @@ function renderSetup(){
   app.querySelectorAll('[data-sl]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.sl.split(':');cfg.seats[+i].level=+k;re()});
   app.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.sp.split(':');cfg.seats[+i].persona=k;re()});
   app.querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.cv.split(':');cfg[k]=k==='dice'?v:k==='timer'?+v:v==='true';re()});
-  app.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{cfg.hero=b.dataset.hero;re()});
+  app.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{const k=b.dataset.hero;if(ui.hprev===k||b.classList.contains('pri')){cfg.hero=k;ui.hprev=null;toast(`${HEROES[k].n} chosen`)}else ui.hprev=k===cfg.hero?null:k;re()});
   app.querySelectorAll('[data-twe]').forEach(b=>b.onclick=()=>{cfg.twEnd=b.dataset.twe;re()});
   app.querySelectorAll('[data-where]').forEach(b=>b.onclick=()=>{ui.mode=b.dataset.where;if(ui.mode==='online'&&!db){ui.mode='local';toast('Online play is unavailable here')}
     if(ui.mode==='online'&&cfg.seats[1].kind!=='open')cfg.seats[1]={kind:'open'};
@@ -2740,7 +2744,7 @@ function renderWait(){
   <button class="btn" id="back">Back</button></div>
   <p class="note">Your partner opens this page on her phone, signed in to her own account, and taps Join on this game.</p></div></div>`;
   app.querySelectorAll('[data-join]').forEach(b=>b.onclick=()=>{const i=+b.dataset.join;S.seats[i].uid=ME.uid;S.seats[i].name=ME.name||'Player';S.pl[i]=S.pl[i];S.v++;save()});
-  app.querySelectorAll('[data-whero]').forEach(b=>b.onclick=()=>{S.pl[me].hero=b.dataset.whero;S.v++;save()});
+  app.querySelectorAll('[data-whero]').forEach(b=>b.onclick=()=>{const k=b.dataset.whero;if(ui.hprev===k||b.classList.contains('pri')){S.pl[me].hero=k;ui.hprev=null;S.v++;save();toast(`${HEROES[k].n} chosen`)}else{ui.hprev=k===S.pl[me].hero?null:k;render()}});
   const go=document.getElementById('go');if(go)go.onclick=()=>{S.phase='setup';S.v++;save()};
   const fl=document.getElementById('fill');if(fl)fl.onclick=()=>{let k=0;S.seats.forEach(s=>{if(s.kind==='human'&&!s.uid){s.kind='bot';s.level=1;s.name=BOTNAMES[k++];s.persona=Object.keys(PERSONA)[rnd(4)]}});S.v++;save()};
   document.getElementById('back').onclick=leave;
@@ -2822,8 +2826,10 @@ function boardSVG(){
   // tiles that just produced glow gold (blocked tile glows red)
   if(S.roll&&Date.now()-(ui.glowAt||0)<2800){const t=S.roll.a+S.roll.b;HEX.forEach((h,i)=>{if(S.hexes[i].n===t)s+=`<polygon points="${hexPts(h.x,h.y,R-4)}" fill="none" stroke="${i===S.robber?'#ff5a4a':'#ffd86a'}" stroke-width="6" opacity=".9" style="filter:drop-shadow(0 0 8px ${i===S.robber?'#ff5a4a':'#ffd86a'})"/>`})}
   // sea routes between islands (claim maps)
-  ROUTES.forEach(([a,b])=>{const A=HEX[a],B=HEX[b];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#f3e9d6" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round" opacity=".85"/>
-    <g transform="translate(${(A.x+B.x)/2},${(A.y+B.y)/2})"><circle r="13" fill="#0d2742cc" stroke="#f3e9d6" stroke-width="1.2"/><use href="#s-ship" x="-10" y="-10" width="20" height="20"/></g>`});
+  if(mine&&['hmove','ferry','gtravel'].includes(ui.build))ROUTES.forEach(([a,b])=>{let best=null;   // nearest corner pair of the two tiles
+    HEX[a].v.forEach(i=>HEX[b].v.forEach(j=>{const d=Math.hypot(V[i].x-V[j].x,V[i].y-V[j].y);if(!best||d<best[2])best=[V[i],V[j],d]}));
+    const A=best[0],B=best[1];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#f3e9d6" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round" opacity=".85"/>
+    <g transform="translate(${(A.x+B.x)/2},${(A.y+B.y)/2})"><circle r="11" fill="#0d2742cc" stroke="#f3e9d6" stroke-width="1.2"/><use href="#s-ship" x="-8" y="-8" width="16" height="16"/></g>`});
   // stone bridges between islands (roads can be built on them)
   E.forEach(e=>{if(!e.br)return;const A=V[e.a],B=V[e.b],L=Math.hypot(B.x-A.x,B.y-A.y),an=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;
     s+=`<g transform="translate(${((A.x+B.x)/2).toFixed(1)},${((A.y+B.y)/2).toFixed(1)}) rotate(${an.toFixed(1)})"><rect x="${-L/2}" y="-7" width="${L}" height="16" rx="3" fill="#0006" transform="translate(2,5)"/>
@@ -3255,9 +3261,10 @@ function setupZoom(){                                       // drag to pan, pinc
     z1=Math.min(ZMAX,Math.max(ZMIN,z1));ui.px=sx-(z1/b.z)*(sx-b.px);ui.py=sy-(z1/b.z)*(sy-b.py);ui.z=z1};
   const pts=new Map();let start=null,lastTap=0,lastXY=null;
   const snap=()=>({z:ui.z,px:ui.px,py:ui.py,pts:new Map(pts),moved:false});
-  st.addEventListener('pointerdown',e=>{if(e.target.closest('button,.sheet'))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});start=snap()});
+  st.addEventListener('pointerdown',e=>{if(e.target.closest('button,.sheet'))return;if(e.isPrimary)pts.clear();pts.set(e.pointerId,{x:e.clientX,y:e.clientY});start=snap()});
   st.addEventListener('pointermove',e=>{
     if(!pts.has(e.pointerId)||!start)return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if((start.moved||pts.size>1)&&!st.hasPointerCapture(e.pointerId))try{st.setPointerCapture(e.pointerId)}catch(_){}   // keep the gesture if the board redraws
     const a=[...pts.values()],b=[...start.pts.values()];
     if(a.length===1&&b.length===1){const dx=a[0].x-b[0].x,dy=a[0].y-b[0].y;if(Math.hypot(dx,dy)>8)start.moved=true;if(start.moved){ui.px=start.px+dx;ui.py=start.py+dy;apply()}}
     else if(a.length>=2&&b.length>=2){                          // pinch: zoom at the midpoint and follow it
@@ -3270,7 +3277,8 @@ function setupZoom(){                                       // drag to pan, pinc
     if(was&&!e.target.closest('[data-k]')){const t=Date.now();                                   // double-tap on the sea / a tile: zoom in, again: fit
       if(t-lastTap<320&&lastXY&&Math.hypot(e.clientX-lastXY.x,e.clientY-lastXY.y)<40){ui.zfrom={z:ui.z,px:ui.px,py:ui.py};if(ui.z>1.6){ui.z=1;ui.px=0;ui.py=0}else zoomAt(ui.z*2,e.clientX,e.clientY);apply(true);lastTap=0}
       else{lastTap=t;lastXY={x:e.clientX,y:e.clientY}}}};
-  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
+  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);st.addEventListener('lostpointercapture',e=>{if(e.target===st&&pts.has(e.pointerId))up(e)});   // only our own capture ending (not the tile handing it over)
+  if(!ui.gestOff){ui.gestOff=1;['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}))}   // iPhone: no page zoom
   st.addEventListener('wheel',e=>{e.preventDefault();zoomAt(ui.z*Math.pow(1.0018,-e.deltaY),e.clientX,e.clientY);apply()},{passive:false});   // trackpad-friendly
   zoomButtons();ui.zoom=f=>{ui.zfrom={z:ui.z,px:ui.px,py:ui.py};const r=st.getBoundingClientRect();if(f===0){ui.z=1;ui.px=0;ui.py=0}else zoomAt(ui.z*f,r.left+r.width/2,r.top+r.height/2);apply(true)};apply();
 }
@@ -3340,7 +3348,7 @@ function renderGame(){
   // your remaining pieces, sitting on the table next to the board
   const sp=document.getElementById('supply');
   if(me>=0){const P=S.pl[me],f=`url(#tint${me})`,it=(sym,n,w,h,lbl)=>`<div class="sp-i" title="${lbl} left"><svg viewBox="0 0 ${w} ${h}" style="filter:${f}"><use href="#p-${sym}" width="${w}" height="${h}"/></svg><b>${n}</b></div>`;
-    sp.innerHTML=it('road',P.rd,40,30,'Roads')+it('house',P.st,40,37,'Villages')+it('temple',P.ct,40,37,'Cities');sp.hidden=false}else sp.hidden=true;
+    sp.innerHTML=it('road',P.rd,40,30,'Roads')+it('house',P.st,40,37,'Villages')+it('temple',P.ct,40,37,'Cities')+(S.rpg.k?`<div class="sp-i sp-g" title="Gold">${ico('coin','ic sm')}<b>${P.gold}</b></div><div class="sp-i sp-g" title="Glory: 5 = 1 VP (max 3)">${ico('crown','ic sm')}<b>${P.ren}</b></div>`:'');sp.hidden=false}else sp.hidden=true;
   {const sb=document.getElementById('bSnd');sb.textContent=SND.fx()?'🔊':'🔇';sb.onclick=()=>{LS.set('st-sfx',!SND.fx());if(!SND.fx())LS.set('st-mus',false);else sfx('click');renderGame()}}
   const d3b=document.getElementById('d3btn');d3b.setAttribute('aria-pressed',!!ui.d3);d3b.textContent=ui.d3?'3D on':'3D off';
   document.getElementById('bh').innerHTML=boardSVG();if(ui.zapply)ui.zapply();   // keep the zoom after every redraw
@@ -3374,7 +3382,11 @@ function renderGame(){
   if(S.warEv&&S.warEv.id!==ui.seenWar){if(ui.seenWar!==undefined)toast(S.warEv.p<0?'⚔ The Titan War begins! Every island is at war.':`⚔ ${pname(S.warEv.p)} declares war on ${pname(S.warEv.q)}!`);ui.seenWar=S.warEv.id}
   if(S.story&&S.story.act&&me>=0){const a=S.story.act,d=S.story.done[me][a-1];ban.unshift(`<button class="bchip good" data-quests="1">${ico('map')}<span>Act ${['I','II','III'][a-1]} · <b>${actName(a)}</b> · quests ${d.filter(x=>x).length}/3</span></button>`)}
   if(S.rpg.k&&S.lair>=0)ban.push(`<button class="bchip" data-world="1">${ico('cave')}<span>Monster in ${S.lairT} · ${S.mons.length} roaming</span></button>`);
-  const bn=document.getElementById('banner');bn.innerHTML=ban.join('');bn.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>openSheet('world'));bn.querySelectorAll('[data-evpop]').forEach(b=>b.onclick=()=>eventPop(S.event));
+  const bn=document.getElementById('banner');
+  if(ban.length>1){const open=!!ui.banOpen;bn.classList.toggle('open',open);    // one chip + a dropdown with everything else
+    bn.innerHTML=(open?ban.join(''):ban[0])+`<button class="bchip bmore" data-banmore="1">${open?'▴ Hide':'▾ '+(ban.length-1)+' more'}</button>`}
+  else{bn.classList.remove('open');bn.innerHTML=ban.join('')}
+  bn.querySelectorAll('[data-banmore]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.banOpen=!ui.banOpen;renderGame()});bn.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>openSheet('world'));bn.querySelectorAll('[data-evpop]').forEach(b=>b.onclick=()=>eventPop(S.event));
   bn.querySelectorAll('[data-tutskip]').forEach(b=>b.onclick=()=>{LS.set('st-tour-tw',true);LS.set('st-tour',true);LS.del('st-local');leave()});
   bn.querySelectorAll('[data-tut]').forEach(b=>b.onclick=()=>toast(TUT[S.tut.step].d));
   bn.querySelectorAll('[data-champ]').forEach(b=>b.onclick=()=>openSheet('champ'));
@@ -3402,6 +3414,8 @@ function renderGame(){
         ${RES.map((r,k)=>{const n=pl.res[r],st=Math.min(n,4),tile={brick:1,lumber:1,wool:1,grain:1,ore:1}[r];   // a little stack of real cards
           return `<div class="rcard tcd ${n?'':'zero'}" id="rc-${r}" style="--rc:${RCOL[r]};--rot:${[-3,2,-1,3,-2,1,-3,2,-1][k%9]}deg;box-shadow:${[...Array(st)].map((_,i)=>`${(i+1)*1.5}px ${-(i+1)*2}px 0 -1px #efe3c6,${(i+1)*1.5}px ${-(i+1)*2}px 0 0 #9b7a45`).join(',')}${st?',':''}0 8px 12px #000a" title="${RNAME[r]}">
             <span class="cart">${tile?`<svg viewBox="-40 -56 80 112" preserveAspectRatio="xMidYMid slice"><use href="#t-${r}" x="-56" y="-56" width="112" height="112"/></svg>`:''}</span>${ico(r)}<span class="n">${n}</span><span class="lab">${RNAME[r]}</span></div>`}).join('')}
+        ${S.rpg.k?`<div class="rcard tcd coinc" style="--rc:#c99a2e;--rot:-2deg" title="Gold: buys gear, battle cards and ferries"><span class="cart"></span>${ico('coin')}<span class="n">${pl.gold}</span><span class="lab">GOLD</span></div>
+          <div class="rcard tcd coinc" style="--rc:#7a5bd6;--rot:2deg" title="Glory: every 5 = 1 VP (max 3)"><span class="cart"></span>${ico('crown')}<span class="n">${pl.ren}</span><span class="lab">GLORY ${Math.min(3,Math.floor(pl.ren/5))}/3</span></div>`:''}
         ${pl.dev.map((d,i)=>`<button class="mcard art ${artc(d.t)} ${canPlay(d)?'ready':''} ${d.b>=S.turn?'new':''}" data-dev="${i}" title="${DEV[d.t].n}">${ico(d.t==='road'?'roadb':d.t)}<span>${DEV[d.t].n}</span></button>`).join('')}
         ${pl.prog.map((c,i)=>`<button class="mcard art prog art-pg-${c.t}" style="--tc:${TRK[PROG[c.t].tr].col}" data-prog="${i}" title="${PROG[c.t].n}">${ico(PROG[c.t].i)}<span>${PROG[c.t].n}</span></button>`).join('')}
         ${pl.relics.map((r,i)=>`<button class="mcard relic" data-relic="${i}" title="${RELICS[r.t].n}">${ico(RELICS[r.t].i)}<span>${RELICS[r.t].n}</span></button>`).join('')}
