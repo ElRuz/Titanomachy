@@ -444,6 +444,9 @@ body[data-board="winter"] #board{filter:saturate(.55) brightness(1.1) hue-rotate
 .pgod{position:absolute;left:-6px;bottom:-6px;width:22px;height:22px;border-radius:50%;background:#14243a;border:2px solid #f2c14e;display:grid;place-items:center}.pgod svg{width:15px;height:15px}
 .ptitle{display:block;font-size:10px;color:var(--gold-hi);font-style:italic;line-height:1.1}
 .lvbadge{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font:900 22px var(--f-disp);color:#2b1d0e;background:radial-gradient(circle at 35% 30%,#fff3c4,#e9b949 55%,#8a5d12);box-shadow:0 4px 12px #0008}
+.zctl{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:6px}
+.zctl button{width:40px;height:40px;border-radius:12px;border:1px solid var(--gold);background:#0d1f35d9;color:var(--gold-hi);font:800 22px/1 system-ui;box-shadow:0 4px 10px #0008;cursor:pointer}
+.zctl button:active{transform:scale(.94)}
 .tour{position:fixed;inset:0;z-index:90;background:#020a14cc;display:grid;place-items:center;padding:16px;backdrop-filter:blur(3px)}
 .tcard{width:100%;max-width:440px;max-height:calc(100dvh - 32px);overflow:auto;background:linear-gradient(#173a5e,#0e2540);border:1.5px solid var(--gold);border-radius:20px;padding:16px 18px;color:var(--ink);box-shadow:0 20px 60px #000a;box-sizing:border-box}
 .tcard .ttabs{display:flex;gap:6px;margin-bottom:10px}.tcard .ttabs button{flex:1;padding:7px;border-radius:99px;border:1px solid var(--gold);background:none;color:var(--ink);font-weight:700}
@@ -3008,23 +3011,36 @@ function hintText(){
     ||(!S.rolled?'Roll the dice (or play a Hoplite first)':ui.build?`Tap a highlighted spot: ${{road:'build a road',settle:'build a village',city:'build a city',knight:'train a hoplite',hmove:'move your hero',kup:'promote a hoplite',kact:'activate a hoplite',chase:'pick the hoplite to chase the Cyclops'}[ui.build]}`:'Build, trade, or end your turn');
 }
 function toggle3d(){ui.d3=!ui.d3;LS.set('st-3d',ui.d3);renderGame()}
-function setupZoom(){                                       // drag to pan, pinch or wheel to zoom
+function zoomButtons(){document.querySelectorAll('.zctl [data-z]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.zoom(+b.dataset.z)})}
+function setupZoom(){                                       // drag to pan, pinch / wheel / double-tap to zoom — always toward your fingers
   const st=document.getElementById('stage'),zm=document.getElementById('zoom');
   ui.z=ui.z||1;ui.px=ui.px||0;ui.py=ui.py||0;
-  const apply=()=>{zm.style.transform=`translate(${ui.px}px,${ui.py}px) scale(${ui.z})`};
-  const pts=new Map();let start=null;
+  const ZMIN=.8,ZMAX=3.5;
+  const clamp=()=>{const r=st.getBoundingClientRect(),mx=Math.max(0,(ui.z-1)*r.width/2+60),my=Math.max(0,(ui.z-1)*r.height/2+60);   // keep the board on screen
+    ui.px=Math.max(-mx,Math.min(mx,ui.px));ui.py=Math.max(-my,Math.min(my,ui.py));if(ui.z<=1.02){ui.px*=.6;ui.py*=.6}};
+  const apply=(smooth)=>{clamp();zm.style.transition=smooth?'transform .25s ease':'none';zm.style.transform=`translate(${ui.px}px,${ui.py}px) scale(${ui.z})`};
+  const zoomAt=(z1,cx,cy,base)=>{const r=st.getBoundingClientRect(),sx=cx-(r.left+r.width/2),sy=cy-(r.top+r.height/2),b=base||{z:ui.z,px:ui.px,py:ui.py};   // keep the point under the fingers still
+    z1=Math.min(ZMAX,Math.max(ZMIN,z1));ui.px=sx-(z1/b.z)*(sx-b.px);ui.py=sy-(z1/b.z)*(sy-b.py);ui.z=z1};
+  const pts=new Map();let start=null,lastTap=0,lastXY=null;
   const snap=()=>({z:ui.z,px:ui.px,py:ui.py,pts:new Map(pts),moved:false});
-  st.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});start=snap()});
+  st.addEventListener('pointerdown',e=>{if(e.target.closest('button,.sheet'))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});start=snap()});
   st.addEventListener('pointermove',e=>{
     if(!pts.has(e.pointerId)||!start)return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
     const a=[...pts.values()],b=[...start.pts.values()];
     if(a.length===1&&b.length===1){const dx=a[0].x-b[0].x,dy=a[0].y-b[0].y;if(Math.hypot(dx,dy)>8)start.moved=true;if(start.moved){ui.px=start.px+dx;ui.py=start.py+dy;apply()}}
-    else if(a.length>=2&&b.length>=2){const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),d0=Math.hypot(b[0].x-b[1].x,b[0].y-b[1].y)||1;ui.z=Math.min(3,Math.max(.6,start.z*d/d0));start.moved=true;apply()}
+    else if(a.length>=2&&b.length>=2){                          // pinch: zoom at the midpoint and follow it
+      const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),d0=Math.hypot(b[0].x-b[1].x,b[0].y-b[1].y)||1;
+      const m={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2},m0={x:(b[0].x+b[1].x)/2,y:(b[0].y+b[1].y)/2};
+      zoomAt(start.z*d/d0,m0.x,m0.y,start);ui.px+=m.x-m0.x;ui.py+=m.y-m0.y;start.moved=true;apply()}
   });
-  const up=e=>{pts.delete(e.pointerId);if(start&&start.moved)ui.dragged=Date.now();start=pts.size?snap():null};
+  const up=e=>{
+    const was=start&&!start.moved&&pts.size===1;pts.delete(e.pointerId);if(start&&start.moved)ui.dragged=Date.now();start=pts.size?snap():null;
+    if(was&&!e.target.closest('[data-k]')){const t=Date.now();                                   // double-tap on the sea / a tile: zoom in, again: fit
+      if(t-lastTap<320&&lastXY&&Math.hypot(e.clientX-lastXY.x,e.clientY-lastXY.y)<40){if(ui.z>1.6){ui.z=1;ui.px=0;ui.py=0}else zoomAt(ui.z*2,e.clientX,e.clientY);apply(true);lastTap=0}
+      else{lastTap=t;lastXY={x:e.clientX,y:e.clientY}}}};
   st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
-  st.addEventListener('wheel',e=>{e.preventDefault();ui.z=Math.min(3,Math.max(.6,ui.z*(e.deltaY<0?1.12:.89)));apply()},{passive:false});
-  ui.zoom=f=>{if(f===0){ui.z=1;ui.px=0;ui.py=0}else ui.z=Math.min(3,Math.max(.6,ui.z*f));apply()};apply();
+  st.addEventListener('wheel',e=>{e.preventDefault();zoomAt(ui.z*Math.pow(1.0018,-e.deltaY),e.clientX,e.clientY);apply()},{passive:false});   // trackpad-friendly
+  zoomButtons();ui.zoom=f=>{const r=st.getBoundingClientRect();if(f===0){ui.z=1;ui.px=0;ui.py=0}else zoomAt(ui.z*f,r.left+r.width/2,r.top+r.height/2);apply(true)};apply();
 }
 const uico=(id,cls='ui')=>`<svg class="${cls}" viewBox="0 0 24 24"><use href="#u-${id}"/></svg>`;
 function renderGame(){
@@ -3037,6 +3053,7 @@ function renderGame(){
       <div class="pbar" id="players"></div>
       <div class="stage" id="stage">
         <div class="zoom" id="zoom"><div id="bh"></div></div>
+        <div class="zctl"><button data-z="1.4" title="Zoom in">+</button><button data-z="0.7" title="Zoom out">−</button><button data-z="0" title="Fit board">⤢</button></div>
         <div class="banner" id="banner"></div>
         <div class="rail">
           <button title="Game log" data-rail="log">${uico('log')}</button><button title="Dice stats" data-rail="stats">${uico('chart')}</button>
