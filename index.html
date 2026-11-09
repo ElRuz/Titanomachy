@@ -310,10 +310,29 @@ h1,h2,h3{letter-spacing:.03em}
 
 .table{grid-template-columns:minmax(0,1fr)}.table>*{min-width:0}
 #toasts{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 96px);z-index:45;display:grid;gap:6px;justify-items:center;width:min(92vw,440px);pointer-events:none}
+.fnote{pointer-events:auto;font-weight:600!important;font-size:14px!important;line-height:1.35;max-width:100%}.fnote b{color:#ffe08a}.fnote.bad{border-color:#ff8a7a88!important}.fnote.good{border-color:#7fe0a088!important}
+.pstats .pmore{display:none}.pban{cursor:pointer}
+.arena2{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;padding:14px 8px 10px;border-radius:14px;background:radial-gradient(ellipse at 50% 120%,#3a2a12,#120d08 70%);box-shadow:inset 0 0 0 1px #f5c34644}
+.af{position:relative;display:grid;gap:5px;justify-items:center;text-align:center;min-width:0}.af .ic.xl{width:84px;height:84px}.af .hpbar{width:100%}.af .intent{white-space:normal;max-width:100%}
+.af.hit{animation:shake .35s}.dmgf{position:absolute;top:18%;left:50%;transform:translateX(-50%);font:900 26px Cinzel,Georgia,serif;font-style:normal;color:#ff6b5a;text-shadow:0 2px 0 #000;animation:dmgup 1.1s ease-out forwards;pointer-events:none}
+.dmgf.crit{color:#ffd86a;font-size:32px}
+.intent{font-size:12.5px;font-weight:800;padding:4px 9px;border-radius:99px;background:#5a1712;border:1px solid #ff8a7a;color:#ffe0da;white-space:nowrap}.intent.guard{background:#14304f;border-color:#7fc3ff;color:#dff0ff}.intent.charge{background:#4a3a08;border-color:#ffd86a;color:#fff3c4;animation:coachp 1s infinite}
+.tmbar{position:relative;height:16px;border-radius:99px;background:#0d1b2c;border:1px solid #f5c34666;margin:10px 4px 0;overflow:hidden}
+.tmbar .tz2{position:absolute;left:30%;width:40%;top:0;bottom:0;background:#f5c34640}.tmbar .tz{position:absolute;left:43%;width:14%;top:0;bottom:0;background:#f5c346;z-index:1}
+.tmbar .tm{position:absolute;top:-2px;bottom:-2px;width:5px;margin-left:-2px;border-radius:3px;background:#fff;box-shadow:0 0 8px #fff;z-index:2;animation:tmv 1.2s linear infinite}
+@keyframes tmv{0%{left:0}50%{left:100%}100%{left:0}}@keyframes dmgup{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}20%{opacity:1;transform:translate(-50%,0) scale(1.15)}100%{opacity:0;transform:translate(-50%,-34px)}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.fbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fbtns small{opacity:.75;font-size:11px}
+.auth{display:grid;gap:10px}.auth input{font:16px system-ui;padding:12px 14px;border-radius:12px;border:1px solid var(--hair);background:#0d1b2c;color:#fff}
+.minihand{display:flex;flex-wrap:wrap;gap:6px 10px;margin:8px 0;padding:8px 10px;border-radius:12px;background:#0d1b2c;border:1px solid #f5c34644}.minihand span{display:flex;align-items:center;gap:3px;font-size:14px}
+.ruinglow{animation:coachp 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}.caphit{cursor:pointer}
+.fnote .tipx{margin-left:8px;background:none;border:0;color:#fff8;font-size:13px;padding:0 2px;cursor:pointer}
 #toasts .toast{position:static;transform:none;background:#081f38f0;border:1px solid #f5c34688;border-radius:12px;padding:8px 14px;font-weight:800;font-size:14px;text-align:center;animation:up .25s ease-out}
 @media (max-width:600px){
-  .pban{min-width:0;flex:0 0 auto;max-width:none}.pinfo{max-width:150px}
-  .pstats{flex-wrap:nowrap;overflow:hidden;font-size:12.5px;gap:6px;padding:3px 6px}.pstats span:nth-child(n+5){display:none}
+  .pbar{gap:5px;padding:6px 6px}
+  .pban{min-width:0;flex:0 0 calc((100% - 10px)/3);max-width:none}.pinfo{min-width:0;flex:1}
+  .pban .avw{width:40px;height:44px}.ribbon b{display:none}.ribbon span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pstats{flex-wrap:nowrap;overflow:hidden;font-size:12.5px;gap:6px;padding:3px 6px}
   .ribbon{font-size:12.5px;padding:3px 10px 3px 7px}.ribbon i{display:none}
   .stage .banner{display:none}.hint{font-size:13.5px}
 }
@@ -442,7 +461,7 @@ body{font-family:var(--f-body)}
 .handrow .mcard:nth-child(even){transform:rotate(2deg)}
 .tutchip{max-width:min(520px,92vw);text-align:left;white-space:normal;line-height:1.3;border:2px solid var(--gold)!important}.tutchip i{font-style:normal;font-size:12px;opacity:.9}
 .hcancel{margin-left:10px;padding:4px 10px;border-radius:99px;border:1px solid var(--gold);background:#0006;color:var(--gold-hi);font-weight:800;cursor:pointer}
-#coachring{position:fixed;pointer-events:none;z-index:95;border-radius:14px;border:3px solid #ffd86a;box-shadow:0 0 0 4px #ffd86a33,0 0 18px #ffd86a88;animation:coachp 2.4s ease-in-out infinite}
+#coachring{position:fixed;pointer-events:none;z-index:95;border-radius:14px;border:3px solid #ffd86a;box-shadow:0 0 0 4px #ffd86a33,0 0 18px #ffd86a88;animation:coachp 1.2s ease-in-out infinite}
 #coachtip{position:fixed;pointer-events:none;z-index:96;background:#ffd86a;color:#2b1d0e;font-weight:800;font-size:13px;padding:5px 10px;border-radius:99px;box-shadow:0 4px 12px #0008;white-space:nowrap;transform:translate(-50%,-100%)}
 #coachtip::after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#ffd86a}
 #coachtip.below{transform:translate(-50%,0)}#coachtip.below::after{top:-6px;bottom:auto;border-top:0;border-bottom:6px solid #ffd86a}
@@ -643,6 +662,7 @@ h3.lbl{font-size:12px;letter-spacing:.16em;color:var(--gold)}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 // ---- Firebase settings (from your Firebase project) ----
 const FIREBASE_CONFIG = {"apiKey":"AIzaSyD9BWxVApkS1xlMdHkGkyavL4W83z0Gpu8","authDomain":"titanomachy-7aa32.firebaseapp.com","projectId":"titanomachy-7aa32","storageBucket":"titanomachy-7aa32.firebasestorage.app","messagingSenderId":"368952442964","appId":"1:368952442964:web:6e93a1eb33b57a1114adc1"};
@@ -665,6 +685,15 @@ const FIREBASE_CONFIG = {"apiKey":"AIzaSyD9BWxVApkS1xlMdHkGkyavL4W83z0Gpu8","aut
     doc:id=>docRef(path+'/'+(id||fs.collection(path).doc().id))});
   const db={doc:docRef,collection:path=>query(fs.collection(path),path)};
   window.claude={use:async n=>n==='db'?db:null};
+  // ---- Accounts: email + password (Firebase Authentication) ----
+  if(firebase.auth){const au=firebase.auth();
+    window.TAUTH={
+      on:cb=>au.onAuthStateChanged(u=>cb(u&&{uid:u.uid,email:u.email,name:u.displayName||''})),
+      signIn:(e,p)=>au.signInWithEmailAndPassword(e,p),
+      signUp:async(e,p,n)=>{const c=await au.createUserWithEmailAndPassword(e,p);if(n)await c.user.updateProfile({displayName:n});return c},
+      setName:n=>au.currentUser&&au.currentUser.updateProfile({displayName:n}).catch(()=>{}),
+      reset:e=>au.sendPasswordResetEmail(e),
+      out:()=>au.signOut()}}
 })();
 </script>
 
@@ -844,12 +873,12 @@ const PROG={
 // Demigods: pw = power text, wk = weakness text; numbers below are read by the rules through dg(p)
 const HEROES={
   heracles:{n:'Heracles',par:'son of Zeus',i:'dg-heracles',atk:2,rest:1,pw:'+2 attack',wk:'After winning a fight he rests: no deed on his next turn'},
-  perseus:{n:'Perseus',par:'son of Zeus',i:'dg-perseus',mv:1,hp:-3,noTower:1,fly:1,pw:'+1 move · raids ignore watchtowers · flies over one sea route for free',wk:'−3 HP'},
-  theseus:{n:'Theseus',par:'son of Poseidon',i:'dg-theseus',mon:3,heavy:1,noTrap:1,fly:2,pw:'+3 attack vs monsters · ruins never trap him · sails 2 routes free without a ship',wk:'Battle cards cost +1 stamina'},
+  perseus:{n:'Perseus',par:'son of Zeus',i:'dg-perseus',mv:1,hp:-3,noTower:1,fly:1,pw:'+1 move · raids ignore watchtowers · his first sea step each move is free',wk:'−3 HP'},
+  theseus:{n:'Theseus',par:'son of Poseidon',i:'dg-theseus',mon:3,heavy:1,noTrap:1,shipAny:1,pw:'+3 attack vs monsters · ruins never trap him · builds a ship without a harbour, boards anywhere',wk:'Battle cards cost +1 stamina'},
   aeneas:{n:'Aeneas',par:'son of Aphrodite',i:'dg-aeneas',atk:-1,pact:5,deal:1,pw:'His pacts last 5 rounds · +1 card from every private deal',wk:'−1 attack'},
   asclepius:{n:'Asclepius',par:'son of Apollo',i:'dg-asclepius',atk:-1,heal:1,uwx:1,pw:'Fully healed every round · leaves the Underworld for 1 Ambrosia',wk:'−1 attack'},
   aristaeus:{n:'Aristaeus',par:'son of Apollo',i:'dg-aristaeus',atk:-1,mv:-1,farm:1,pw:'+1 Wheat or Fleece every round',wk:'−1 attack, −1 move'},
-  orion:{n:'Orion',par:'son of Poseidon',i:'dg-orion',lock:1,sea:1,lure:1,pw:'Walks across the sea anywhere',wk:'Monsters hunt him first'},
+  orion:{n:'Orion',par:'son of Poseidon',i:'dg-orion',lock:1,sea:1,lure:1,pw:'Walks on water — no ship needed',wk:'Monsters hunt him first'},
   achilles:{n:'Achilles',par:'son of Thetis',i:'dg-achilles',lock:1,tough:2,heel:1,pw:'Takes 2 less damage in duels',wk:'Double damage when a Feint beats his stance'},
   orpheus:{n:'Orpheus',par:'son of Apollo',i:'dg-orpheus',lock:1,atk:-2,lull:1,back:1,pw:'Monsters never strike back at him · returns from the Underworld at full HP',wk:'−2 attack'},
   autolycus:{n:'Autolycus',par:'son of Hermes',i:'dg-autolycus',lock:1,hp:-2,raid:1,pw:'Raids take +1 card and cost no glory',wk:'−2 HP'},
@@ -885,6 +914,10 @@ function storyRound(){                                        // called at each 
   if(!S.story)return;const a=actOf();if(a===S.story.act)return;
   S.story.act=a;storyBase();S.actEv={a,id:(S.actEv?S.actEv.id:0)+1};log(`<b>Act ${['I','II','III'][a-1]}: ${actName(a)}</b>`);
 }
+function monIntent(t,charged){                              // the monster's next move, shown to the player before they choose
+  const M=MONS[t],v=Math.ceil(d6()/2)+M.atk;if(charged)return {k:'atk',v};
+  const w={goblin:[7,1,2],troll:[5,3,2],dragon:[5,2,3]}[t]||[6,2,2],r=rnd(10);
+  return r<w[0]?{k:'atk',v}:r<w[0]+w[1]?{k:'charge'}:{k:'guard'}}
 const XPL=[0,8,20,38,60];                                   // XP needed for hero level 1..5
 // Monsters keep their wounds between turns; anyone next to them can chip away. loot = cards for the killing blow
 const MONS={                                                // atk = extra damage it deals on top of half a d6
@@ -1022,14 +1055,14 @@ const d6=()=>rnd(6)+1;
 // ---------- Board geometry (pointy-top hexes, radius-2 island) ----------
 const R=56,S3=Math.sqrt(3);
 // ---------- Board geometry: 'arch' = three islands joined by stone bridges; 'classic' = games saved earlier ----------
-const HEX=[],V=[],E=[],HN=[],HADJ0=[],HADJ=[],COAST=[],PORTS=[],TWC=[],ROUTES=[],RSET=new Set(),XADJ=[];let vmap={},emap={},GEO='',SEA='',VBOX='';
+const HEX=[],V=[],E=[],HN=[],HADJ0=[],HADJ=[],COAST=[],PORTS=[],TWC=[],ROUTES=[],RSET=new Set(),XADJ=[],WH=[],NB={};/* WH: sea hexes (cell id 1000+j); NB: hero travel graph */let vmap={},emap={},GEO='',SEA='',VBOX='';
 const SHIPC={lumber:1,wool:1};                                 // a ship: Timber + Fleece
 const BARREN=new Set(['desert','shrine','forge','vault','capital']);   // tiles that never produce
 const TWLAY={'3x':[[-3,2],[2,-3],[2,2]],'4x':[[-2,-1],[-2,4],[3,-3],[3,1]],'5x':[[-3,1],[-2,4],[1,-3],[2,2],[4,-2]],'2v':[[-2,4],[2,-3]],2:[[-2,-1],[2,2]],3:[[-3,2],[2,-3],[2,2]],4:[[-2,-1],[-2,4],[3,-3],[3,1]]};   // Titan War home-island centres around Olympus
 const HDIR=[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
 function buildGeo(shape){
   if(GEO===shape)return;GEO=shape;
-  [HEX,V,E,HN,HADJ0,HADJ,COAST,PORTS,TWC,ROUTES,XADJ].forEach(a=>a.length=0);RSET.clear();vmap={};emap={};
+  [HEX,V,E,HN,HADJ0,HADJ,COAST,PORTS,TWC,ROUTES,XADJ,WH].forEach(a=>a.length=0);RSET.clear();for(const k in NB)delete NB[k];vmap={};emap={};
   const ax=[],tw=shape.startsWith('tw'),tn=tw?parseInt(shape.slice(2)):0;
   if(tw){TWLAY[shape.slice(2)in TWLAY?shape.slice(2):tn].forEach(([q,r],k)=>{TWC.push(ax.length);ax.push([q,r,k]);HDIR.forEach(([a,b])=>ax.push([q+a,r+b,k]))});   // island k belongs to seat k
     [[0,0],[1,0],[0,1]].forEach(([q,r])=>ax.push([q,r,tn]))}                                                           // Olympus = island tn
@@ -1093,7 +1126,17 @@ function buildGeo(shape){
   SEA=Pt.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
   const vx=V.map(v=>v.x),vy=V.map(v=>v.y),pad=52;              // view = land + harbour badges (the sea frame may run off the edge)
   VBOX=[Math.min(...vx)-pad,Math.min(...vy)-pad,Math.max(...vx)-Math.min(...vx)+2*pad,Math.max(...vy)-Math.min(...vy)+2*pad].map(x=>x.toFixed(0)).join(' ');
+  if(tw&&shape.endsWith('x')){                                // sea hexes fill the frame; heroes count their steps on them
+    const key=(q,r)=>q+','+r,land={};HEX.forEach((h,i)=>land[key(h.q,h.r)]=i);const wid={};
+    for(let r=-14;r<=14;r++)for(let q=-14;q<=14;q++){if(land[key(q,r)]!=null)continue;
+      const x=R*S3*(q+r/2)-cx,y=R*1.5*r-cy;if(N.some(([nx,ny],i)=>x*nx+y*ny>d[i]-R*.95))continue;   // whole hex inside the frame
+      wid[key(q,r)]=1000+WH.length;WH.push({q,r,x,y})}
+    const id=(q,r)=>land[key(q,r)]??wid[key(q,r)];
+    HEX.forEach((h,i)=>{NB[i]=HADJ0[i].slice();HDIR.forEach(([a,b])=>{const n=wid[key(h.q+a,h.r+b)];if(n!=null)NB[i].push(n)})});   // land: own island + the sea beside it
+    WH.forEach((w,j)=>{NB[1000+j]=HDIR.map(([a,b])=>id(w.q+a,w.r+b)).filter(n=>n!=null)});
+  }
 }
+const cellOf=h=>h>=1000?WH[h-1000]:HEX[h];                     // land tile or sea hex
 buildGeo('classic');
 
 // ---------- Balanced board generator ----------
@@ -1366,6 +1409,10 @@ function kingdomInit(){
 function reach(p){                                            // tiles the hero can walk to this turn
   if(S.pl[p].hx<0)return new Set();                           // hero is in the Underworld
   const range=(hlv(p)>=3?3:2)+stat(p,'spd')+(S.tut&&p===0?1:0)+(dg(p).mv||0),ship=Math.max(S.pl[p].ship?2:0,dg(p).fly||0);
+  if(seaMap()){const fr=dg(p).fly?1:0,best=new Map(),out=new Set(),q=[[S.pl[p].hx,0,0]];best.set(S.pl[p].hx+':0',0);
+    while(q.length){const [h,d,f]=q.shift();(NB[h]||[]).forEach(n=>{if(!seaStep(p,h,n))return;const free=n>=1000&&f<fr,nd=d+(free?0:1),nf=f+(free?1:0);if(nd>range)return;
+      const k=n+':'+nf;if(best.has(k)&&best.get(k)<=nd)return;best.set(k,nd);out.add(n);q.push([n,nd,nf])})}
+    out.delete(S.pl[p].hx);return out}
   const best=new Map(),out=new Set(),q=[[S.pl[p].hx,0,0]];best.set(S.pl[p].hx+':0',0);   // state: tile, steps used, free sails used
   while(q.length){const [h,d,f]=q.shift();
     (dg(p).sea?[...HADJ[h],...(XADJ[h]||[])]:HADJ[h]).forEach(n=>{const sea=RSET.has(h+'-'+n),free=sea&&f<ship,nd=d+(free?0:1),nf=f+(free?1:0);if(nd>range)return;
@@ -1377,6 +1424,7 @@ const atk=p=>stat(p,'str')+(dg(p).atk||0)+(S.ares===p?3:0)+Math.max(0,hlv(p)-1)+
 const armor=p=>stat(p,'def');
 function tileActions(p){                                      // what the hero can do where it stands
   const h=S.pl[p].hx,out=[];if(h<0)return out;
+  if(h>=1000){if(S.pl[p].ship)S.seats.forEach((_,q)=>{if(q!==p&&S.pl[q].hx===h&&atWar(p,q))out.push({k:'sink',q})});return out}   // at sea
   const mi=S.mons.findIndex(m=>m.h===h);if(mi>=0)out.push({k:'battle',mi});
   if(S.ruins.includes(h))out.push({k:'explore'});
   if(S.tw&&S.pl[p].ship)S.seats.forEach((_,q)=>{if(q!==p&&S.pl[q].ship&&S.pl[q].hx===h&&atWar(p,q))out.push({k:'sink',q})});
@@ -1391,6 +1439,14 @@ function tileActions(p){                                      // what the hero c
 }
 // ---------- Titan War: island ownership ----------
 const harbourHexes=()=>[...new Set(S.ports.map(pt=>E[pt.e].h[0]))];   // tiles that touch a harbour
+const seaMap=()=>!!S.tw&&WH.length>0;                         // island maps with sailing
+const harbourVillage=p=>S.ports.some(pt=>[E[pt.e].a,E[pt.e].b].some(v=>S.vb[v]&&S.vb[v].p===p));
+const canShip=p=>!!dg(p).shipAny||harbourVillage(p)||!!S.tut;   // a village on a harbour ⚓ lets you build a ship
+function seaStep(p,a,b){                                       // may this hero go from cell a to cell b?
+  if(a<1000&&b<1000)return true;
+  const sail=!!S.pl[p].ship||!!dg(p).sea||!!S.tut;if(!sail)return false;
+  if(a<1000)return !!dg(p).sea||!!dg(p).shipAny||!!S.tut||harbourHexes().includes(a);   // board the ship at a harbour
+  return true}
 function twCanBuild(p,hs){                                      // islands a player may build on
   if(!S.tw.claim)return hs.some(h=>HEX[h].isl===p);             // older games: island = seat
   if(hs.some(h=>isOly(h)))return false;                         // nobody builds on Olympus
@@ -1414,7 +1470,7 @@ const capMax=q=>(S.tut&&q?5:14)+5*cs(q).wall;               // the tutorial enem
 const grudge=(p,q)=>!!S.tw&&S.round-((S.tw.gr||{})[p+'>'+q]??-99)<=4;   // q attacked p in the last 4 rounds
 const markGr=(victim,attacker)=>{if(S.tw)(S.tw.gr=S.tw.gr||{})[victim+'>'+attacker]=S.round};
 const aggro=(p,q,lvl)=>lvl===2||(lvl===1&&grudge(p,q));        // Hard attacks freely, Medium only hits back, Easy never
-const isOly=h=>!!S.tw&&h>=0&&HEX[h].isl===(S.tw.ni??S.seats.length);     // Olympus tiles
+const isOly=h=>!!S.tw&&h>=0&&h<1000&&HEX[h].isl===(S.tw.ni??S.seats.length);     // Olympus tiles
 const hpow=p=>atk(p)+armor(p)+S.pl[p].hp/3;                    // rough hero strength (bots)
 const isLeader=q=>S.seats.every((_,o)=>o===q||vp(o)<vp(q));   // strict public VP leader
 const WARCOST={ambrosia:1},WARGOLD=2;                         // declaring war early: 1 Ambrosia + 2 gold
@@ -1443,17 +1499,18 @@ function rebel(w,l){                                          // a vassal beats 
 // ---------- Titan War duel engine ----------
 const DBEAT={atk:'fnt',def:'atk',fnt:'def'},DSTN={atk:'Attack',def:'Defend',fnt:'Feint'};   // Attack > Feint > Defend > Attack
 function duelRound(){
-  const D=S.duel,P=[D.a,D.b],pk=D.pk,card=[pk[0].c,pk[1].c];
+  const D=S.duel,P=[D.a,D.b],pk=D.pk,card=[pk[0].c,pk[1].c],tim=[pk[0].t||0,pk[1].t||0];
   if(card[0]==='feintc'&&card[1]&&card[1]!=='feintc')card[1]=null;   // Feint cancels the other card
   if(card[1]==='feintc'&&card[0]&&card[0]!=='feintc')card[0]=null;
   const res={r:D.r,st:[pk[0].st,pk[1].st],c:[pk[0].c,pk[1].c],live:card.slice(),roll:[0,0],dmg:[0,0],heal:[0,0],first:0,txt:''};
   D.pk=[null,null];D.last=res;
   if(card[0]==='retreat'||card[1]==='retreat'){const w=card[0]==='retreat'?0:1;res.txt=`${pname(P[w])} retreats.`;log(`Duel: <b>${pname(P[w])}</b> retreats`);return duelEnd(-1)}
   card.forEach((c,i)=>{if(c==='potion'){const pl=S.pl[P[i]],hl=Math.min(4,hpMax(P[i])-pl.hp);pl.hp+=hl;res.heal[i]=hl}});
-  const home=i=>S.pl[P[i]].hx>=0&&HEX[S.pl[P[i]].hx].isl===P[i]?1:0;   // fighting on your own island: +1 armour
+  const home=i=>S.pl[P[i]].hx>=0&&S.pl[P[i]].hx<1000&&HEX[S.pl[P[i]].hx].isl===P[i]?1:0;   // fighting on your own island: +1 armour
   const hit=i=>{const j=1-i;let d=d6();res.roll[i]=d;d+=atk(P[i])+(card[i]==='spear'?3:0)+(isLeader(P[j])?1:0);   // +1 against the VP leader
     if(DBEAT[res.st[i]]===res.st[j])d+=3;else if(DBEAT[res.st[j]]===res.st[i])d=Math.floor(d/2);   // stance won / lost
     if(card[i]==='fury')d*=2;
+    d+=tim[i]===1?3:tim[i]===.5?1:0;                           // timing bonus on Attack
     if(dg(P[j]).heel&&res.st[i]==='fnt'&&DBEAT.fnt===res.st[j])d*=2;           // Achilles' heel
     return Math.max(0,d-(dg(P[j]).tough||0)-armor(P[j])-(card[j]==='shieldwall'?2:0)-(res.st[j]==='def'?1:0)-home(j))};
   const first=stat(P[0],'spd')>=stat(P[1],'spd')?0:1;res.first=first;   // faster hero strikes first (attacker wins ties)
@@ -1490,7 +1547,7 @@ function botDuel(p){                                          // bot stance + ca
   else if(st==='atk'&&has('spear')>=0)c=has('spear');
   else if(st==='def'&&has('shieldwall')>=0)c=has('shieldwall');
   else if(lvl>0&&has('feintc')>=0&&!rnd(3))c=has('feintc');
-  return {st,c};
+  return {st,c,t:st==='atk'?(lvl===2?(rnd(10)<5?1:.5):lvl===1?(rnd(2)?.5:0):0):0};
 }
 function breakCamp(p){if(S.tw)(S.tw.cs||[]).forEach(c=>{if(c&&c.camp===p)c.camp=-1})}
 function knockout(p){breakCamp(p);if(dg(p).drop&&Object.keys(S.pl[p].gear||{}).length){S.pl[p].gear={};log(`<b>${pname(p)}</b>'s Meleager loses all his gear`)}
@@ -1504,7 +1561,7 @@ function spawnMonster(){
 }
 function monstersAct(){                                       // each round: walk one tile toward the nearest village, then pillage
   const town=HEX.map(h=>h.v.some(v=>S.vb[v])),D=HEX.map(()=>99),q=[];
-  const ori=S.seats.map((_,p)=>p).filter(p=>dg(p).lure&&S.pl[p].hx>=0);
+  const ori=S.seats.map((_,p)=>p).filter(p=>dg(p).lure&&S.pl[p].hx>=0&&S.pl[p].hx<1000);   // monsters can't swim after him
   if(ori.length)ori.forEach(p=>{D[S.pl[p].hx]=0;q.push(S.pl[p].hx)});else town.forEach((t,i)=>{if(t){D[i]=0;q.push(i)}});
   while(q.length){const h=q.shift();HADJ[h].forEach(n=>{if(D[n]>D[h]+1){D[n]=D[h]+1;q.push(n)}})}
   S.mons.forEach(m=>{
@@ -1615,7 +1672,7 @@ function expireTasks(){
     if(S.round>c.due){payout(p,c.pen,-1);taskEvent(p,c,false);log(`<b>${pname(p)}</b> failed a secret task: <b>${c.n}</b> (−${rwTxt(c.pen)})`);return false}
     return true})});
 }
-const startTurn=()=>{if(S.rpg.k&&S.pl[S.cur].court)S.sub='court'};   // the court speaks before you roll
+const startTurn=()=>{if(S.rpg.k&&S.pl[S.cur].court&&S.round>=3&&S.round%2===1)S.sub='court'};   // Agora from round 3, every other round   // the court speaks before you roll
 function checkGoals(){
   S.seats.forEach((_,p)=>{const g=S.pl[p].goal;if(!g||g.done||!GOALTEST[g.t](p))return;
     g.done=true;S.pl[p].bonus+=2;xp(p,3);log(`<b>${pname(p)}</b> completed a secret goal: <b>${GOALS[g.t].n}</b> (+2 VP)`)});
@@ -1827,19 +1884,39 @@ const RULES={
   // ---- Kingdom: hero moves, then one action on its tile ----
   hmove(p,h){if(S.tw&&S.seats.some((_,q)=>S.tw.cap[q]===S.pl[p].hx))breakCamp(p);
     if(!S.rpg.k||!S.rolled||S.sub||S.hmoved||!reach(p).has(h))return bad("Your hero can't reach that tile");
-    S.pl[p].hx=h;S.hmoved=true;log(`<b>${pname(p)}</b>'s hero travels to a ${RNAME[S.hexes[h].r]} tile`);
+    S.pl[p].hx=h;S.hmoved=true;log(h>=1000?`<b>${pname(p)}</b>'s hero sails the open sea`:`<b>${pname(p)}</b>'s hero travels to a ${RNAME[S.hexes[h].r]} tile`);
   },
-  battle(p){
+  battle(p){                                                  // start a fight with the monster on the hero's tile
     const pl=S.pl[p],mi=S.mons.findIndex(m=>m.h===pl.hx);
     if(!S.rpg.k||!S.rolled||S.sub||S.hacted||mi<0)return bad('No monster on your hero\'s tile');
-    S.hacted=true;const m=S.mons[mi],M=MONS[m.t],d=d6(),dmg=d+atk(p)+(dg(p).mon||0);m.hp-=dmg;
-    let md=0,taken=0,ko=false;const win=m.hp<=0;
-    if(win){S.mons.splice(mi,1);S.tr[p].kills++;updLA(p);xp(p,5);loot(p,m.t);if(dg(p).loot)loot(p,m.t);if(dg(p).rest)pl.tired=1;
-      log(`<b>${pname(p)}</b>'s hero strikes for ${dmg} and slays the <b>${M.n}</b>! +${M.gold} gold, +${M.ren} glory`)}
-    else{md=d6();taken=dg(p).lull?0:Math.max(0,Math.ceil(md/2)+M.atk-armor(p));pl.hp-=taken;xp(p,1);
-      log(`<b>${pname(p)}</b>'s hero strikes the ${M.n} for ${dmg} (${m.hp}/${m.max} HP left) and takes ${taken} damage`);
-      if(pl.hp<=0){ko=true;knockout(p)}}
-    S.lastFight={p,t:m.t,d,dmg,md,taken,hp:Math.max(0,m.hp),max:m.max,win,ko,id:(S.lastFight?S.lastFight.id:0)+1};
+    S.hacted=true;const m=S.mons[mi];
+    S.mf={p,id:m.id,t:m.t,max:m.max,r:1,sta:Math.min(5,stamina(p)),intent:monIntent(m.t,false),charged:false,last:null,done:false,win:false,ko:false,n:(S.mf?S.mf.n:0)+1};
+    S.sub='mfight';log(`<b>${pname(p)}</b>'s hero attacks the <b>${MONS[m.t].n}</b>!`);
+  },
+  mfight(p,o){                                                // one round: your move, then the monster's
+    const F=S.mf;if(S.sub!=='mfight'||!F||F.p!==p||F.done)return bad('No fight now');
+    const pl=S.pl[p],m=S.mons.find(x=>x.id===F.id),M=MONS[F.t],a=o&&o.a,q=o&&[0,.5,1].includes(o.t)?o.t:0;
+    if(!m||!['strike','power','guard','flee'].includes(a))return bad('Pick a move');
+    if(a==='power'&&F.sta<2)return bad('Power needs 2 stamina');
+    const end=()=>{F.done=true;S.sub=null;S.lastFight={p,t:F.t,d:F.last.d,dmg:F.last.dmg,md:0,taken:F.last.mdmg,hp:Math.max(0,m.hp),max:m.max,win:F.win,ko:F.ko,id:(S.lastFight?S.lastFight.id:0)+1}};
+    if(a==='flee'){F.last={a,d:0,dmg:0,mdmg:0,q:0,txt:'You step back. Its wounds stay.'};log(`<b>${pname(p)}</b>'s hero backs away from the ${M.n}`);return end()}
+    const I=F.intent;let d=0,dmg=0;
+    if(a!=='guard'){d=d6();dmg=d+atk(p)+(dg(p).mon||0);if(a==='power'){F.sta-=2;dmg*=2}
+      dmg=q===1?dmg+3:q===.5?dmg+1:Math.floor(dmg*.6);              // timing: perfect +3, good +1, miss = weak hit
+      if(I.k==='guard')dmg=Math.ceil(dmg/2)}
+    else F.sta=Math.min(5,F.sta+1);
+    m.hp-=dmg;if(dmg)xp(p,1);
+    let mdmg=0,txt='';
+    if(m.hp<=0){F.win=true;S.mons=S.mons.filter(x=>x!==m);S.tr[p].kills++;updLA(p);xp(p,5);loot(p,F.t);if(dg(p).loot)loot(p,F.t);if(dg(p).rest)pl.tired=1;
+      txt=`Your ${a==='power'?'power blow':a==='strike'?'strike':'move'} deals ${dmg} — the ${M.n} is slain! +${M.gold} gold, +${M.ren} glory`;log(`<b>${pname(p)}</b>'s hero slays the <b>${M.n}</b>! +${M.gold} gold, +${M.ren} glory`)}
+    else{
+      if(I.k==='atk'&&!dg(p).lull)mdmg=Math.max(0,I.v*(F.charged?2:1)-armor(p)-(a==='guard'?4:0));
+      pl.hp-=mdmg;txt=`${dmg?`You hit for ${dmg}. `:a==='guard'?'You raise your guard. ':''}${I.k==='atk'?`It strikes for ${mdmg}${a==='guard'?' (blocked)':''}.`:I.k==='charge'?'It gathers power…':'It hides behind its guard.'}`;
+      log(`Fight vs ${M.n}: <b>${pname(p)}</b> deals ${dmg}, takes ${mdmg} (${Math.max(0,m.hp)}/${m.max} HP left)`);
+      if(pl.hp<=0){F.ko=true;knockout(p)}}
+    F.last={a,d,dmg,mdmg,q,txt,mk:I.k};
+    if(F.win||F.ko||F.r>=3){if(!F.win&&!F.ko)F.last.txt+=' The fight ends — its wounds stay.';return end()}
+    F.charged=I.k==='charge';F.intent=monIntent(F.t,F.charged);F.r++;
   },
   explore(p){
     const pl=S.pl[p],i=S.ruins.indexOf(pl.hx);
@@ -1918,7 +1995,7 @@ const RULES={
   },
   ship(p){                                                    // own ship: 2 sea routes per move cost no steps
     const pl=S.pl[p];if(!S.tw||!S.rolled||S.sub)return bad('Build after rolling');if(pl.ship)return bad('You already have a ship');
-    if(!afford(p,SHIPC))return bad('A ship costs Timber + Fleece');pay(p,SHIPC);pl.ship=1;log(`<b>${pname(p)}</b> builds a ship`);
+    if(seaMap()&&!canShip(p))return bad('Build a village on a harbour ⚓ first');if(!afford(p,SHIPC))return bad('A ship costs Timber + Fleece');pay(p,SHIPC);pl.ship=1;log(`<b>${pname(p)}</b> builds a ship`);
   },
   sink(p,q){                                                  // at war: attack a rival's ship where both heroes stand
     if(!S.tw||!S.rolled||S.sub||S.hacted||!tileActions(p).some(a=>a.k==='sink'&&a.q===q))return bad('No ship to attack here');
@@ -1966,7 +2043,7 @@ const RULES={
     if(i<0||D.pk[i])return bad('Already chosen');if(!o||!['atk','def','fnt'].includes(o.st))return bad('Pick a stance');
     const bc=S.pl[p].bc||[],c=o.c==null||o.c<0?-1:+o.c;
     const cst=c>=0&&bc[c]?BCARD[bc[c]].sta+(dg(p).heavy||0):0;if(c>=0&&(!bc[c]||cst>D.sta[i]))return bad('Not enough stamina for that card');
-    D.pk[i]={st:o.st,c:c>=0?bc[c]:null};if(c>=0){D.sta[i]-=cst;bc.splice(c,1)}
+    D.pk[i]={st:o.st,c:c>=0?bc[c]:null,t:o.st==='atk'&&[.5,1].includes(o.t)?o.t:0};if(c>=0){D.sta[i]-=cst;bc.splice(c,1)}
     if(D.pk[0]&&D.pk[1])duelRound();
   },
   pray(p,g){
@@ -2107,6 +2184,7 @@ function vScore(p,v,lvl){
     if(!seen.has(r)){seen.add(r);if(!pr[r]&&lvl>0)s+=1.5}
   });
   const t=portAt(v);if(t)s+=t==='any'?1.2:(pr[t]>=5?2.5:.6);
+  if(t&&S.tw&&WH.length&&!harbourVillage(p))s+=2;              // island maps: a harbour lets the hero sail
   return s;
 }
 function pickBest(items,score,lvl){                          // difficulty = how often the bot picks the true best
@@ -2190,7 +2268,7 @@ function botExtras(p,lvl,spots,myS){
       const t=S.seats.map((_,q)=>q).filter(q=>q!==p&&!atWar(p,q)).sort((a,b)=>vp(b)-vp(a))[0];
       if(t!=null&&hpow(p)>=hpow(t)&&(vp(t)>=vp(p)||per(p).n==='Bully'))return A('war',t)}
     const g=Object.keys(GEAR).filter(g=>!gear[g]&&pl.gold>=GEAR[g].g).sort((a,b)=>GEAR[b].g-GEAR[a].g)[0];
-    if(g&&S.hexes[pl.hx].r==='forge')return A('hgear',g);
+    if(g&&S.hexes[pl.hx]&&S.hexes[pl.hx].r==='forge')return A('hgear',g);
     if(g&&!S.hmoved&&!S.tut){const f=S.hexes.findIndex(h=>h.r==='forge');if(reach(p).has(f))return A('hmove',f)}
     if(lvl>0&&tot(p)>=6){const k=['str','def','hp','sta','spd'].filter(k=>(hs[k]||0)<HSTAT[k].max&&afford(p,tcost(p,k))).sort((a,b)=>(hs[a]||0)-(hs[b]||0))[0];if(k&&rnd(2))return A('htrain',k)}
     if((pl.bc||[]).length<3&&pl.gold>=BGOLD+(g?GEAR[g].g:0)&&afford(p,BCOST)&&tot(p)>=5)return A('bcbuy');
@@ -2210,19 +2288,18 @@ function botExtras(p,lvl,spots,myS){
     if(acts.some(a=>a.k==='explore')&&pl.hp>3)return A('explore');
     const du=acts.find(a=>a.k==='duel');if(du&&lvl>0&&(!S.tw||aggro(p,du.q,lvl)||HEX[pl.hx].isl===p)&&(S.tw?hpow(p)>=hpow(du.q)-1:atk(p)>=atk(du.q))&&pl.hp>5)return A('duel',du.q);
     if(acts.some(a=>a.k==='colony')&&pl.st>0&&afford(p,costFor(p,'settle')))return A('colony');
-    if(S.tw&&!pl.ship&&lvl>0&&tot(p)>=7&&afford(p,SHIPC)&&!rnd(3))return A('ship');
+    if(S.tw&&!pl.ship&&lvl>0&&(!seaMap()||canShip(p))&&!dg(p).sea&&tot(p)>=(seaMap()?3:7)&&afford(p,SHIPC)&&(seaMap()||!rnd(3)))return A('ship');
     const sk=acts.find(a=>a.k==='sink');if(sk&&aggro(p,sk.q,lvl))return A('sink',sk.q);
     if(S.tw&&S.tw.claim&&!S.hmoved&&lvl>0){                        // sail to an unclaimed island to found a colony
       const free=HEX.map((h,i)=>i).filter(i=>!isOly(i)&&S.tw.own[HEX[i].isl]==null);
       if(free.length&&!free.includes(pl.hx)&&afford(p,costFor(p,'settle'))){
         const H=harbourHexes(),fh=H.filter(h=>free.includes(h));
-        if(H.includes(pl.hx)&&fh.length&&pl.gold>=1)return A('ferry',fh[0]);
         if(pl.res.ambrosia>=4)return A('gtravel',free[0]);}}
     const sg=acts.find(a=>a.k==='siege');if(sg&&aggro(p,sg.q,lvl))return A('siege',sg.q);
     const bu=acts.find(a=>a.k==='burn');if(bu&&aggro(p,bu.q,lvl)&&!rnd(3))return A('burn',bu.q);   // sometimes burn instead of raiding
     const ra=acts.find(a=>a.k==='raid');if(ra&&(S.tw?aggro(p,ra.q,lvl)&&atWar(p,ra.q):(per(p).n==='Bully'||(lvl===2&&vp(ra.q)>vp(p)))))return A('raid',ra.q);
     if(!S.hmoved){
-      const sc=h=>{let s=0;const m=S.mons.find(m=>m.h===h);
+      const sc=h=>{if(h>=1000)return -1;let s=0;const m=S.mons.find(m=>m.h===h);
         if(m&&pl.hp>=MONS[m.t].atk+5)s+=6+(HEX[h].v.some(v=>S.vb[v]&&S.vb[v].p===p)?4:0)-m.hp/4;
         if(S.ruins.includes(h)&&pl.hp>3)s+=5;if(pl.hp<6&&h===pl.cap)s+=3;
         if(per(p).n==='Bully'&&HEX[h].v.some(v=>S.vb[v]&&S.vb[v].p!==p))s+=2;
@@ -2236,7 +2313,12 @@ function botExtras(p,lvl,spots,myS){
           if(cs(p).fallen&&rivals.includes(cs(p).by)&&hpow(p)>=hpow(cs(p).by))s+=6}                     // rebel against the conqueror
         if(S.tw&&h===S.tw.cap[p]&&lvl>0&&(cs(p).camp>=0||S.seats.some((_,q)=>q!==p&&S.pl[q].hx===h&&atWar(p,q))))s+=10;   // rush home to defend   // rush home to defend
         return s+rnd(10)/10};
-      const best=[...reach(p)].sort((a,b)=>sc(b)-sc(a))[0];
+      let best=[...reach(p)].sort((a,b)=>sc(b)-sc(a))[0];
+      if(seaMap()&&!S.tut&&(best==null||sc(best)<2)){                 // nothing good nearby: sail toward the best tile on the map
+        const dist={},qq=[pl.hx];dist[pl.hx]=0;while(qq.length){const x=qq.shift();(NB[x]||[]).forEach(y=>{if(dist[y]==null&&seaStep(p,x,y)){dist[y]=dist[x]+1;qq.push(y)}})}
+        const goal=HEX.map((_,h)=>h).filter(h=>dist[h]>3).sort((a,b)=>(sc(b)-dist[b]*.5)-(sc(a)-dist[a]*.5))[0];
+        if(goal!=null&&sc(goal)>=4){const back={},q2=[goal];back[goal]=0;while(q2.length){const x=q2.shift();(NB[x]||[]).forEach(y=>{if(back[y]==null){back[y]=back[x]+1;q2.push(y)}})}
+          const step=[...reach(p)].sort((a,b)=>(back[a]??99)-(back[b]??99))[0];if(step!=null&&(back[step]??99)<(back[pl.hx]??99))return A('hmove',step)}}
       if(best!=null&&sc(best)>=2&&!S.tut)return A('hmove',best);   // tutorial enemy hero stays home
     }
     if(pl.gold>=3){const nd=needs(p),r=BASE.find(r=>nd[r]>0);if(r&&BASE.reduce((t,x)=>t+nd[x],0)<=2&&S.bank[r]>0)return A('buy',r)}
@@ -2282,6 +2364,13 @@ function botStep(p){
   }
   // --- forced sub-steps ---
   if(S.sub==='duel')return A('dpick',botDuel(p));
+  if(S.sub==='mfight'&&S.mf){const F=S.mf,m=S.mons.find(x=>x.id===F.id),I=F.intent,pl=S.pl[p],hit=d6()+atk(p);
+    const tq=lvl===2?(rnd(10)<6?1:.5):lvl===1?(rnd(3)?.5:0):(rnd(2)?.5:0);   // bots' timing skill
+    const danger=I.k==='atk'&&I.v*(F.charged?2:1)-armor(p)>=pl.hp-1;
+    if(danger&&pl.hp<=4&&m&&m.hp>hit+2)return A('mfight',{a:'flee'});
+    if(danger||(F.charged&&I.k==='atk'&&lvl>0))return A('mfight',{a:'guard'});
+    if(F.sta>=2&&m&&m.hp>hit+2&&I.k!=='guard')return A('mfight',{a:'power',t:tq});
+    return A('mfight',{a:'strike',t:tq})}
   if(S.sub==='discard'){
     let k=Math.floor(handTot(p)/2);const nd=needs(p),h={...pl.res},d=z();
     while(k--){const r=RES.filter(x=>x!=='ambrosia'&&h[x]>0).sort((a,b)=>(h[b]-(nd[b]?2:0))-(h[a]-(nd[a]?2:0)))[0];h[r]--;d[r]++}
@@ -2535,9 +2624,14 @@ const ico=(id,cls='ic')=>`<svg class="${cls}" viewBox="-12 -12 24 24"><use href=
 const RKEY=Object.fromEntries(Object.entries(RNAME).filter(([k])=>!BARREN.has(k)).map(([k,v])=>[v,k]));
 const RXRES=new RegExp('\\b('+Object.keys(RKEY).join('|')+')\\b','g');
 const riz=html=>String(html).split(/(<[^>]+>)/).map((part,i)=>i%2?part:part.replace(RXRES,m=>`<span class="ri">${ico(RKEY[m],'ic ri-ic')}${m}</span>`)).join('');
+function note(html,ms,cls){                                   // short floating text, no images
+  let box=document.getElementById('toasts');if(!box){box=document.createElement('div');box.id='toasts';document.body.appendChild(box)}
+  while(box.children.length>=2)box.firstChild.remove();
+  const t=document.createElement('div');t.className='toast fnote '+(cls||'');t.innerHTML=html;t.onclick=()=>t.remove();box.appendChild(t);setTimeout(()=>t.remove(),ms||4500);return t;
+}
 function toast(m){
   let box=document.getElementById('toasts');if(!box){box=document.createElement('div');box.id='toasts';document.body.appendChild(box)}
-  while(box.children.length>=3)box.firstChild.remove();
+  while(box.children.length>=2)box.firstChild.remove();
   const t=document.createElement('div');t.className='toast';t.textContent=m;box.appendChild(t);setTimeout(()=>t.remove(),2600);
 }
 function mySeat(){
@@ -2557,7 +2651,7 @@ function render(){
 }
 
 // ---------- Lobby ----------
-let cfg={seats:[{kind:'me'},{kind:'open'},{kind:'bot',level:1,persona:'random'},{kind:'none'}],dice:'random',timer:0,speed:false,friendly:true,tasks:true,ck:false,rpg:{k:true,ev:true,goals:true},hero:'warrior'};
+let cfg={seats:[{kind:'me'},{kind:'open'},{kind:'bot',level:1,persona:'random'},{kind:'none'}],dice:'random',timer:0,speed:false,friendly:true,tasks:true,ck:false,rpg:{k:true,ev:true,goals:true},hero:LS.get('st-hero','heracles')};
 const heroChips=(sel,attr)=>{const pv=ui.hprev&&HEROES[ui.hprev]?ui.hprev:sel;return `<div class="tabs">${Object.entries(HEROES).map(([k,h])=>{const lk=h.lock&&!unlocked(prof(),'hero',k);return `<button ${attr}="${k}" class="${pv===k&&pv!==sel?'hprev':''}" aria-pressed="${sel===k}" ${lk?`disabled title="Unlock at level ${UNL.find(u=>u[2]===k)[0]}"`:''}>${ico(h.i)} ${h.n}${lk?' 🔒':''}</button>`}).join('')}</div><div class="dgpick">${ico(HEROES[pv].i,'dgbig')}<p class="note"><b>${HEROES[pv].n}</b>, ${HEROES[pv].par}<br>✦ ${HEROES[pv].pw}<br>✖ ${HEROES[pv].wk}<br>${pv===sel?'<span class="tag">✓ Chosen</span>':`<button class="btn sm pri" ${attr}="${pv}">Choose ${HEROES[pv].n}</button> <i>or tap it again</i>`}</p></div>`};
 const seg=(key,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button data-cfg="${key}" data-v="${v}" aria-pressed="${String(cfg[key])===String(v)}">${l}</button>`).join('')}</div>`;
 async function loadHist(){                                   // local games + shared online history
@@ -2601,6 +2695,7 @@ const TOGGLES=[                                               // [key, title, on
   ['friendly','Friendly Cyclops','The Cyclops leaves players with 2 VP or less alone','cyclops'],
   ['ck','Polis & Phalanx','Expansion: city upgrades, hoplites, sea raiders','knight']
 ];
+const isAdmin=()=>!!LS.get('st-admin',0);                  // set when the secret code is entered on this device
 const getCfg=k=>k.startsWith('rpg.')?!!cfg.rpg[k.slice(4)]:!!cfg[k];
 const setCfg=(k,v)=>{if(k.startsWith('rpg.'))cfg.rpg[k.slice(4)]=v;else cfg[k]=v};
 const autoTarget=()=>(cfg.ck?13:10)-(cfg.speed?2:0)+(cfg.rpg.goals?1:0)+(cfg.rpg.k?2:0);
@@ -2609,6 +2704,8 @@ const presetOn=k=>{const P=PRESETS[k].set;return ['tw','speed','ck','tasks','fri
 function renderLobby(){
   document.querySelectorAll('.evcard,.godpop,.bigroll,.taskpop,#tipcard,#coachring,#coachtip,#toasts>*').forEach(e=>e.remove());   // no game pop-ups over the menus
   applyCos();
+  if(window.TAUTH&&ui.authWait){app.innerHTML='<div class="home"><p class="note center">Loading…</p></div>';return}
+  if(window.TAUTH&&!ui.user&&!LS.get('st-guest',0))return renderLogin();
   const sc=ui.screen||'home';
   if(sc==='setup')return renderSetup();
   const local=LS.get('st-local',null),mine=games.filter(g=>g.s&&g.phase!=='over');
@@ -2626,7 +2723,7 @@ function renderLobby(){
   app.innerHTML=`<div class="home">
     <div class="brand"><svg viewBox="-12 -12 24 24" class="brand-ic"><use href="#s-logo" x="-12" y="-12" width="24" height="24"/></svg><h1>Titanomachy</h1>
       <p class="sub">Build your polis, trade across the Aegean and win the favour of the gods.</p></div>
-    <label class="namebar" for="nm"><span>Playing as</span><input id="nm" value="${esc(ME.name)}" placeholder="Your name" maxlength="16"></label>
+    <label class="namebar" for="nm"><span>${ui.user?'👤':'Playing as'}</span><input id="nm" value="${esc(ME.name)}" placeholder="Your name" maxlength="16">${window.TAUTH?`<button class="btn sm" id="bAcct" type="button">${ui.user?'Sign out':'Sign in'}</button>`:''}</label>
     <div class="hmenu">
       ${cont?`<div class="hcont"><button class="hbtn gold" id="resLocal">${ico('temple','hic')}<span><b>Continue${local.tut?' tutorial':local.tw?' · Titan War':''}</b><i>${local.seats.map(s=>esc(s.name)).join(' · ')} · round ${local.round||1}</i></span></button>
         <button class="hx" id="endLocal" title="End this game">${ui.endArm?'End?':'✕'}</button></div>`:''}
@@ -2642,7 +2739,8 @@ function renderLobby(){
         <div class="row" style="gap:6px"><button class="btn sm pri" data-open="${g.id}">${seated?'Resume':'Join'}</button>${seated?`<button class="btn sm" data-gend="${g.id}">${ui.gendArm===g.id?'Sure?':'End'}</button>`:`<button class="btn sm" data-ghide="${g.id}">Hide</button>`}</div></div>`}).join('')}</div></div>`:''}
     <p class="note center">${db?'Online: start a New game, choose “Online”, and your friend taps Join here on their phone.':dbState==='connecting'?'Connecting to online play…':'Online play is unavailable in this view.'}</p>
   </div>`;
-  const nm=document.getElementById('nm');nm.oninput=()=>{ME.name=nm.value.trim();LS.set('st-name',ME.name)};
+  const nm=document.getElementById('nm');nm.oninput=()=>{ME.name=nm.value.trim();LS.set('st-name',ME.name);if(ui.user){TAUTH.setName(ME.name);cloudSave()}};
+  const ba=document.getElementById('bAcct');if(ba)ba.onclick=async()=>{if(ui.user){await TAUTH.out();ui.user=null;ui.amode='in';LS.del('st-guest')}else LS.del('st-guest');renderLobby()};
   const bi=app.querySelector('.brand-ic');if(bi&&LS.get('st-nodev',0))bi.onclick=()=>{const t=Date.now();ui.btaps=(ui.btaps||[]).filter(x=>t-x<4000);ui.btaps.push(t);
     if(ui.btaps.length>=7){ui.btaps=[];LS.del('st-nodev');toast('Developer menu restored')}};
   const el=document.getElementById('endLocal');if(el)el.onclick=()=>{if(!ui.endArm){ui.endArm=1;return renderLobby()}ui.endArm=0;LS.del('st-local');renderLobby()};   // tap twice to end
@@ -2675,13 +2773,13 @@ function renderSetup(){
   };
   app.innerHTML=`<div class="lobby setup">
     <div class="setbar"><button class="backbtn" id="bBack">‹ Home</button><h2>New game</h2></div>
-    <div class="box"><h3 class="lbl">1 · MODE</h3><div class="presets">${Object.entries(PRESETS).map(([k,P])=>`<button class="preset" data-preset="${k}" aria-pressed="${presetOn(k)}">${ico(P.i,'pic')}<b>${P.n}</b><i>${P.d}</i></button>`).join('')}</div>${(()=>{const k=Object.keys(PRESETS).find(presetOn);return k?`<p class="note" style="margin-top:8px"><b>${PRESETS[k].n}:</b> ${PRESETS[k].d}</p>`:'<p class="note" style="margin-top:8px">Custom mix — see More options.</p>'})()}</div>
+    <div class="box"><h3 class="lbl">1 · MODE</h3><div class="presets">${Object.entries(PRESETS).filter(([k])=>k!=='olympus'||isAdmin()).map(([k,P])=>`<button class="preset" data-preset="${k}" aria-pressed="${presetOn(k)}">${ico(P.i,'pic')}<b>${P.n}</b><i>${P.d}</i></button>`).join('')}</div>${(()=>{const k=Object.keys(PRESETS).find(presetOn);return k?`<p class="note" style="margin-top:8px"><b>${PRESETS[k].n}:</b> ${PRESETS[k].d}</p>`:'<p class="note" style="margin-top:8px">Custom mix — see More options.</p>'})()}</div>
     <div class="box"><h3 class="lbl">2 · WHERE</h3><div class="pills">${pill('data-where','local',online?'online':'local','📱 This device')}${pill('data-where','online',online?'online':'local','🌐 Online — friends join on their phones')}</div>${!db?'<p class="note">Online play is unavailable in this view.</p>':''}</div>
     <div class="box"><h3 class="lbl">3 · PLAYERS</h3><div class="seats">${cfg.seats.map(seatCard).join('')}</div>
       ${cfg.rpg.k||cfg.tw?`<h3 class="lbl" style="margin-top:8px">YOUR HERO</h3>${heroChips(cfg.hero,'data-hero')}`:''}
       ${cfg.tw?`<div class="optrow" style="margin-top:6px"><b>War ends</b><div class="pills">${pill('data-twe','r15',cfg.twEnd||'r15','After round 15')}${pill('data-twe','conquest',cfg.twEnd||'r15','Until conquest')}</div></div>`:''}</div>
     <details class="box more" ${ui.more?'open':''}><summary class="lbl">MORE OPTIONS</summary>
-      <div class="togs" style="margin-top:8px">${TOGGLES.filter(([k])=>!cfg.tw||!['ck'].includes(k)).map(([k,t,d,ic])=>`<button class="tog" data-tog="${k}" aria-pressed="${getCfg(k)}">${ico(ic,'tic')}<span><b>${t}</b><i>${d}</i></span><span class="sw"></span></button>`).join('')}</div>
+      <div class="togs" style="margin-top:8px">${TOGGLES.filter(([k])=>(!cfg.tw||!['ck'].includes(k))&&(k!=='ck'||isAdmin())).map(([k,t,d,ic])=>`<button class="tog" data-tog="${k}" aria-pressed="${getCfg(k)}">${ico(ic,'tic')}<span><b>${t}</b><i>${d}</i></span><span class="sw"></span></button>`).join('')}</div>
       <div class="optrow"><b>Points to win</b><div class="vpslide"><input type="range" id="vpr" min="5" max="20" step="1" value="${target()}" aria-label="Victory points to win">
         <output id="vpo">${target()} VP</output>${cfg.vp?'<button class="linkbtn" id="vpauto">auto</button>':'<i>auto</i>'}</div></div>
       <div class="optrow"><b>Length</b><div class="pills">${pill('data-cv','speed:false',cfg.speed,'Normal')}${pill('data-cv','speed:true',cfg.speed,'Speed (−2 VP)')}</div></div>
@@ -2699,7 +2797,7 @@ function renderSetup(){
   app.querySelectorAll('[data-sl]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.sl.split(':');cfg.seats[+i].level=+k;re()});
   app.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.sp.split(':');cfg.seats[+i].persona=k;re()});
   app.querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.cv.split(':');cfg[k]=k==='dice'?v:k==='timer'?+v:v==='true';re()});
-  app.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{const k=b.dataset.hero;if(ui.hprev===k||b.classList.contains('pri')){cfg.hero=k;ui.hprev=null;toast(`${HEROES[k].n} chosen`)}else ui.hprev=k===cfg.hero?null:k;re()});
+  app.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{const k=b.dataset.hero;if(ui.hprev===k||b.classList.contains('pri')){cfg.hero=k;ui.hprev=null;LS.set('st-hero',k);cloudSave();toast(`${HEROES[k].n} chosen`)}else ui.hprev=k===cfg.hero?null:k;re()});
   app.querySelectorAll('[data-twe]').forEach(b=>b.onclick=()=>{cfg.twEnd=b.dataset.twe;re()});
   app.querySelectorAll('[data-where]').forEach(b=>b.onclick=()=>{ui.mode=b.dataset.where;if(ui.mode==='online'&&!db){ui.mode='local';toast('Online play is unavailable here')}
     if(ui.mode==='online'&&cfg.seats[1].kind!=='open')cfg.seats[1]={kind:'open'};
@@ -2712,6 +2810,7 @@ function renderSetup(){
   document.getElementById('bStart').onclick=()=>start(online);
 }
 function start(online){
+  if(!isAdmin())cfg.ck=false;                                  // Polis & Phalanx is admin-only for now
   if(!ME.name)ME.name='Player';
   let bi=0,hi=1;const pk=Object.keys(PERSONA);
   const seats=cfg.seats.filter(s=>s.kind!=='none').map(s=>
@@ -2767,12 +2866,7 @@ function boardSVG(){
     else if(S.rolled&&!S.sub&&ui.build==='kup')hot.k=Object.keys(S.kn).map(Number).filter(v=>S.kn[v].p===me&&(S.kn[v].lv<2||(S.kn[v].lv===2&&S.pl[me].imp.politics>=3)));
     else if(S.rolled&&!S.sub&&ui.build==='kact')hot.k=Object.keys(S.kn).map(Number).filter(v=>S.kn[v].p===me&&!S.kn[v].act);
     else if(S.rolled&&!S.sub&&ui.build==='chase')hot.k=Object.keys(S.kn).map(Number).filter(v=>S.kn[v].p===me&&S.kn[v].act&&V[v].h.includes(S.robber));
-    else if(S.phase==='main'&&S.rolled&&!S.sub&&!ui.build){       // idle: show everything I can afford to build right now
-      const pl=S.pl[me];hot.soft=true;
-      if(pl.rd>0&&afford(me,costFor(me,'road')))hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e));
-      if(pl.st>0&&afford(me,costFor(me,'settle')))hot.v=V.map((_,v)=>v).filter(v=>canSettle(me,v));
-      if(pl.ct>0&&(afford(me,COST.city)||S.freeCity===me))hot.c=Object.keys(S.vb).map(Number).filter(v=>S.vb[v].p===me&&!S.vb[v].c);
-    }
+    // idle: nothing glows — spots light up only after you pick Build → Road / Village / City
   }
   let s=`<svg id="board" viewBox="${VBOX}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Game board">`;
   const sea=SEA;
@@ -2807,7 +2901,7 @@ function boardSVG(){
     s+=`<polygon id="hx${i}" points="${hexPts(h.x,h.y,R-3.4)}" fill="none" stroke="#c9a35e" stroke-opacity=".75" stroke-width="1.3"/><polygon points="${hexPts(h.x,h.y,R-5)}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1"/>`;
     const temple=S.temples&&S.temples.includes(i);
     if(t.r==='capital'&&S.tw&&S.tw.claim&&S.tw.own[HEX[i].isl]==null){s+=`<polygon points="${hexPts(h.x,h.y,R-4)}" fill="none" stroke="#f3e9d6" stroke-width="3" stroke-dasharray="8 6" opacity=".8"/><g transform="translate(${h.x},${h.y+31})"><rect x="-30" y="-8" width="60" height="16" rx="8" fill="#1c0d10e6" stroke="#f3e9d6" stroke-width="1.2"/><text y="4" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="8" font-weight="800" fill="#f3e9d6">FREE ISLAND</text></g>`}
-    else if(t.r==='capital'){const o=S.tw&&S.tw.claim?S.tw.own[HEX[i].isl]:HEX[i].isl;s+=`<polygon points="${hexPts(h.x,h.y,R-4)}" fill="none" stroke="${PCOL[o].c}" stroke-width="5" opacity=".95"/><g transform="translate(${h.x},${h.y+31})"><rect x="-27" y="-8" width="54" height="16" rx="8" fill="#1c0d10e6" stroke="${PCOL[o].c}" stroke-width="1.6"/><text y="4" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="8" font-weight="800" fill="${cs(o).fallen?'#ff8a7a':'#f3e9d6'}">${cs(o).fallen?'FALLEN':'♜ '+cs(o).hp+'/'+capMax(o)}</text></g>`}
+    else if(t.r==='capital'){const o=S.tw&&S.tw.claim?S.tw.own[HEX[i].isl]:HEX[i].isl;const war=me>=0&&o!==me&&atWar(me,o),camp=cs(o).camp;s+=`${war?`<g transform="translate(${h.x+26},${h.y-26})"><circle r="11" fill="#5a1712" stroke="#ff8a7a" stroke-width="1.5"/><use href="#s-attack" x="-8" y="-8" width="16" height="16"/></g>`:''}${camp>=0?`<g transform="translate(${h.x-26},${h.y-26})"><circle r="11" fill="#1c0d10" stroke="${PCOL[camp].c}" stroke-width="2"/><text y="4" text-anchor="middle" font-size="12">⛺</text></g>`:''}${!ui.build&&!S.sub&&S.phase==='main'?`<polygon class="caphit" data-k="cap" data-id="${o}" points="${hexPts(h.x,h.y,R-8)}" fill="transparent"/>`:''}<polygon points="${hexPts(h.x,h.y,R-4)}" fill="none" stroke="${PCOL[o].c}" stroke-width="5" opacity=".95"/><g transform="translate(${h.x},${h.y+31})"><rect x="-27" y="-8" width="54" height="16" rx="8" fill="#1c0d10e6" stroke="${PCOL[o].c}" stroke-width="1.6"/><text y="4" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="8" font-weight="800" fill="${cs(o).fallen?'#ff8a7a':'#f3e9d6'}">${cs(o).fallen?'FALLEN':'♜ '+cs(o).hp+'/'+capMax(o)}</text></g>`}
     if(temple)s+=`<g transform="translate(${h.x},${h.y-29})" filter="url(#f-shadow)"><circle r="14" fill="#4a2477" stroke="url(#g-goldrim)" stroke-width="2.5"/><use href="#s-ambrosia" x="-11" y="-11" width="22" height="22"/></g>`;
     if(t.n){
       const red=t.n===6||t.n===8,pp=PIPS[t.n],ink=red?'#9b1c12':'#2b1606';
@@ -2826,7 +2920,7 @@ function boardSVG(){
   // tiles that just produced glow gold (blocked tile glows red)
   if(S.roll&&Date.now()-(ui.glowAt||0)<2800){const t=S.roll.a+S.roll.b;HEX.forEach((h,i)=>{if(S.hexes[i].n===t)s+=`<polygon points="${hexPts(h.x,h.y,R-4)}" fill="none" stroke="${i===S.robber?'#ff5a4a':'#ffd86a'}" stroke-width="6" opacity=".9" style="filter:drop-shadow(0 0 8px ${i===S.robber?'#ff5a4a':'#ffd86a'})"/>`})}
   // sea routes between islands (claim maps)
-  if(mine&&['hmove','ferry','gtravel'].includes(ui.build))ROUTES.forEach(([a,b])=>{let best=null;   // nearest corner pair of the two tiles
+  if(false)ROUTES.forEach(([a,b])=>{let best=null;   // nearest corner pair of the two tiles
     HEX[a].v.forEach(i=>HEX[b].v.forEach(j=>{const d=Math.hypot(V[i].x-V[j].x,V[i].y-V[j].y);if(!best||d<best[2])best=[V[i],V[j],d]}));
     const A=best[0],B=best[1];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#f3e9d6" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round" opacity=".85"/>
     <g transform="translate(${(A.x+B.x)/2},${(A.y+B.y)/2})"><circle r="11" fill="#0d2742cc" stroke="#f3e9d6" stroke-width="1.2"/><use href="#s-ship" x="-8" y="-8" width="16" height="16"/></g>`});
@@ -2846,7 +2940,7 @@ function boardSVG(){
   // monsters: red outline, beast, HP badge (tap to fight when allowed)
   // the Tartarus (monsters are born here) and ruins (explore with your hero)
   if(S.lair>=0){const h=HEX[S.lair];s+=`<g transform="translate(${h.x},${h.y-38})" filter="url(#f-shadow)"><rect x="-40" y="-9" width="80" height="18" rx="4" fill="#1c0d10" stroke="url(#g-goldrim)" stroke-width="1.6"/><text y="4" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="9" font-weight="900" fill="#f6e3a1" letter-spacing=".5">${S.tw?'VAULT':'TARTARUS'} · ${S.lairT}</text></g>`}
-  S.ruins.forEach(r=>{const h=HEX[r];s+=`<g transform="translate(${h.x-28},${h.y-24})" filter="url(#f-shadow)"><circle r="13" fill="url(#g-ivory)" stroke="url(#g-goldrim)" stroke-width="2"/><use href="#s-ruin" x="-10" y="-10" width="20" height="20"/></g>`});
+  S.ruins.forEach(r=>{const h=HEX[r];s+=`<g transform="translate(${h.x-24},${h.y-22})" filter="url(#f-shadow)"><circle class="ruinglow" r="20" fill="#ffd86a33"/><circle r="17" fill="url(#g-ivory)" stroke="url(#g-goldrim)" stroke-width="2.5"/><use href="#s-ruin" x="-14" y="-14" width="28" height="28"/><rect x="-19" y="15" width="38" height="12" rx="6" fill="#2b1d0e" stroke="#e5b450" stroke-width="1"/><text y="24" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="7.5" font-weight="900" fill="#ffe08a">RUINS</text></g>`});
   S.mons.forEach((m,mi)=>{const h=HEX[m.h],can=mine&&S.rolled&&!S.sub&&!S.hacted&&S.rpg.k&&S.pl[me].hx===m.h;
     s+=`<polygon points="${hexPts(h.x,h.y,R-5)}" fill="#c0261c22" stroke="#ff5a4a" stroke-width="3" stroke-dasharray="7 5"/>
     <g transform="translate(${h.x+20},${h.y-14})" ${can?`class="hot" data-k="battle" data-id="${mi}"`:''}><ellipse rx="16" ry="5" cy="20" fill="#000" opacity=".5"/><use href="#s-${m.t}" x="-26" y="-32" width="52" height="52"/>
@@ -2880,8 +2974,9 @@ function boardSVG(){
     s+=`<g transform="translate(${V[v].x},${V[v].y})"><circle r="11.5" cy="2" fill="#0008"/><circle r="11" fill="${k.act?c:'#f4ecd8'}" stroke="${k.act?'#1b130c':c}" stroke-width="${k.act?1.8:3.2}"/>
       <path d="M-4 6 V0 Q-4 -6 1 -6 L5 -2 L1 -1 L2 6 Z" fill="${k.act?(k.p===2?'#333':'#fff'):c}"/>${[...Array(k.lv)].map((_,j)=>`<circle cx="${(j-(k.lv-1)/2)*5.5}" cy="14" r="2.3" fill="#ffd86a" stroke="#000" stroke-width=".6"/>`).join('')}</g>`}
   // champions: shield in the owner's colour, numbered by level, red ring when hurt
-  if(S.rpg&&S.rpg.k)S.seats.forEach((_,p)=>{const pl=S.pl[p];if(pl.hx<0)return;const h=HEX[pl.hx];
-    const k=S.seats.filter((_,q)=>q<p&&S.pl[q].hx===pl.hx).length,x=h.x+18-k*17,y=h.y+22;
+  if(S.rpg&&S.rpg.k)S.seats.forEach((_,p)=>{const pl=S.pl[p];if(pl.hx<0)return;const h=cellOf(pl.hx);if(!h)return;
+    if(pl.hx>=1000)s+=`<use href="#s-ship" x="${h.x-26}" y="${h.y-12}" width="52" height="52"/>`;   // sailing: hero rides a ship
+    const k=S.seats.filter((_,q)=>q<p&&S.pl[q].hx===pl.hx).length,sea=pl.hx>=1000,x=sea?h.x-k*12:h.x+18-k*17,y=sea?h.y+4:h.y+22;
     s+=`<g transform="translate(${x},${y})"><ellipse rx="12" ry="4.5" cy="11" fill="#000" opacity=".55"/>
       <ellipse rx="11" ry="4" cy="9" fill="${PCOL[p].c}" stroke="${pl.hp<=4?'#ff3b2f':'#0008'}" stroke-width="1.6"/>
       <use href="#p-h${hero(p)}" x="-21" y="-30" width="42" height="42" filter="url(#tint${p})"/>
@@ -2896,7 +2991,9 @@ function boardSVG(){
   hot.e.forEach(e=>{const {a,b}=E[e];s+=`<line class="hot ${hot.soft?'soft':''}" data-k="road" data-id="${e}" x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="#fffaf0" stroke-opacity=".9" stroke-width="${hot.soft?3.5:5.5}" stroke-dasharray="${hot.soft?'4 5':'7 4'}" stroke-linecap="round"/>`});
   hot.v.forEach(v=>s+=`<circle class="hot ${hot.soft?'soft':''}" data-k="settle" data-id="${v}" cx="${V[v].x}" cy="${V[v].y}" r="${hot.soft?5.5:7}" fill="#fffaf0" fill-opacity=".92" stroke="#a8761f" stroke-width="2"/>`);
   if(mine&&S.tw&&(ui.build==='ferry'||ui.build==='gtravel')&&S.rolled&&!S.sub&&!S.hmoved)(ui.build==='ferry'?harbourHexes():HEX.map((_,i)=>i)).filter(i=>i!==S.pl[me].hx).forEach(i=>s+=`<polygon class="hexhit" data-k="${ui.build}" data-id="${i}" points="${hexPts(HEX[i].x,HEX[i].y,R-6)}" fill="#7fd3ff22" stroke="#7fd3ff" stroke-width="3" stroke-dasharray="6 5"/>`);
-  if(mine&&S.rpg&&S.rpg.k&&ui.build==='hmove'&&S.rolled&&!S.sub&&!S.hmoved)reach(me).forEach(i=>s+=`<polygon class="hexhit" data-k="hmove" data-id="${i}" points="${hexPts(HEX[i].x,HEX[i].y,R-6)}" fill="#ffd86a22" stroke="#ffd86a" stroke-width="3" stroke-dasharray="6 5"/>`);
+  if(WH.length){const mv=mine&&ui.build==='hmove';s+=`<g class="seagrid" opacity="${mv?.5:.14}">${WH.map(w=>`<polygon points="${hexPts(w.x,w.y,R-3)}" fill="none" stroke="#e8f6ff" stroke-width="1.2"/>`).join('')}</g>`}
+  if(mine&&S.rpg&&S.rpg.k&&ui.build==='hmove'&&S.rolled&&!S.sub&&!S.hmoved)[...reach(me)].filter(i=>i>=1000).forEach(i=>{const w=cellOf(i);s+=`<polygon class="hexhit" data-k="hmove" data-id="${i}" points="${hexPts(w.x,w.y,R-6)}" fill="#7fd3ff2a" stroke="#7fd3ff" stroke-width="2.4" stroke-dasharray="5 4"/>`});
+  if(mine&&S.rpg&&S.rpg.k&&ui.build==='hmove'&&S.rolled&&!S.sub&&!S.hmoved)[...reach(me)].filter(i=>i<1000).forEach(i=>s+=`<polygon class="hexhit" data-k="hmove" data-id="${i}" points="${hexPts(HEX[i].x,HEX[i].y,R-6)}" fill="#ffd86a22" stroke="#ffd86a" stroke-width="3" stroke-dasharray="6 5"/>`);
   hot.k.forEach(v=>s+=`<circle class="hot" data-k="${ui.build}" data-id="${v}" cx="${V[v].x}" cy="${V[v].y}" r="14" fill="#fff" fill-opacity=".25" stroke="#ffd86a" stroke-width="3"/>`);
   hot.c.forEach(v=>s+=`<circle data-k="city" data-id="${v}" cx="${V[v].x}" cy="${V[v].y-4}" r="26" fill="#fff" fill-opacity="0" style="cursor:pointer"/>`);   // generous hit area
   hot.c.forEach(v=>s+=`<circle class="hot ${hot.soft?'soft':''}" data-k="city" data-id="${v}" cx="${V[v].x}" cy="${V[v].y}" r="20" fill="none" stroke="#fffaf0" stroke-width="2.4" stroke-dasharray="5 4" style="pointer-events:none"/>`);
@@ -2981,7 +3078,31 @@ const TITLES={sparta:'Hero of Sparta',zeusson:'Child of Zeus',titan:'Titan Slaye
 const KINDN={dice:'Dice',board:'Board',frame:'Frame',title:'Title',god:'Patron god',hero:'Hero'};
 const xpNeed=l=>60+40*l;                                       // XP from level l to l+1
 const prof=()=>LS.get('st-prof',null)||{xp:0,lv:1,sel:{},day:{},week:{}};
-const saveProf=p=>LS.set('st-prof',p);
+const saveProf=p=>{LS.set('st-prof',p);cloudSave()};
+// ---- account: everything personal lives in users/<uid> when signed in ----
+let cloudT=0;
+function cloudSave(){if(!ui.user||!db)return;clearTimeout(cloudT);cloudT=setTimeout(()=>db.doc('users/'+ui.user.uid).set({name:ME.name,prof:prof(),hero:LS.get('st-hero','heracles'),hist:LS.get('st-hist',[]).slice(-60),tips:LS.get('st-tips',{}),upd:Date.now()}).catch(()=>{}),800)}
+async function cloudLoad(){                                   // account data wins over this device's data
+  if(!ui.user||!db)return;try{const sn=await db.doc('users/'+ui.user.uid).get();
+    if(sn.exists){const d=sn.data();if(d.prof)LS.set('st-prof',d.prof);if(d.hero){LS.set('st-hero',d.hero);cfg.hero=d.hero}if(d.hist)LS.set('st-hist',d.hist);if(d.tips)LS.set('st-tips',d.tips);if(d.name&&!ui.user.name){ME.name=d.name;LS.set('st-name',d.name)}}
+    else cloudSave()}catch(e){}}
+function renderLogin(){                                        // sign in / create account / guest
+  const m=ui.amode||'in';
+  app.innerHTML=`<div class="home"><div class="brand"><svg viewBox="-12 -12 24 24" class="brand-ic"><use href="#s-logo" x="-12" y="-12" width="24" height="24"/></svg><h1>Titanomachy</h1></div>
+    <div class="box auth"><div class="tabs"><button data-am="in" aria-pressed="${m==='in'}">Sign in</button><button data-am="up" aria-pressed="${m==='up'}">Create account</button></div>
+      ${m==='up'?'<input id="aName" placeholder="Your name" maxlength="16" autocomplete="nickname">':''}
+      <input id="aMail" type="email" placeholder="Email" autocomplete="email"><input id="aPass" type="password" placeholder="Password (6+ characters)" autocomplete="${m==='up'?'new-password':'current-password'}">
+      <button class="btn pri" id="aGo">${m==='up'?'Create account':'Sign in'}</button>
+      ${m==='in'?'<button class="btn sm" id="aReset">Forgot password?</button>':''}<p class="note" id="aErr"></p></div>
+    <button class="btn" id="aGuest">Play as guest</button><p class="note center">An account keeps your level, trophies, hero and games on every device.</p></div>`;
+  const err=t=>{document.getElementById('aErr').textContent=t},val=id=>(document.getElementById(id)||{}).value||'';
+  const msg=e=>({'auth/invalid-credential':'Wrong email or password','auth/wrong-password':'Wrong email or password','auth/user-not-found':'No account with that email','auth/email-already-in-use':'That email already has an account — sign in','auth/weak-password':'Password needs 6+ characters','auth/invalid-email':'That email looks wrong','auth/operation-not-allowed':'Accounts are not switched on yet'}[e.code]||e.message);
+  app.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{ui.amode=b.dataset.am;renderLogin()});
+  document.getElementById('aGo').onclick=async()=>{const em=val('aMail').trim(),pw=val('aPass');if(!em||!pw)return err('Enter email and password');err('…');
+    try{if(m==='up'){const n=val('aName').trim();if(!n)return err('Enter your name');ME.name=n;LS.set('st-name',n);await TAUTH.signUp(em,pw,n)}else await TAUTH.signIn(em,pw)}catch(e){err(msg(e))}};
+  const rs=document.getElementById('aReset');if(rs)rs.onclick=async()=>{const em=val('aMail').trim();if(!em)return err('Type your email first');try{await TAUTH.reset(em);err('Reset email sent')}catch(e){err(msg(e))}};
+  document.getElementById('aGuest').onclick=()=>{LS.set('st-guest',1);renderLobby()};
+}
 const unlocked=(p,kind,id)=>(kind==='hero'&&DG_OPEN)||UNL.some(u=>u[1]===kind&&u[2]===id&&u[0]<=p.lv);
 const myCos=()=>{const s=prof().sel||{};return {fr:s.frame||'',ti:s.title||'',god:s.god||''}};
 const DCH=[{id:'play',t:'Finish a game',n:1,f:()=>1},{id:'win',t:'Win a game',n:1,f:x=>x.won?1:0},{id:'city',t:'Build 3 cities',n:3,f:x=>x.cities||0},
@@ -3073,7 +3194,7 @@ function syncMusic(){const want=SND.mu()&&!!document.getElementById('stage');if(
 if(typeof addEventListener==='function')addEventListener('pointerdown',()=>{if(SND.fx()||SND.mu())actx()},{once:true});
 // ---------- Coach: point at the next thing to tap ----------
 const coachOn=()=>LS.get('st-coach',true);
-function hexDist(a,t){const seen=new Map([[a,0]]),q=[a];while(q.length){const x=q.shift();if(x===t)return seen.get(x);for(const y of HADJ[x])if(!seen.has(y)){seen.set(y,seen.get(x)+1);q.push(y)}}return 99}
+function hexDist(a,t){const G=WH.length?NB:HADJ,seen=new Map([[a,0]]),q=[a];while(q.length){const x=q.shift();if(x===t)return seen.get(x);for(const y of (G[x]||[]))if(!seen.has(y)){seen.set(y,seen.get(x)+1);q.push(y)}}return 99}
 function goHero(me,t,why){                                    // walk the player's hero toward tile t, button by button
   const pl=S.pl[me],sh=ui.sheet;if(pl.hx===t)return null;
   if(S.hmoved)return sh?['#x','Close']:['#bEnd','Moved — end turn'];
@@ -3113,8 +3234,13 @@ function coachFor(){                                           // [selector,labe
 }
 function placeCoach(){                                         // draw the ring + label over the target (HTML or board SVG)
   let ring=document.getElementById('coachring'),tip=document.getElementById('coachtip');
-  const c=coachFor(),el=c&&document.querySelector(c[0]);
-  if(!el||!el.getClientRects().length){if(ring)ring.remove();if(tip)tip.remove();return}
+  let c=coachFor(),el=c&&document.querySelector(c[0]);
+  const cover=['tour','tipcard'].some(id=>{const e=document.getElementById(id);return e&&e.getClientRects().length});   // never behind a walkthrough / tip
+  if(c&&!S.tut&&!cover){                                       // outside the tutorial: each hint pulses twice, once ever, then stays off
+    const seen=ui.coachSeen=ui.coachSeen||LS.get('st-coachseen',{}),k=c[1];
+    if(!seen[k]&&el&&el.getClientRects().length){seen[k]=Date.now();LS.set('st-coachseen',seen)}
+    if(!seen[k]||Date.now()-seen[k]>2600)c=null}
+  if(cover||!c||!el||!el.getClientRects().length){if(ring)ring.remove();if(tip)tip.remove();return}
   if(!ring){ring=document.createElement('div');ring.id='coachring';document.body.appendChild(ring)}
   if(!tip){tip=document.createElement('div');tip.id='coachtip';document.body.appendChild(tip)}
   const r=el.getBoundingClientRect(),pad=5;Object.assign(ring.style,{left:r.left-pad+'px',top:r.top-pad+'px',width:r.width+2*pad+'px',height:r.height+2*pad+'px'});
@@ -3128,7 +3254,7 @@ const TOUR={
     {i:'logo',t:'Welcome to Titanomachy',l:['Build the richest Greek island.','Villages and cities give <b>victory points (VP)</b>.','The first player to reach the goal (usually 10 VP) wins.'],tip:'The number on each player’s portrait is their VP.'},
     {i:'grain',t:'The board makes resources',l:['Each tile makes one resource: Clay, Timber, Fleece, Wheat or Marble.','Each tile has a bronze coin with a number (2–12).','The <b>laurel leaves</b> on the coin show how often it comes up: more leaves = more often.','Purple-ringed tiles are temples: they also give rare Ambrosia.'],tip:'6 and 8 are red because they come up most.'},
     {i:'house',t:'Start: 2 villages and 2 roads',l:['Everyone places a village on a corner, then a road next to it.','Then everyone places a second village and road (in reverse order).','Your second village gives you your first cards.'],tip:'Pick corners touching many leaves and different resources.'},
-    {i:'trade',t:'Your turn in 4 steps',l:['<b>Roll</b> the dice.','Every village or city touching a tile with that number <b>collects</b> its resource (everyone, not just you).','<b>Build</b> or <b>trade</b> as much as you can afford.','Press <b>End</b>.'],tip:'Spots you can afford glow. Tap one, then press ✓.'},
+    {i:'trade',t:'Your turn in 4 steps',l:['<b>Roll</b> the dice.','Every village or city touching a tile with that number <b>collects</b> its resource (everyone, not just you).','<b>Build</b> or <b>trade</b> as much as you can afford.','Press <b>End</b>.'],tip:'Tap Build, pick Road, Village or City — then the spots you can use glow.'},
     {i:'road',t:'What you can build',l:['<b>Road</b> — Clay + Timber. Roads let you reach new corners.','<b>Village</b> — Clay + Timber + Fleece + Wheat = <b>1 VP</b>. Must touch your road, with one empty corner between villages.','<b>City</b> — upgrade a village: 2 Wheat + 2 Marble + Clay = <b>2 VP</b>, and it collects double.','<b>Oracle card</b> — Fleece + Timber + Marble: a surprise card.'],tip:'Build 2 things in one turn and the gods give you +1 Ambrosia.'},
     {i:'anchor',t:'Trading',l:['<b>Bank</b>: give 4 of one resource for 1 of any other.','<b>Harbours</b> on the coast: 3:1 or 2:1 if you have a village on them.','<b>Players</b>: post an offer; others accept, decline or counter.'],tip:'Unlucky? After 3 rolls with nothing, Hermes gives you a free card.'},
     {i:'cyclops',t:'Rolling a 7: the Cyclops',l:['Nobody collects on a 7.','Anyone holding more than 9 cards gives back half.','The roller moves the Cyclops onto a tile: that tile makes nothing until he leaves.','The roller steals 1 card from someone next to it.'],tip:'Ambrosia is never stolen or discarded.'},
@@ -3140,9 +3266,10 @@ const TOUR={
     {i:'map',t:'The story: 3 acts',l:['<b>Act I</b> (rounds 1–4): the gods choose — build and explore.','<b>Act II</b> (5–9): the omens — monsters rise, grow strong.','<b>Act III</b> (10+): the Titan War — players fight each other.','Each act has 3 quests: <b>+2 glory</b> each, all 3 = <b>+1 VP</b>.'],tip:'Tap the Act chip at the top to open your quest book.'},
     {i:'house',t:'Your island and its Capital',l:['The <b>Capital</b> sits in the island centre with a number.','When it is rolled, your buildings touching it get the resource <b>you choose</b> (Hero → Train & equip).','Your Capital pays <b>1 gold</b> every round (+1 per city).','Build walls before round 10.'],tip:'Conquer a Capital and you may build on that island too.'},
     {i:'sword',t:'Your demigod',l:['Pick one of 12 demigods. Each has <b>one power</b> and <b>one weakness</b>.','After rolling, open <b>Hero</b>: <b>move</b>, then do <b>one deed</b> on that tile.','Deeds: fight a monster, explore ruins, duel, raid a village, siege a Capital, found a colony.'],tip:'Train stats and buy gear to hit harder.'},
-    {i:'ship',t:'Crossing the sea',l:['<b>Sea routes</b>: the dotted lines. Sailing one costs 1 step.','<b>Ferry</b>: from a harbour tile to any harbour, 1 gold.','<b>Ship</b>: Timber + Fleece. Sails 2 routes for free. Can be sunk at war.','<b>Divine travel</b>: 2 Ambrosia, Hermes takes you anywhere.'],tip:'Orion walks across the sea; Perseus and Theseus sail routes for free.'},
+    {i:'ship',t:'Crossing the sea',l:['Build a village on a <b>harbour ⚓</b> corner.','Then build a <b>ship</b> (Timber + Fleece).','Board at a harbour tile. Every sea hex is <b>1 step</b> — far harbours take more turns.','<b>Divine travel</b>: 2 Ambrosia, Hermes takes you anywhere.'],tip:'Orion walks on water. Theseus builds a ship without a harbour.'},
     {i:'temple',t:'Olympus, the middle island',l:['<b>Shrine</b>: be the only hero on it at the start of a round to get Ambrosia, a card and gold.','<b>Forge</b>: stand on it to buy gear (sword, armour, Aegis…).','<b>Vault</b>: monsters come out of it. Beat them for gold and loot.'],tip:'Everyone wants the Shrine — expect to be challenged there.'},
     {i:'warhorn',t:'War, pacts and deals',l:['Before round 10 you may <b>declare war</b> on one rival (1 Ambrosia + 2 gold).','At peace you can duel only on Olympus or your own island.','At war: duel anywhere, raids take 2 cards, you can burn roads.','<b>Pact</b>: 3 rounds of peace with one player. <b>Private deal</b>: trade with only one player.'],tip:'Breaking a pact costs 1 VP and marks you Oathbreaker.'},
+    {i:'attack',t:'Fighting monsters',l:['Move onto a monster, then <b>Fight</b>.','Above its head you see its <b>next move</b>: a hit, a charge (×2) or a guard.','<b>Strike</b> or <b>Power</b> (2 stamina, ×2): tap when the marker is in the gold for a critical.','<b>Guard</b> blocks big hits and gives +1 stamina.'],tip:'Up to 3 rounds. Its wounds stay if it survives.'},
     {i:'defend',t:'Duels',l:['Up to 3 rounds. Each round both secretly pick a stance:','<b>Attack</b> beats Feint · <b>Defend</b> beats Attack · <b>Feint</b> beats Defend.','Winning the stance = +3 damage. Losing it = half damage.','You may add one <b>battle card</b> (costs stamina). Then dice decide the damage.'],tip:'At 0 HP a hero goes to the Underworld for 1 round (or pay 2 Ambrosia to return).'},
     {i:'rebel',t:'Conquering a Capital',l:['At war, move your hero onto an enemy Capital while their hero is <b>away</b>.','Press <b>Siege</b> to set up camp; from the next turn every Siege lowers its HP.','At 0 HP it falls: you take half their cards, <b>+2 VP</b> and their best city.','They become your vassal — until they beat your hero in a duel and rebel.'],tip:'Keep your hero near home when enemies are close.'},
     {i:'crown',t:'How to win Titan War',l:['Reach the VP goal, <b>or</b>','conquer every other Capital, <b>or</b>','have the most VP after round 15 (if that ending is on).'],tip:'Simple plan: grow early, buy gear, hold the Shrine, defend at round 10, strike when an enemy hero is away.'}
@@ -3166,29 +3293,29 @@ function openTour(track,pg){                                 // full-screen walk
 }
 // ---------- First-time explainers: shown once per device, the first time each thing appears ----------
 const TIPS={
-  welcome:{i:'temple',t:'Welcome to the Isles',l:['Build roads, villages and cities to earn victory points (VP).','First to the target VP wins — see the number on each player’s badge.','On your turn: Roll → collect resources → build or trade → End.','Three islands, joined by stone bridges. Build roads across them.','Unlucky? After 3 rolls with nothing, Hermes gives you a free card.']},
-  conquest:{i:'rebel',t:'Conquest',l:['At war, put your hero on an enemy Capital while their hero is away. Siege once to set up camp, then attack from the next turn.','At 0 HP the Capital falls: you take half their cards, +2 VP and their best city. They become your vassal.','A vassal who beats the conqueror in a duel rebels and gets everything back.','Fallen heroes spend 1 round in the Underworld (or pay 2 Ambrosia to Hades).','Win by VP, by conquering every Capital, or by leading when time runs out.']},
-  titan:{i:'sword',t:'Titan War',l:['Place your first village on any island: that island becomes yours. One extra island stays free to claim later.','The Capital in your island centre: when its number rolls, you pick the resource.','Olympus in the middle holds the Shrine, the Forge and the Vault.','Heroes cross the sea by routes, ferry, ship or divine travel.','Watch the Titan clock: at round 10 the war begins.','Hero → Train & equip: raise stats, buy gear at the Forge, collect battle cards for duels.','Stand alone on the Olympus Shrine at the start of a round: Ambrosia, a card and gold.','Hero → War: declare war early (1 Ambrosia + 2 gold) to duel anywhere and raid harder.']},
-  build:{i:'house',t:'Building',l:['After rolling, every spot you can afford glows.','Tap a spot, check the preview, then press ✓ to build.','<b>Road</b> — Clay + Timber','<b>Village</b> — Clay + Timber + Fleece + Wheat','<b>City</b> — 2 Wheat + 2 Marble + 1 Clay','Build 2+ things in one turn → <b>Divine Favour</b>: +1 Ambrosia.']},
-  ambrosia:{i:'ambrosia',t:'Ambrosia — food of the gods',l:['A rare purple resource. It comes from the 3 temple tiles (purple ring around the number) and from Divine Favour.','Spend it on Gods (⚡ button) and Secret missions.','The bank never sells it, so guard it.']},
-  gods:{i:'bolt',t:'The Gods',l:['Once per turn, after rolling, tap ⚡ Gods.','Pay Ambrosia for a blessing: free Wheat, a free road, steal a card, +1 VP…','Everyone sees who you prayed to.']},
-  missions:{i:'flag',t:'Secret missions',l:['Tap the purple Missions card, then “Draw 3 missions”.','Pay the cost (always 1 Ambrosia) to take one. Finish before the ⏳ runs out.','Done = green reward. Missed = red penalty. Rivals can’t see what it is.']},
-  cyclops:{i:'cyclops',t:'The Cyclops (a 7 was rolled)',l:['Anyone holding more than 9 cards discards half (Ambrosia doesn’t count and is never stolen).','The roller moves the Cyclops onto a tile: it makes nothing until he leaves.','The roller also steals 1 card from someone next to that tile.']},
-  hero:{i:'sword',t:'Your demigod',l:['The shield piece in your colour is your demigod hero. It starts next to your first village.','Each demigod has <b>one power</b> and <b>one weakness</b> (Hero sheet).','After rolling: tap Hero → Move, then do one deed where it stands: monster, ruins, duel or raid.']},
-  quests:{i:'map',t:'The quest book',l:['The game has 3 acts. Each act has 3 quests.','Every quest done = <b>+2 glory</b>. All 3 in an act = <b>+1 VP</b>.','Tap the <b>Act</b> chip at the top to see them.']},
-  sea:{i:'ship',t:'Crossing the sea',l:['Dotted lines are <b>sea routes</b>: 1 step each.','<b>Ferry</b> (harbour to harbour, 1 gold), <b>ship</b> (Timber + Fleece, 2 free routes), <b>divine travel</b> (2 Ambrosia, anywhere).','Find them in Hero → Cross the sea.']},
-  monster:{i:'troll',t:'A monster appeared!',l:['Monsters climb out of Tartarus (the dark tile) and walk toward villages.','Nobody collects from the tile a monster stands on, and it steals from villages next to it.','Walk your hero onto its tile and Battle it. Its wounds stay between turns.']},
-  ruins:{i:'ruin',t:'Ruins',l:['Broken pillars on a tile are ruins.','Move your hero onto that tile and choose Explore.','You may find gold, glory, a relic — or a trap.']},
-  agora:{i:'temple',t:'The Agora',l:['Once a round your city asks you to decide something.','Each choice shows exactly what you gain or lose.','Glory: every 5 glory = 1 VP (up to 3).']},
-  event:{i:'sun',t:'World events',l:['Each new round brings an event — shown at the top of the board.','Some help (double harvest), some hurt (drought, storm).','Tap the chip at the top to read it again.']},
-  relic:{i:'chest',t:'Relics',l:['Magic items found by heroes. They sit in your hand next to your cards.','Tap one to read it and use it. Some work all the time.']},
-  oracle:{i:'knight',t:'Oracle cards',l:['Bought with Fleece + Timber + Marble.','Play one per turn, but not on the turn you bought it.','Laurel Wreaths are secret +1 VP and count automatically.']},
-  market:{i:'trade',t:'Trading',l:['Trade → “Bank / Harbour” for fixed rates (4:1, or better at your harbours).','Trade → “Offer to everyone” to ask players. They accept, decline or counter, and you pick.']},
-  raiders:{i:'ship',t:'Sea raiders',l:['A third die moves the raider ship. At the end of the track they attack.','Active hoplites defend. Win: top defender +1 VP. Lose: weakest players lose a city.']}
+  welcome:{s:'Tap a glowing corner for a village, then a road next to it.',i:'temple',t:'Welcome to the Isles',l:['Build roads, villages and cities to earn victory points (VP).','First to the target VP wins — see the number on each player’s badge.','On your turn: Roll → collect resources → build or trade → End.','Three islands, joined by stone bridges. Build roads across them.','Unlucky? After 3 rolls with nothing, Hermes gives you a free card.']},
+  conquest:{s:'War: send your hero to a rival Capital while their hero is away, then Siege.',i:'rebel',t:'Conquest',l:['At war, put your hero on an enemy Capital while their hero is away. Siege once to set up camp, then attack from the next turn.','At 0 HP the Capital falls: you take half their cards, +2 VP and their best city. They become your vassal.','A vassal who beats the conqueror in a duel rebels and gets everything back.','Fallen heroes spend 1 round in the Underworld (or pay 2 Ambrosia to Hades).','Win by VP, by conquering every Capital, or by leading when time runs out.']},
+  titan:{s:'Your first village claims an island. Grow it before the war.',i:'sword',t:'Titan War',l:['Place your first village on any island: that island becomes yours. One extra island stays free to claim later.','The Capital in your island centre: when its number rolls, you pick the resource.','Olympus in the middle holds the Shrine, the Forge and the Vault.','Heroes cross the sea by routes, ferry, ship or divine travel.','Watch the Titan clock: at round 10 the war begins.','Hero → Train & equip: raise stats, buy gear at the Forge, collect battle cards for duels.','Stand alone on the Olympus Shrine at the start of a round: Ambrosia, a card and gold.','Hero → War: declare war early (1 Ambrosia + 2 gold) to duel anywhere and raid harder.']},
+  build:{s:'Tap Build to turn cards into roads, villages and cities.',i:'house',t:'Building',l:['After rolling, every spot you can afford glows.','Tap a spot, check the preview, then press ✓ to build.','<b>Road</b> — Clay + Timber','<b>Village</b> — Clay + Timber + Fleece + Wheat','<b>City</b> — 2 Wheat + 2 Marble + 1 Clay','Build 2+ things in one turn → <b>Divine Favour</b>: +1 Ambrosia.']},
+  ambrosia:{s:'Ambrosia is rare. Spend it on the gods (⚡).',i:'ambrosia',t:'Ambrosia — food of the gods',l:['A rare purple resource. It comes from the 3 temple tiles (purple ring around the number) and from Divine Favour.','Spend it on Gods (⚡ button) and Secret missions.','The bank never sells it, so guard it.']},
+  gods:{s:'Tap ⚡ to pray: one blessing per turn.',i:'bolt',t:'The Gods',l:['Once per turn, after rolling, tap ⚡ Gods.','Pay Ambrosia for a blessing: free Wheat, a free road, steal a card, +1 VP…','Everyone sees who you prayed to.']},
+  missions:{s:'Missions are secret goals. Tap the purple card.',i:'flag',t:'Secret missions',l:['Tap the purple Missions card, then “Draw 3 missions”.','Pay the cost (always 1 Ambrosia) to take one. Finish before the ⏳ runs out.','Done = green reward. Missed = red penalty. Rivals can’t see what it is.']},
+  cyclops:{s:'A 7: nobody collects, and the Cyclops blocks a tile.',i:'cyclops',t:'The Cyclops (a 7 was rolled)',l:['Anyone holding more than 9 cards discards half (Ambrosia doesn’t count and is never stolen).','The roller moves the Cyclops onto a tile: it makes nothing until he leaves.','The roller also steals 1 card from someone next to that tile.']},
+  hero:{s:'Tap Hero to move your demigod and do one deed.',i:'sword',t:'Your demigod',l:['The shield piece in your colour is your demigod hero. It starts next to your first village.','Each demigod has <b>one power</b> and <b>one weakness</b> (Hero sheet).','After rolling: tap Hero → Move, then do one deed where it stands: monster, ruins, duel or raid.']},
+  quests:{s:'Your quests are in the Act chip at the top.',i:'map',t:'The quest book',l:['The game has 3 acts. Each act has 3 quests.','Every quest done = <b>+2 glory</b>. All 3 in an act = <b>+1 VP</b>.','Tap the <b>Act</b> chip at the top to see them.']},
+  sea:{s:'A village on a harbour ⚓ lets you build a ship. Each sea hex = 1 step.',i:'ship',t:'Crossing the sea',l:['Dotted lines are <b>sea routes</b>: 1 step each.','<b>Ferry</b> (harbour to harbour, 1 gold), <b>ship</b> (Timber + Fleece, 2 free routes), <b>divine travel</b> (2 Ambrosia, anywhere).','Find them in Hero → Cross the sea.']},
+  monster:{s:'A monster is loose. Beat it with your hero for gold.',i:'troll',t:'A monster appeared!',l:['Monsters climb out of Tartarus (the dark tile) and walk toward villages.','Nobody collects from the tile a monster stands on, and it steals from villages next to it.','Walk your hero onto its tile and Battle it. Its wounds stay between turns.']},
+  ruins:{s:'Broken pillars are ruins. Send your hero to explore.',i:'ruin',t:'Ruins',l:['Broken pillars on a tile are ruins.','Move your hero onto that tile and choose Explore.','You may find gold, glory, a relic — or a trap.']},
+  agora:{s:'The Agora: pick one. Saying no is always free.',i:'temple',t:'The Agora',l:['Once a round your city asks you to decide something.','Each choice shows exactly what you gain or lose.','Glory: every 5 glory = 1 VP (up to 3).']},
+  event:{s:'A world event changes this round. Tap its chip to read it.',i:'sun',t:'World events',l:['Each new round brings an event — shown at the top of the board.','Some help (double harvest), some hurt (drought, storm).','Tap the chip at the top to read it again.']},
+  relic:{s:'You found a relic. Tap it in your hand to use it.',i:'chest',t:'Relics',l:['Magic items found by heroes. They sit in your hand next to your cards.','Tap one to read it and use it. Some work all the time.']},
+  oracle:{s:'Tap an Oracle card in your hand to play it.',i:'knight',t:'Oracle cards',l:['Bought with Fleece + Timber + Marble.','Play one per turn, but not on the turn you bought it.','Laurel Wreaths are secret +1 VP and count automatically.']},
+  market:{s:'Tap Trade to swap cards with the bank or players.',i:'trade',t:'Trading',l:['Trade → “Bank / Harbour” for fixed rates (4:1, or better at your harbours).','Trade → “Offer to everyone” to ask players. They accept, decline or counter, and you pick.']},
+  raiders:{s:'Sea raiders strike when their ship arrives. Keep hoplites ready.',i:'ship',t:'Sea raiders',l:['A third die moves the raider ship. At the end of the track they attack.','Active hoplites defend. Win: top defender +1 VP. Lose: weakest players lose a city.']}
 };
 let tipsSeen=LS.get('st-tips',{});
 function tipCheck(me){
-  if(me<0||tipsSeen.off||document.getElementById('tipcard'))return;
+  if(me<0||tipsSeen.off||document.getElementById('tipcard')||Date.now()-(ui.lastTip||0)<40000||(document.getElementById('toasts')||{children:[]}).children.length)return;
   const pl=S.pl[me],q=[];
   if(S.phase==='setup')q.push(S.tw?'titan':'welcome');
   if(S.tw&&S.phase==='main'&&(S.tw.on||(S.tw.wars||[]).length))q.push('conquest');
@@ -3212,6 +3339,9 @@ function tipCheck(me){
   const k=q.find(k=>!tipsSeen[k]);if(k)showTip(k);
 }
 function showTip(k,again){
+  if(!again){const T=TIPS[k];tipsSeen[k]=1;LS.set('st-tips',tipsSeen);ui.lastTip=Date.now();   // in-game tip = one floating line
+    const t=note(`💡 ${T.s}<button class="tipx" title="Turn tips off">✕</button>`,7000,'tipn');
+    t.querySelector('.tipx').onclick=e=>{e.stopPropagation();tipsSeen.off=1;LS.set('st-tips',tipsSeen);t.remove();toast('Tips off (Guide still has everything)')};return}
   const T=TIPS[k],el=document.createElement('div');el.id='tipcard';el.className='tipcard';
   el.innerHTML=`<div class="tip-ic">${ico(T.i)}</div><span class="tip-k">${again?'GUIDE':'NEW'}</span><h2>${T.t}</h2><ul>${T.l.map(x=>`<li>${riz(x)}</li>`).join('')}</ul>
     <div class="row"><button class="btn pri" id="tipOk">Got it</button>${again?'':'<button class="btn sm" id="tipOff">Hide tips</button>'}</div>`;
@@ -3239,6 +3369,7 @@ function hintText(){
   if(a!==me)return S.sub==='market'?`${who} is trading…`:S.sub==='discard'?`${who} is discarding`:`${who}'s turn${S.seats[a].kind==='bot'?' — thinking…':''}`;
   if(S.phase==='setup')return S.sub==='s'?(S.step>=S.seats.length?'Place your 2nd village (collects resources)':'Place your first village'):'Place a road next to it';
   if(S.sub==='duel'&&S.duel)return `Duel: ${pname(S.duel.a)} vs ${pname(S.duel.b)} — round ${S.duel.r}`;
+  if(S.sub==='mfight'&&S.mf)return `${pname(S.mf.p)} fights the ${MONS[S.mf.t].n} — round ${S.mf.r}`;
   return {court:'The Agora awaits your decision',alch:S.alchOne?'Oracle: choose one die':'Alchemist: choose your dice',robber:S.bishop?'Bishop: tap a tile — rob everyone there':'Tap a tile to move the Cyclops',steal:'Choose who to steal from',discard:'Discard half your cards',roadbuild:`Place ${S.free} free road${S.free>1?'s':''}`,yop:'Choose 2 resources',mono:'Choose a resource to monopolize',market:'Waiting for answers to your offer'}[S.sub]
     ||(!S.rolled?'Roll the dice (or play a Hoplite first)':ui.build?`Tap a highlighted spot: ${{road:'build a road',settle:'build a village',city:'build a city',knight:'train a hoplite',hmove:'move your hero',ferry:'pick a harbour to sail to',gtravel:'pick any tile — Hermes takes you there',kup:'promote a hoplite',kact:'activate a hoplite',chase:'pick the hoplite to chase the Cyclops'}[ui.build]}`:'Build, trade, or end your turn');
 }
@@ -3304,7 +3435,7 @@ function renderGame(){
         </div>
         <button class="d3btn" id="d3btn" aria-pressed="false">3D</button><button class="fbtn" id="bSnd" title="Sound">🔊</button><button class="fbtn" id="bEmote" title="Emotes">💬</button><div class="supply" id="supply"></div>
         <div class="tray" id="tray" hidden><div class="dice">${dieHTML()}${dieHTML()}${evDieHTML()}</div><div class="lbl"></div></div>
-        <div class="tbar" id="tbar" hidden><i></i><span></span></div><div class="hint" id="hint"></div><div class="confirm" id="confirm" hidden></div>
+        <div class="tmbar" id="tbar" hidden><i></i><span></span></div><div class="hint" id="hint"></div><div class="confirm" id="confirm" hidden></div>
       </div>
       <div class="dock" id="dock"></div></div>`;
     document.querySelectorAll('[data-rail]').forEach(b=>b.onclick=()=>{const k=b.dataset.rail;
@@ -3320,7 +3451,8 @@ function renderGame(){
       const t=e.target.closest('[data-k]');if(!t)return;const k=t.dataset.k,id=+t.dataset.id,p=mySeat();
       if(k==='robber'){ui.pick={k:'robber',id};return renderGame()}   // confirm before moving the Cyclops
       if(k==='battle')return openSheet('battle');
-      if(k==='hmove'){ui.build=null;return act(p,'hmove',id)}
+      if(k==='cap')return openSheet('capital',id);
+      if(k==='hmove'){ui.build=null;const r=act(p,'hmove',id);if(S.pl[p].hx===+id&&!S.hacted&&tileActions(p).length)setTimeout(()=>openSheet('champ'),250);return r}
       if(k==='ferry'||k==='gtravel'){ui.build=null;return act(p,k,id)}
       if(['knight','kup','kact','chase'].includes(k)){ui.build=null;return act(p,'knight',{op:{knight:'build',kup:'up',kact:'act',chase:'chase'}[k],id})}
       ui.pick={k,id};renderGame();                             // wait for ✓ before building
@@ -3333,13 +3465,16 @@ function renderGame(){
       <div class="avw ${s.cos&&s.cos.fr?'fr-'+s.cos.fr:''}">${avatar(i)}${s.cos&&s.cos.god&&GODS[s.cos.god]?`<span class="pgod" title="Patron: ${GODS[s.cos.god].n}">${ico(GODS[s.cos.god].i)}</span>`:''}<span class="vpb" title="Victory points">${vp(i,i===me)}</span>${S.lr===i?'<span class="aw lr" title="Royal Highway">RH</span>':''}${S.la===i?'<span class="aw la" title="Favour of Ares">FA</span>':''}</div>
       <div class="pinfo"><div class="ribbon"><span>${esc(s.name||'Open seat')}${s.cos&&s.cos.ti?`<em class="ptitle">${TITLES[s.cos.ti]}</em>`:''}</span>${i===me?'<b>YOU</b>':s.kind==='bot'?`<i>${LVL[s.level]}${s.persona?' · '+PERSONA[s.persona].n:''}</i>`:''}</div>
         <div class="pstats">
-          <span title="Resource cards">${ico('yop','ic sm')}${tot(i)}</span>
+          <span title="Resource cards">${ico('yop','ic sm')}${tot(i)}</span>${S.rpg.k?`<span class="ph" title="Hero level · HP">❤${pl.hp}</span>`:''}<span class="pmore">
           <span title="Roads placed"><svg class="ic sm" viewBox="-12 -12 24 24"><path d="M-9 7 L9 -7" stroke="${PCOL[i].c}" stroke-width="5" stroke-linecap="round"/></svg>${roads}<small>/${roadLen(i)}</small></span>
           <span title="Villages / cities"><svg class="ic sm" viewBox="-12 -12 24 24"><path d="M-8,8 L-8,-2 L0,-10 L8,-2 L8,8 Z" fill="${PCOL[i].c}" stroke="#000"/></svg>${setl}${cts?` · ${cts}c`:''}</span>
           ${S.ck?`<span title="Active hoplites / total levels">${ico('sword','ic sm')}${kActive(i)}/${kLevels(i)}</span>`:`<span title="Oracle cards · hoplites played">${ico('knight','ic sm')}${pl.dev.length}·${pl.kn}</span>`}
           ${S.rpg.k?`<span title="Hero level · HP">${ico(HEROES[pl.hero].i,'ic sm')}${hlv(i)}·${pl.hp}</span><span title="Gold · glory">${ico('coin','ic sm')}${pl.gold}·${pl.ren}</span>`:''}
-          <span title="Ambrosia">${ico('ambrosia','ic sm')}${pl.res.ambrosia||0}</span>${nt?`<span title="Secret missions">${ico('flag','ic sm')}${nt}</span>`:''}${pl.goal&&pl.goal.done?'<span class="badge">GOAL</span>':''}
+          <span title="Ambrosia">${ico('ambrosia','ic sm')}${pl.res.ambrosia||0}</span>${nt?`<span title="Secret missions">${ico('flag','ic sm')}${nt}</span>`:''}${pl.goal&&pl.goal.done?'<span class="badge">GOAL</span>':''}</span>
         </div></div></div>`}).join('');
+  // tap another player's banner: their full numbers in one line
+  document.querySelectorAll('#players .pban').forEach((b,i)=>{if(i===me)return;b.onclick=()=>{const pl=S.pl[i];
+    toast(`${pname(i)}: ${tot(i)} cards · ${Object.values(S.vb).filter(x=>x.p===i&&!x.c).length} villages · ${cities(i)} cities · ${15-pl.rd} roads${S.rpg.k?` · Lv${hlv(i)} ${pl.hp}HP · ${pl.gold} gold · ${pl.ren} glory`:''}`)}});
   // secret: tap your own portrait 7 times within 4 seconds, then enter the code
   if(me>=0&&!LS.get('st-nodev',0)){const av=document.querySelector('#pc'+me+' .avw');if(av)av.onclick=()=>{const t=Date.now();ui.taps=(ui.taps||[]).filter(x=>t-x<4000);ui.taps.push(t);
     if(ui.taps.length>=7){ui.taps=[];ui.dev?openSheet('dev'):openSheet('devcode')}}}
@@ -3392,16 +3527,16 @@ function renderGame(){
   bn.querySelectorAll('[data-champ]').forEach(b=>b.onclick=()=>openSheet('champ'));
   bn.querySelectorAll('[data-quests]').forEach(b=>b.onclick=()=>openSheet('quests'));
   bn.querySelectorAll('[data-twc]').forEach(b=>b.onclick=()=>toast(S.tw.on?'The Titan War is on: every island is at war.':`Titan clock: total war starts at round ${S.tw.war}. Build your island and hero now.`));
-  if(S.lastFight&&S.lastFight.id!==ui.seenFight){if(ui.seenFight!==undefined){const f=S.lastFight;toast(f.duel?`Duel: ${pname(f.p)} ${f.a} vs ${pname(f.q)} ${f.b} — ${f.w<0?'no winner':pname(f.w)+' wins'}`:`${pname(f.p)} hits the ${MONS[f.t].n} for ${f.dmg}${f.win?' — SLAIN!':` (${f.hp}/${f.max} HP left) and takes ${f.taken} damage${f.ko?' — knocked out!':''}`}`)}ui.seenFight=S.lastFight.id}
-  if(S.lastEx&&S.lastEx.id!==ui.seenEx){if(ui.seenEx!==undefined)toast(`${pname(S.lastEx.p)} explored ruins: ${S.lastEx.txt}`);ui.seenEx=S.lastEx.id}
-  if(S.godEv&&S.godEv.id!==ui.seenGod){if(ui.seenGod!==undefined){const G=GODS[S.godEv.g];godPop(G,S.godEv.p,me)}ui.seenGod=S.godEv.id}
+  if(S.lastFight&&S.lastFight.id!==ui.seenFight){if(ui.seenFight!==undefined&&(S.lastFight.p===me||S.lastFight.q===me)){const f=S.lastFight;toast(f.duel?`Duel: ${pname(f.p)} ${f.a} vs ${pname(f.q)} ${f.b} — ${f.w<0?'no winner':pname(f.w)+' wins'}`:`${pname(f.p)} hits the ${MONS[f.t].n} for ${f.dmg}${f.win?' — SLAIN!':` (${f.hp}/${f.max} HP left) and takes ${f.taken} damage${f.ko?' — knocked out!':''}`}`)}ui.seenFight=S.lastFight.id}
+  if(S.lastEx&&S.lastEx.id!==ui.seenEx){if(ui.seenEx!==undefined&&S.lastEx.p===me)toast(`Ruins: ${S.lastEx.txt}`);ui.seenEx=S.lastEx.id}
+  if(S.godEv&&S.godEv.id!==ui.seenGod){if(ui.seenGod!==undefined&&S.godEv.p===me){const G=GODS[S.godEv.g];note(`⚡ <b>${G.n}</b>: ${G.d}`,4000)}ui.seenGod=S.godEv.id}
   if(S.actEv&&S.actEv.id!==ui.seenAct){if(ui.seenAct!==undefined||S.round<=1)actPop(S.actEv.a);ui.seenAct=S.actEv.id}
-  if(S.taskEv&&S.taskEv.id!==ui.seenTask){if(ui.seenTask!==undefined)taskPop(S.taskEv,me);ui.seenTask=S.taskEv.id}
+  if(S.taskEv&&S.taskEv.id!==ui.seenTask){if(ui.seenTask!==undefined&&S.taskEv.p===me)note(`${S.taskEv.ok?'✓':'✗'} <b>${esc(S.taskEv.n)}</b> ${S.taskEv.txt}`,4500,S.taskEv.ok?'good':'bad');ui.seenTask=S.taskEv.id}
   ui.vpSeen=ui.vpSeen||{};S.seats.forEach((_,i)=>{const v=vp(i,i===me);if(ui.vpSeen[i]!==undefined&&ui.vpSeen[i]!==v&&S.silentV!==S.v){const b=document.querySelector('#pc'+i+' .vpb');if(b){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}ui.vpSeen[i]=v});
   const evId=S.event?S.event.t+':'+S.event.round:null;
   if(evId&&evId!==ui.seenEv){if(ui.seenEv!==undefined&&S.phase==='main')eventPop(S.event);ui.seenEv=evId}
   if(S.lastErr&&S.lastErr.id!==ui.seenErr){if(ui.seenErr!==undefined&&S.lastErr.uid===ME.uid)toast(S.lastErr.m);ui.seenErr=S.lastErr.id}
-  if(S.lvup&&S.lvup.id!==ui.seenLv){if(ui.seenLv!==undefined)toast(`${pname(S.lvup.p)} reached hero level ${S.lvup.lv}!`);ui.seenLv=S.lvup.id}
+  if(S.lvup&&S.lvup.id!==ui.seenLv){if(ui.seenLv!==undefined&&S.lvup.p===me)toast(`Your hero reached level ${S.lvup.lv}!`);ui.seenLv=S.lvup.id}
   updateDice();
   // ---- bottom dock: hand + big action buttons ----
   const dock=document.getElementById('dock');
@@ -3502,6 +3637,7 @@ function flyFromHex(h,p,r,k,delay){
   }
 }
 function eventPop(ev){sfx(ev&&EVBAD[ev.t]?'horn':'bless');
+  {const E2=EVENTS[ev.t];return note(`<b>${E2.n}</b> — ${riz(E2.d)}`,5000,EVBAD[ev.t]?'bad':'good')}
   document.querySelectorAll('.evcard').forEach(e=>e.remove());
   const E2=EVENTS[ev.t],tone=EVGOOD[ev.t]?'good':EVBAD[ev.t]?'bad':'calm';
   const el=document.createElement('div');el.className='evcard '+tone;
@@ -3514,7 +3650,8 @@ function godPop(G,p,me){
   el.innerHTML=`<div class="tp-k">${p===me?'YOU PRAY TO':esc(pname(p)).toUpperCase()+' PRAYS TO'}</div><div class="g-big">${ico('god-'+G.k)}</div><div class="tp-n">${G.n}</div><div class="tp-d">${G.d}</div>`;
   document.body.appendChild(el);setTimeout(()=>el.remove(),3200);
 }
-function actPop(a){                                          // scene card when a new act begins (art added later)
+function actPop(a){                                          // a new act: one floating line
+  return note(`<b>Act ${['I','II','III'][a-1]}: ${actName(a)}</b> — ${ACTS[a-1].s.split('. ')[0]}.`,5500,'act');
   const A=ACTS[a-1],el=document.createElement('div');el.className='evcard scene sc'+a;
   el.innerHTML=`<div class="sc-art art-scene-${a}"></div><div class="ev-k">ACT ${['I','II','III'][a-1]}</div><div class="ev-n">${actName(a)}</div><div class="ev-d">${A.s}${a===3&&!S.tw?' '+A.sh:''}</div>
     <div class="ev-d"><b>New quests:</b> ${A.q.map(Q=>Q.d).join(' · ')}</div><div class="ev-tap">tap to close</div>`;
@@ -3536,12 +3673,14 @@ function showBubble({p,t}){
 }
 
 // ---------- Sheets (bottom drawers) ----------
+const miniHand=me=>me<0?'':`<div class="minihand">${RES.filter(r=>r!=='ambrosia'||S.pl[me].res.ambrosia).map(r=>`<span title="${RNAME[r]}">${ico(r,'ic sm')}<b>${S.pl[me].res[r]||0}</b></span>`).join('')}${S.rpg&&S.rpg.k?`<span title="Gold">${ico('coin','ic sm')}<b>${S.pl[me].gold}</b></span>`:''}</div>`;   // your cards, shown on choice screens
 function closeSheet(){ui.sheet=null;ui.back=null;const s=document.getElementById('scrim');if(s)s.remove();requestAnimationFrame(placeCoach)}
 function needSheet(){                                         // the decision screen this player still owes, if any
   if(!S||S.phase==='over')return null;const me=mySeat(),mine=me>=0&&actor()===me;
   let need=mine&&['discard','steal','yop','mono','alch','court'].includes(S.sub)?S.sub:null;
   if(S.sub==='market'&&S.mk){if(S.mk.from===me)need='market';else if(!S.mk.resp[me])need='mresp'}
   if(S.sub==='duel'&&S.duel&&(S.duel.a===me||S.duel.b===me))need='duel';
+  if(S.sub==='mfight'&&S.mf&&S.mf.p===me)need='battle';
   return need;
 }
 function userClose(){                                         // Close / tap outside: Hero sub-screens go back to Hero
@@ -3660,20 +3799,37 @@ function drawSheet(){
       <div class="panel"><h3>RUINS</h3><p class="note">${S.ruins.length} ruin${S.ruins.length===1?'':'s'} on the map (the broken pillars). Walk your hero onto one and explore it: gold, glory, a relic, or a trap.</p></div>`:''}
       <button class="btn" id="x">Close</button>`;
   }else if(kind==='battle'){
-    const m=S.mons.find(m=>m.h===pl.hx),f=S.lastFight&&!S.lastFight.duel&&S.lastFight.p===me&&S.lastFight.id===ui.battleSeen?S.lastFight:null;
-    if(!m&&!f)return closeSheet();
-    const M=m?MONS[m.t]:MONS[f.t],can=m&&myMove()&&S.rolled&&!S.sub&&!S.hacted;
-    h=`<h2>Battle: ${M.n}</h2>
-      <div class="arena"><div class="fighter">${ico(HEROES[pl.hero].i,'ic xl')}<b>Your hero</b><div class="hpbar"><i style="width:${pl.hp/hpMax(me)*100}%"></i><span>HP ${pl.hp}/${hpMax(me)}</span></div><span class="tag">Hits for d6${atk(me)?' + '+atk(me):''}</span></div>
+    const F=S.mf&&S.mf.p===me&&(!S.mf.done||ui.mfSeen!==S.mf.n)?S.mf:null,m=F?S.mons.find(x=>x.id===F.id):S.mons.find(x=>x.h===pl.hx);
+    if(!F&&!m)return closeSheet();
+    const live=F&&!F.done,can=!F&&m&&myMove()&&S.rolled&&!S.sub&&!S.hacted,M=MONS[F?F.t:m.t],mhp=m?Math.max(0,m.hp):0,mmax=m?m.max:F.max,L=F&&F.last,I=live&&F.intent;
+    const it=I?(I.k==='atk'?`⚔ Next: hits for ${I.v*(F.charged?2:1)}`:I.k==='charge'?'⚡ Charging — next hit ×2':'🛡 Guarding — takes half'):'';
+    h=`<h2>${ico(F?F.t:m.t)} ${M.n}${live?` · round ${F.r} of 3`:''}</h2>
+      <div class="arena2">
+        <div class="af ${L&&L.mdmg?'hit':''}">${ico(HEROES[pl.hero].i,'dgmid')}<div class="hpbar"><i style="width:${Math.max(0,pl.hp)/hpMax(me)*100}%"></i><span>HP ${Math.max(0,pl.hp)}/${hpMax(me)}</span></div>${live?`<span class="tag">⚡ ${F.sta} stamina</span>`:`<span class="tag">⚔ ${atk(me)} · 🛡 ${armor(me)}</span>`}${L&&L.mdmg?`<i class="dmgf">−${L.mdmg}</i>`:''}</div>
         <b class="vs">VS</b>
-        <div class="fighter">${ico(m?m.t:f.t,'ic xl')}<b>${M.n}</b><div class="hpbar mon"><i style="width:${m?m.hp/m.max*100:0}%"></i><span>HP ${m?m.hp:0}/${m?m.max:f.max}</span></div><span class="tag">Hits for ½d6 + ${M.atk}${armor(me)?` − ${armor(me)} armour`:''}</span></div></div>
-      ${f?`<div class="panel"><b>${f.win?'Victory!':'You struck!'}</b><p class="note">You rolled <b>${f.d}</b> and dealt <b>${f.dmg}</b> damage.${f.win?` The ${M.n} is slain: +${M.gold} gold, +${M.ren} glory and loot.`:` It rolled ${f.md} and dealt <b>${f.taken}</b> damage to you.${f.ko?' Your hero was knocked out and carried home.':''}`}</p></div>`
-        :`<p class="note">One exchange per turn: you strike first; if it survives, it strikes back. Its wounds stay, so you can finish it next turn${S.seats.length>1?' (or a rival might steal the kill)':''}. At 0 HP your hero is carried home with 4 HP.</p>`}
-      <div class="row">${can?'<button class="btn pri" id="strike">Strike!</button>':''}<button class="btn" id="x">Close</button></div>`;
+        <div class="af ${L&&L.dmg?'hit':''}">${I?`<div class="intent ${I.k}">${it}</div>`:''}${ico(F?F.t:m.t,'ic xl')}<div class="hpbar mon"><i style="width:${mhp/mmax*100}%"></i><span>HP ${mhp}/${mmax}</span></div>${L&&L.dmg?`<i class="dmgf ${L.q===1?'crit':''}">−${L.dmg}</i>`:''}</div>
+      </div>
+      ${L?`<p class="note" style="text-align:center">${L.q===1&&L.dmg?'<b>PERFECT!</b> ':''}${L.txt}</p>`:''}
+      ${live?`<div class="tmbar"><i class="tz"></i><i class="tz2"></i><i class="tm"></i></div><p class="note" style="text-align:center;margin:4px 0 8px">Tap Strike or Power when the marker is in the gold</p>
+        <div class="fbtns"><button class="btn pri" data-mf="strike">⚔ Strike</button><button class="btn pri" data-mf="power" ${F.sta>=2?'':'disabled'}>💥 Power ×2 <small>2⚡</small></button><button class="btn" data-mf="guard">🛡 Guard <small>+1⚡</small></button><button class="btn sm" data-mf="flee">Flee</button></div>`
+      :can?`<p class="note">Up to 3 rounds. Its next move shows above its head — guard against big hits.</p><div class="row"><button class="btn pri" id="strike">⚔ Fight!</button><button class="btn" id="x">Close</button></div>`
+      :`<div class="panel" style="text-align:center"><b>${F&&F.win?'🏆 Victory!':F&&F.ko?'☠ Your hero was knocked out.':F?'The fight is over.':''}</b></div><button class="btn" id="x">Close</button>`}`;
+  }else if(kind==='capital'){                                 // a Capital: defences + the conquest checklist
+    const o=ui.arg,c=cs(o),own=o===me,hx=S.tw.cap[o],ok=b=>b?'✅':'⬜';
+    const st=[[atWar(me,o),`You are at war with ${esc(pname(o))}`+(S.tw.on?'':' (declare war in Hero → War, or wait for round '+S.tw.war+')')],
+      [pl.hx===hx,'Your hero stands on this Capital'],[S.pl[o].hx!==hx,'Their hero is away (or in the Underworld)'],
+      [c.camp===me,'Siege camp set (first Siege)'],[c.hp<=0||c.fallen,'Siege every turn until its HP is 0']];
+    h=`<h2>${ico('ptower')} ${own?'Your':esc(pname(o))+"'s"} Capital</h2>
+      <div class="hpbar mon" style="margin:6px 0"><i style="width:${c.fallen?0:c.hp/capMax(o)*100}%"></i><span>${c.fallen?'FALLEN to '+esc(pname(c.by)):'HP '+c.hp+'/'+capMax(o)}</span></div>
+      <p class="note">${ico('pwall','ic sm')} Walls ${c.wall}/3 · ${ico('ptower','ic sm')} Tower ${c.tower?'yes':'no'} · ${ico('pgar','ic sm')} Garrison ${c.gar} (each blocks 2 damage per Siege)${c.camp>=0?` · ⛺ ${esc(pname(c.camp))} is camped here`:''}</p>
+      ${own?`<div class="panel"><h3>DEFEND IT</h3><p class="note">Keep your hero home when enemies are near. Build walls, a tower and a garrison in Hero → Train & equip → Capital.</p></div>`
+        :`<div class="panel"><h3>HOW TO CONQUER IT</h3><div class="glist">${st.map(([b,t])=>`<div class="gitem"><span>${ok(b)} ${t}</span></div>`).join('')}</div>
+          <p class="note">When it falls: <b>+2 VP</b>, half their cards, their best city, and you may build on their island. They become your vassal until they beat your hero.</p></div>`}
+      <button class="btn" id="x">Close</button>`;
   }else if(kind==='court'){
     const D=COURT.find(x=>x.id===pl.court);if(!D||S.sub!=='court')return closeSheet();
     const eff=o=>[o.cost?'Pay '+tradeTxt(o.cost):'',o.gcost?`Pay ${o.gcost} gold`:'',o.gold?`+${o.gold} gold`:'',o.ren?`${o.ren>0?'+':''}${o.ren} glory`:'',o.xp?`+${o.xp} hero XP`:'',o.heal?'Hero fully healed':'',o.gain?'Gain '+tradeTxt(o.gain):'',o.lose?'Lose 1 random card':'',o.relic?'Gain the '+RELICS[o.relic].n:''].filter(Boolean).join(' · ')||'Nothing happens';
-    h=`<span class="tag">THE AGORA · ROUND ${S.round}</span><h2>${D.t}</h2><p>${D.d}</p>
+    h=`<span class="tag">THE AGORA · ROUND ${S.round}</span><h2>${D.t}</h2><p>${D.d}</p>${miniHand(me)}
       ${['a','b'].map(c=>`<button class="courtopt" data-court="${c}" ${canChoose(me,D[c])?'':'disabled'}><b>${D[c].l}</b><span>${eff(D[c])}</span></button>`).join('')}
       <p class="note">Renown: every 5 points is worth 1 victory point (up to 3).</p>`;
   }else if(kind==='gold'){
@@ -3773,10 +3929,10 @@ function drawSheet(){
             :`${atWar(me,q)?'<span class="tag">⚔ at war</span>':S.tw.on?'':`<button class="btn sm" data-war="${q}" ${post&&afford(me,WARCOST)&&pl.gold>=WARGOLD?'':'disabled'}>Declare war</button>`}${dg(me).noPact||dg(q).noPact?'':`<button class="btn sm" data-pact="${q}" ${myMove()&&!sent?'':'disabled'}>${sent?'Pact offered':'Offer pact'}</button>`}`}</span></div>
           ${al?`<p class="note">Ally's hand: ${RES.filter(r=>S.pl[q].res[r]).map(r=>riz(S.pl[q].res[r]+' '+RNAME[r])).join(', ')||'empty'} · pact until round ${(S.tw.pacts.find(x=>(x.a===q&&x.b===me)||(x.a===me&&x.b===q))||{}).until}</p>`:''}`}).join('')}
         <p class="note">Pact: no war, duels or raids between you for 3 rounds, and you see each other's hand. Breaking it costs 1 VP.</p></div>`:''}
-      ${S.tw&&!S.hmoved&&post?`<div class="panel"><h3>${ico('ship')} CROSS THE SEA</h3><p class="note">Dotted routes: 1 step each${pl.ship?' — your ship sails 2 routes for free':''}.</p><div class="row" style="flex-wrap:wrap;gap:6px">
-        ${harbourHexes().includes(pl.hx)?`<button class="btn sm" data-bmode="ferry" ${pl.gold>=1?'':'disabled'}>⛴ Ferry to any harbour · 1 gold</button>`:'<span class="note">Ferry: stand on a harbour tile first.</span>'}
+      ${S.tw&&!S.hmoved&&post?`<div class="panel"><h3>${ico('ship')} CROSS THE SEA</h3><p class="note">${seaMap()?'Ships sail from harbours ⚓ hex by hex.':'Dotted routes: 1 step each.'}</p><div class="row" style="flex-wrap:wrap;gap:6px">
+        ${seaMap()?`<span class="note">${pl.ship||dg(me).sea?'Board at a harbour ⚓ tile, then every sea hex is 1 step.':canShip(me)?'You can build a ship.':'Build a village on a harbour ⚓ to build a ship.'}</span>`:''}
         <button class="btn sm" data-bmode="gtravel" ${pl.res.ambrosia>=2?'':'disabled'}>${ico('wing')} Divine travel anywhere · ${costIcons({ambrosia:2})}</button>
-        ${pl.ship?'<span class="tag">⛵ ship owned</span>':`<button class="btn sm" data-ship="1" ${afford(me,SHIPC)?'':'disabled'}>⛵ Build a ship · ${costIcons(SHIPC)}</button>`}</div></div>`:''}
+        ${pl.ship?'<span class="tag">⛵ ship owned</span>':`<button class="btn sm" data-ship="1" ${afford(me,SHIPC)&&(!seaMap()||canShip(me))?'':'disabled'}>⛵ Build a ship · ${costIcons(SHIPC)}</button>`}</div></div>`:''}
       <div class="row">${S.tw?`<button class="btn pri" id="bArm">${ico('str')} Train & equip</button>`:''}<button class="btn" id="bHero2">Perks & rules</button><button class="btn" id="x">Close</button></div>`;}
   }else if(kind==='exit'){                                    // leave now and continue later, or end the game for everyone
     h=`<h2>${ico('exit')} Leave the game?</h2>
@@ -3800,7 +3956,7 @@ function drawSheet(){
         <h3 class="lbl">BATTLE CARD (optional) · ⚡${D.sta[mi]} stamina left</h3>
         <div class="row" style="flex-wrap:wrap;gap:6px"><button class="dcard" data-dc="-1" aria-pressed="${ui.dc<0}"><b>None</b></button>${bc.map((c,i)=>`<button class="dcard art art-bc-${c}" data-dc="${i}" aria-pressed="${ui.dc===i}" title="${BCARD[c].d}" ${BCARD[c].sta+(dg(me).heavy||0)>D.sta[mi]?'disabled style="opacity:.4"':''}><b>${BCARD[c].n}</b></button>`).join('')}</div>
         ${ui.dc>=0&&bc[ui.dc]?`<p class="note"><b>${BCARD[bc[ui.dc]].n}</b>: ${BCARD[bc[ui.dc]].d} (${BCARD[bc[ui.dc]].sta+(dg(me).heavy||0)} stamina)</p>`:''}
-        <button class="btn pri" id="dgo">Lock in</button>`
+        ${ui.dst==='atk'?'<div class="tmbar"><i class="tz"></i><i class="tz2"></i><i class="tm"></i></div><p class="note" style="text-align:center;margin:4px 0 8px">Attack: lock in when the marker is in the gold for bonus damage</p>':''}<button class="btn pri" id="dgo">Lock in</button>`
       :`<p class="note">${mi>=0?'Your choice is locked. ':''}Waiting for ${esc(pname(actor()))} to choose…</p>${mi<0?'<button class="btn" id="x">Close</button>':''}`}`;
   }else if(kind==='armory'){
     if(!S.tw)return closeSheet();
@@ -3882,7 +4038,7 @@ function drawSheet(){
   sc.querySelectorAll('[data-bmode]').forEach(b=>b.onclick=()=>{ui.build=b.dataset.bmode;closeSheet();renderGame()});
   sc.querySelectorAll('[data-dst]').forEach(b=>b.onclick=()=>{ui.dst=b.dataset.dst;drawSheet()});
   sc.querySelectorAll('[data-dc]').forEach(b=>b.onclick=()=>{ui.dc=+b.dataset.dc;drawSheet()});
-  const dgo=sc.querySelector('#dgo');if(dgo)dgo.onclick=()=>{const o={st:ui.dst,c:ui.dc};ui.dst='atk';ui.dc=-1;act(me,'dpick',o);drawSheet()};
+  const dgo=sc.querySelector('#dgo');if(dgo)dgo.onclick=()=>{const tt=((performance.now()-ui.tb0)%1200)/1200,tx=tt<.5?tt*2:2-tt*2,td=Math.abs(tx-.5),o={st:ui.dst,c:ui.dc,t:ui.dst==='atk'?(td<.07?1:td<.2?.5:0):0};if(o.t)note(o.t===1?'<b>PERFECT!</b> +3 if your Attack lands':'Good timing +1',1200,'good');ui.dst='atk';ui.dc=-1;act(me,'dpick',o);drawSheet()};
   sc.querySelectorAll('[data-war]').forEach(b=>b.onclick=()=>{act(me,'war',+b.dataset.war);drawSheet()});
   sc.querySelectorAll('[data-pact]').forEach(b=>b.onclick=()=>{act(me,'pactoffer',+b.dataset.pact);drawSheet()});
   sc.querySelectorAll('[data-pans]').forEach(b=>b.onclick=()=>{const [q,ok]=b.dataset.pans.split(':');act(me,'pactans',{from:+q,ok:ok==='1'});drawSheet()});
@@ -3905,14 +4061,20 @@ function drawSheet(){
   on('devdice',()=>{act(me,'dev',{op:'dice',arg:[ui.dd[0],ui.dd[1]]});toast('Next roll set to '+(ui.dd[0]+ui.dd[1]))});
   on('devfast',()=>{ui.fast=!ui.fast;drawSheet()});on('devlock',()=>{ui.dev=false;closeSheet();renderGame()});
   on('devkill',()=>{ui.dev=false;LS.set('st-nodev',1);closeSheet();toast('Developer menu removed from this device');renderGame()});
-  on('devok',()=>{const v=(document.getElementById('devin').value||'').trim().toUpperCase();if(v==='ZEUS'){ui.dev=true;openSheet('dev');renderGame()}else{toast('Wrong code');closeSheet()}});
+  on('devok',()=>{const v=(document.getElementById('devin').value||'').trim().toUpperCase();if(v==='ZEUS'){ui.dev=true;LS.set('st-admin',1);openSheet('dev');renderGame()}else{toast('Wrong code');closeSheet()}});
   sc.querySelectorAll('[data-pray]').forEach(b=>b.onclick=()=>{act(me,'pray',b.dataset.pray);closeSheet()});
   sc.querySelectorAll('[data-take]').forEach(b=>b.onclick=()=>act(me,'ttake',+b.dataset.take));
   on('tdraw',()=>act(me,'tdraw'));on('bImp',()=>openSheet('imp'));on('bDev',()=>{act(me,'buydev');closeSheet()});on('bGold',()=>openSheet('gold'));on('bHero2',()=>openSheet('hero'));on('exLater',()=>{closeSheet();leave()});
   on('exEnd',()=>{closeSheet();endState(S,pname(mySeat()));if(S.online)save();else LS.del('st-local');leave()});on('bArm',()=>openSheet('armory'));on('bBuyBC',()=>{act(me,'bcbuy');drawSheet()});
   sc.querySelectorAll('[data-court]').forEach(b=>b.onclick=()=>act(me,'court',b.dataset.court));
   sc.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>act(me,'buy',b.dataset.buy));
-  on('strike',()=>{act(me,'battle');ui.battleSeen=S.lastFight&&S.lastFight.id;drawSheet()});
+  on('strike',()=>{act(me,'battle');drawSheet()});
+  ui.tb0=performance.now();                                    // timing bar: marker runs 0→1→0 every 1.2 s (matches the CSS animation)
+  const tq=()=>{const t=((performance.now()-ui.tb0)%1200)/1200,x=t<.5?t*2:2-t*2,d=Math.abs(x-.5);return d<.07?1:d<.2?.5:0};
+  sc.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{const a=b.dataset.mf,q=['strike','power'].includes(a)?tq():0;
+    if(['strike','power'].includes(a))note(q===1?'<b>PERFECT!</b> +3':q===.5?'Good hit +1':'Off-beat — weak hit',1200,q?'good':'bad');
+    act(me,'mfight',{a,t:q});if(S.mf&&S.mf.done)ui.mfDone=S.mf.n;drawSheet()});
+  {const x=sc.querySelector('#x');if(x&&S.mf&&S.mf.done&&S.mf.p===me)x.addEventListener('click',()=>{ui.mfSeen=S.mf.n})}
   sc.querySelectorAll('[data-steal]').forEach(b=>b.onclick=()=>act(me,'steal',+b.dataset.steal));
   sc.querySelectorAll('[data-mono]').forEach(b=>b.onclick=()=>act(me,'mono',b.dataset.mono));
   on('x',userClose);on('lob',()=>{closeSheet();leave()});
@@ -3945,6 +4107,10 @@ render();
     }
   }catch(e){db=null}
   dbState=db?'on':'off';
+  if(window.TAUTH){ui.authWait=true;TAUTH.on(async u=>{ui.user=u;
+    if(u){ME.uid=u.uid;if(u.name){ME.name=u.name;LS.set('st-name',u.name)}LS.del('st-guest');await cloudLoad()}
+    else ME.uid=LS.get('st-uid',ME.uid);
+    ui.authWait=false;if(!S)renderLobby()})}
   if(db){
     unsubList=db.collection('games').orderBy('upd','desc').limit(12).onSnapshot(s=>{games=s.docs.map(x=>({id:x.id,...x.data()}));if(!S)renderLobby()},()=>{});
   }
