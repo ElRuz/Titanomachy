@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261110015059'</script>
+<script>window.BUILD='20261110015836'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -419,6 +419,34 @@ h1,h2,h3{letter-spacing:.03em}
 .mythbtn{background-image:linear-gradient(90deg,#120a26e6,#120a2666),var(--mbg)!important;background-size:cover!important;background-position:center!important}
 .gi{width:1.35em;height:1.35em;vertical-align:-.3em;flex:none;filter:drop-shadow(0 1px 1px #0009)}
 .btn.pri .gi,.hbtn.gold .gi,.rv-tag .gi{color:#4a2d06;filter:none}
+.btn.lockd{filter:grayscale(.7) brightness(.75)}
+#rfbtn{position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top));z-index:60;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;padding:0;border:2px solid #c9a24a;background:radial-gradient(circle at 35% 30%,#2d4f80,#0b1626);color:#ffd86a;box-shadow:0 4px 10px #0009}#rfbtn svg{width:22px;height:22px}#rfbtn[hidden]{display:none}body.ingame #rfbtn{display:none}
+/* ===== quest rows (high-end game style) ===== */
+.qrow{position:relative;display:grid;grid-template-columns:44px 1fr 52px;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(#1d3557,#132640);border:1px solid #c9a24a55;box-shadow:inset 0 1px 0 #ffffff1a,0 4px 10px #0006;animation:qin .45s calc(var(--k)*.07s) cubic-bezier(.2,.8,.2,1) both}
+@keyframes qin{from{opacity:0;translate:-14px 0}}
+.qrow.done{background:linear-gradient(#3b2f12,#1c1608);border-color:#ffd86a;box-shadow:inset 0 1px 0 #fff3,0 0 14px #ffd86a44}
+.qic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#3c5a86,#0e1d33);border:2px solid #c9a24a;box-shadow:0 3px 6px #0008}
+.qic .gi{width:22px;height:22px;color:#ffd86a}
+.qrow.done .qic{background:radial-gradient(circle at 35% 30%,#fff6 0 15%,#ffe7a3 30%,#c9952f 70%,#7a4f0e);border-color:#ffe7a3}.qrow.done .qic .gi{color:#3a2604}
+.qmid b{display:block;font:800 15px Cinzel,Georgia,serif;color:#fff;margin-bottom:5px}
+.qbar{position:relative;height:14px;border-radius:7px;background:#06101e;border:1px solid #c9a24a99;box-shadow:inset 0 2px 4px #000c;overflow:hidden}
+.qbar i{position:absolute;inset:0;width:calc(var(--f)*100%);background:linear-gradient(#fff4a8,#f2c14e 45%,#b8801d);box-shadow:0 0 10px #ffd86a99;border-radius:6px 0 0 6px;animation:qfill 1.1s .2s cubic-bezier(.3,.8,.3,1) both}
+@keyframes qfill{from{width:0}}
+.qbar::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/var(--seg) - 2px),#06101ecc calc(100%/var(--seg) - 2px) calc(100%/var(--seg)))}  /* segment ticks */
+.qbar span{position:absolute;inset:0;display:grid;place-items:center;font:900 10px system-ui;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;z-index:1}
+.qbar.big{height:18px;border-radius:9px}.qbar.big span{font-size:11px}
+.qrew{display:grid;justify-items:center;gap:1px}.qrew .gi{width:24px;height:24px;color:#ffd86a;filter:drop-shadow(0 0 4px #ffd86a88)}.qrew small{font:900 11px Cinzel,Georgia,serif;color:#ffe7a3}
+.qrow.done .qrew{opacity:0}
+.qstamp{position:absolute;right:6px;top:50%;translate:0 -50%;rotate:-10deg;font:900 12px Cinzel,Georgia,serif;letter-spacing:.14em;color:#ffd86a;border:2px solid #ffd86a;padding:2px 8px;border-radius:6px;background:#1c1608cc;
+  box-shadow:0 0 10px #ffd86a66;animation:qstamp .5s calc(.4s + var(--k)*.07s) cubic-bezier(.2,1.6,.4,1) both}
+@keyframes qstamp{from{scale:2.2;opacity:0}}
+/* level emblem: laurel wreath + number */
+.lvemb{position:relative;width:86px;height:86px;flex:none;display:grid;place-items:center;
+  background:radial-gradient(circle at 40% 35%,#2d4f80,#0b1626 70%);border-radius:50%;border:3px solid #c9a24a;box-shadow:0 0 0 3px #0b1626,0 0 0 5px #8a5a12,0 6px 16px #000a,0 0 22px #ffd86a44}
+.lvwreath{position:absolute;inset:6%;width:88%;height:88%;color:#ffd86a;filter:drop-shadow(0 0 4px #ffd86a88)}
+.lvemb span{position:relative;font:900 32px/1 Cinzel,Georgia,serif;background:linear-gradient(#fff,#ffe7a3 50%,#c9952f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #0009);margin-top:-8px}
+.lvemb small{position:absolute;bottom:12px;font:900 8px Cinzel,Georgia,serif;letter-spacing:.2em;color:#ffe7a3}
 /* ===== victory / defeat ===== */
 .vic{text-align:center}
 .vic-rays{position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg,#ffd86a33 0 8deg,transparent 8deg 20deg);animation:vspin 30s linear infinite;pointer-events:none}
@@ -3135,7 +3163,7 @@ function sealSVG(){                                            // chains from th
     <circle cx="50" cy="73" r="3.6" fill="none" stroke="#fff3c4" stroke-width=".5" opacity=".7"/></svg>`}
 const TAPS={};                                                  // taps on each locked hero
 function tapUnlock(k){                                           // 3 taps on a locked hero = unlock it
-  TAPS[k]=(TAPS[k]||0)+1;if(TAPS[k]<3)return toast(`Tap ${3-TAPS[k]} more time${TAPS[k]===2?'':'s'} to unlock`);
+  TAPS[k]=(TAPS[k]||0)+1;if(TAPS[k]<3)return;                    // silent until the 3rd tap
   TAPS[k]=0;const r=grantHero(k);cloudSave();
   if(HVID[k])return revealHero(k,r,()=>renderLobby());           // hero with a clip: full video reveal
   sfx('win');toast(`${HEROES[k].n} unlocked!`);renderLobby()}    // no clip yet: just unlock
@@ -3144,7 +3172,7 @@ function redeemPromo(code){
   code=(code||'').trim().toUpperCase();if(!code)return toast('Enter a code');
   const p=prof();p.used=p.used||[];if(!PROMOS[code])return toast('Invalid code');if(p.used.includes(code))return toast('Code already used');
   p.used.push(code);p.heroes=p.heroes||{};Object.keys(HEROES).forEach(k=>{if(!p.heroes[k])p.heroes[k]={c:1}});   // every hero unlocked
-  p.packs=(p.packs||0)+99;p.xp=(p.xp||0)+5000;saveProf(p);cloudSave();sfx('win');toast('All heroes unlocked · +99 packs');renderLobby()}
+  p.packs=(p.packs||0)+99;p.xp=(p.xp||0)+5000;while(p.xp>=xpNeed(p.lv)){p.xp-=xpNeed(p.lv);p.lv++}saveProf(p);cloudSave();sfx('win');toast('All heroes unlocked · +99 packs');renderLobby()}
 function heroesHTML(){                                         // the collection: owned cards, locked cards, mythic teaser
   const p=prof(),ord=['l','e','r','c'];
   return `<div class="box"><h2>Your heroes</h2>
@@ -3155,7 +3183,11 @@ function heroesHTML(){                                         // the collection
       return `<button class="hc ry-${ry} ${o?'':'lock'} ${cfg.hero===k?'sel':''}" data-hc="${k}"><span class="cfr fr-${ry}"></span><img src="${o?heroImg(k):figImg(k)}" alt=""><span class="hn">${o?H.n:'???'}</span>${o?`<span class="hpa">${H.par}</span>`:''}<span class="hs">${o?'★'.repeat(Math.max(1,st)):'<svg class=gi><use href=#g-lock></use></svg>'}</span></button>`}).join('')}</div>`).join('')}
     <h3 class="rhead mythic-t">Mythic · the gods</h3><div class="mythban"></div><div class="hgrid">${MYTHIC.map(g=>`<button class="hc mythic myth-${g.n.toLowerCase()}" data-myth="${g.n}"><i class="mchain a"></i><i class="mchain b"></i><i class="mlock"></i>${ico(g.i,'mic')}<span class="hn">${g.n}</span><span class="hs">SEALED</span></button>`).join('')}</div>
     <p class="note center mythic-t">No weakness. They reshape the board, the sky and your whole world. Sealed by the Fates — for now.</p></div>`}
-function renderLobby(){
+const isApp=()=>{try{return navigator.standalone||matchMedia('(display-mode: standalone)').matches}catch(e){return false}};   // opened from the home screen
+function reloadApp(){toast('Reloading…');setTimeout(()=>location.reload(),250)}
+function renderLobby(){setTimeout(()=>{let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
+    if(!b){b=document.createElement('button');b.id='rfbtn';b.setAttribute('aria-label','Reload');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.onclick=reloadApp;document.body.appendChild(b)}
+    b.hidden=!!(S&&S.phase)},0);
   document.querySelectorAll('.evcard,.godpop,.bigroll,.taskpop,#tipcard,#coachring,#coachtip,#toasts>*').forEach(e=>e.remove());   // no game pop-ups over the menus
   applyCos();
   if(window.TAUTH&&ui.authWait){app.innerHTML='<div class="splash"><p>Loading…</p></div>';return}   /* loading screen with the Olympus splash art */
@@ -3178,7 +3210,9 @@ function renderLobby(){
       saveProf({xp:0,lv:1,sel:{},day:{},week:{}});                                   // fresh profile: no heroes, packs, XP; Trials start again (also overwrites the cloud save)
       ['st-hero','st-local','st-tour','st-tour-tw','st-coachseen'].forEach(k=>LS.del(k));
       cfg.hero=Object.keys(HEROES)[0];S=null;sfx('click');toast('Profile reset');ui.screen='home';renderLobby()};
-    app.querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.equip.split(':'),p=prof();p.sel=p.sel||{};p.sel[k]=id;saveProf(p);applyCos();sfx('click');renderLobby()});return}
+    app.querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.equip.split(':'),p=prof();
+      if(b.classList.contains('lockd')){TAPS[k+':'+id]=(TAPS[k+':'+id]||0)+1;if(TAPS[k+':'+id]<3)return;   /* secret: 3 taps unlock it */
+        TAPS[k+':'+id]=0;p.unl=p.unl||[];p.unl.push(k+':'+id);saveProf(p);sfx('win');toast('Unlocked!');return renderLobby()}p.sel=p.sel||{};p.sel[k]=id;saveProf(p);applyCos();sfx('click');renderLobby()});return}
   if(sc==='heroes'){app.innerHTML=`<div class="lobby">${back}${heroesHTML()}</div>`;document.getElementById('bBack').onclick=()=>{ui.screen='home';renderLobby()};
     const bp=document.getElementById('bPack');if(bp)bp.onclick=()=>openPack();
     const bpromo=app.querySelector('#bPromo');if(bpromo)bpromo.onclick=()=>redeemPromo(app.querySelector('#promoIn').value);
@@ -3625,7 +3659,7 @@ function renderLogin(){                                        // sign in / crea
   document.getElementById('aGuest').onclick=()=>{LS.set('st-guest',1);ui.user=null;try{TAUTH.out()}catch(e){}   /* end any old account session */
     ME.name=LS.get('st-gname','Guest');renderLobby()};
 }
-const unlocked=(p,kind,id)=>(kind==='hero'&&DG_OPEN)||UNL.some(u=>u[1]===kind&&u[2]===id&&u[0]<=p.lv);
+const unlocked=(p,kind,id)=>(kind==='hero'&&DG_OPEN)||(p.unl||[]).includes(kind+':'+id)||UNL.some(u=>u[1]===kind&&u[2]===id&&u[0]<=p.lv);   /* p.unl = tap-unlocked */
 // ---- hero cards: prof().heroes = {key:{c:copies}}; stars from duplicates (1,2,3,4 more copies = ★2..★5) ----
 const STARN=[0,1,3,6,10];
 const heroStar=k=>{const c=((prof().heroes||{})[k]||{}).c||0;let st=0;STARN.forEach((n,i)=>{if(c>n)st=i+1});return st};
@@ -3753,18 +3787,21 @@ function awardGame(){                                          // XP once per fi
 }
 function applyCos(){const s=prof().sel||{};if(document.body&&document.body.dataset){document.body.dataset.dice=s.dice||'';document.body.dataset.board=s.board||''}}
 function profileHTML(){
-  const p=freshCh(prof());saveProf(p);const sel=p.sel||{},need=xpNeed(p.lv),nxt=UNL.find(u=>u[0]>p.lv);
-  const ch=(list,D,xp)=>list.map(c=>{const d=D.find(z=>z.id===c.id);return `<div class="gitem"><span>${c.done?'<svg class=gi><use href=#g-check></use></svg>':'<svg class=gi><use href=#g-target></use></svg>'} <b>${d.t}</b><div class="hpbar" style="margin-top:4px"><i style="width:${c.pr/d.n*100}%"></i><span>${c.pr}/${d.n}</span></div></span><span class="tag">+${xp} XP</span></div>`}).join('');
+  const p=freshCh(prof());p.lv=p.lv||1;p.xp=p.xp||0;while(p.xp>=xpNeed(p.lv)){p.xp-=xpNeed(p.lv);p.lv++}saveProf(p);const sel=p.sel||{},need=xpNeed(p.lv),nxt=UNL.find(u=>u[0]>p.lv);
+  const ch=(list,D,xp)=>list.map((c,k)=>{const d=D.find(z=>z.id===c.id),pr=Math.min(c.pr,d.n),seg=d.n<=10?d.n:10,f=pr/d.n;   // quest card: segmented bar, reward chest, COMPLETE stamp
+      return `<div class="qrow ${c.done?'done':''}" style="--k:${k}"><div class="qic"><svg class=gi><use href=#g-${c.done?'check':'target'}></use></svg></div>
+        <div class="qmid"><b>${d.t}</b><div class="qbar" style="--seg:${seg}"><i style="--f:${f}"></i><span>${pr} / ${d.n}</span></div></div>
+        <div class="qrew"><svg class=gi><use href=#g-laurel></use></svg><small>+${xp}</small></div>${c.done?'<div class="qstamp">COMPLETE</div>':''}</div>`}).join('');
   const kinds=['dice','board','frame','title','god','hero'];
   return `<div class="box"><h2>${ico('vp')} Your profile</h2>
-    <div class="row" style="gap:12px;align-items:center"><div class="lvbadge">${p.lv}</div><div style="flex:1"><b>${esc(ME.name||'Player')}</b>${sel.title?` · <i>${TITLES[sel.title]}</i>`:''}
-      <div class="hpbar" style="margin-top:6px"><i style="width:${p.xp/need*100}%"></i><span>Level ${p.lv} · ${p.xp}/${need} XP</span></div>
+    <div class="row" style="gap:12px;align-items:center"><div class="lvemb"><svg viewBox="0 0 100 100" class="lvwreath"><use href="#g-laurel"/></svg><span>${p.lv}</span></div><div style="flex:1"><b>${esc(ME.name||'Player')}</b>${sel.title?` · <i>${TITLES[sel.title]}</i>`:''}
+      <div class="qbar big" style="--seg:10;margin-top:6px"><i style="--f:${Math.min(1,p.xp/need)}"></i><span>${p.xp} / ${need} XP</span></div>
       <p class="note">${nxt?`Next unlock at level ${nxt[0]}: ${nxt[3]}`:'Everything unlocked!'} · Every game gives XP; wins, duels, trophies and challenges give more.</p></div></div></div>
     <div class="box"><h3 class="lbl">TODAY'S CHALLENGES · +25 XP each</h3><div class="glist">${ch(p.day.list,DCH,25)}</div>
       <h3 class="lbl" style="margin-top:10px">THIS WEEK · +100 XP each</h3><div class="glist">${ch(p.week.list,WCH,100)}</div></div>
     <div class="box"><h3 class="lbl">UNLOCKS · tap to use</h3>${kinds.map(k=>`<h4 style="margin:10px 0 4px">${KINDN[k]}</h4><div class="row" style="flex-wrap:wrap;gap:6px">
       ${k!=='hero'?`<button class="btn sm" data-equip="${k}:" ${!sel[k]?'aria-pressed="true"':''}>Default</button>`:''}
-      ${UNL.filter(u=>u[1]===k).map(u=>{const ok=u[0]<=p.lv,on=sel[k]===u[2];return `<button class="btn sm ${on?'pri':''}" data-equip="${k}:${u[2]}" ${ok&&k!=='hero'?'':'disabled'}>${ok?'':'<svg class=gi><use href=#g-lock></use></svg> Lv'+u[0]+' · '}${u[3].replace(/^[^:]*: /,'')}${on?' ✓':''}</button>`}).join('')}</div>`).join('')}
+      ${UNL.filter(u=>u[1]===k).map(u=>{const ok=u[0]<=p.lv||(p.unl||[]).includes(k+':'+u[2]),on=sel[k]===u[2];return `<button class="btn sm ${on?'pri':''} ${ok?'':'lockd'}" data-equip="${k}:${u[2]}" ${k==='hero'&&ok?'disabled':''}>${ok?'':'<svg class=gi><use href=#g-lock></use></svg> Lv'+u[0]+' · '}${u[3].replace(/^[^:]*: /,'')}${on?' ✓':''}</button>`}).join('')}</div>`).join('')}
       <p class="note">Unlocked heroes appear in the hero picker when you start a game. Patron gods are only for looks.</p></div>
     <div class="box"><h3 class="lbl">SHOP</h3><p class="note">Coming soon: extra dice, boards and frames. Everything that changes the game stays free to unlock by playing.</p></div>`;
 }
@@ -4526,7 +4563,7 @@ function drawSheet(){
       ${S.prayed?'<p class="note">You have prayed this turn.</p>':!post?'<p class="note">Prayers are made on your turn, after rolling.</p>':''}<button class="btn" id="x">Close</button>`;
   }else if(kind==='guide'){
     const ks=Object.keys(TIPS).filter(k=>!(k==='raiders'&&!S.ck)&&!(['hero','monster','ruins','agora'].includes(k)&&!(S.rpg&&S.rpg.k))&&!(k==='event'&&!S.rpg.ev)&&!(k==='missions'&&!S.tasks)&&!(k==='oracle'&&S.ck));
-    h=`<h2>${uico('help','ui')} Guide</h2><button class="btn pri" id="bTour" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-play></use></svg> Step-by-step walkthrough</button><div class="row" style="gap:8px;margin-bottom:8px"><button class="btn tgl" id="bSfx"><svg class=gi><use href=#g-speaker></use></svg> Sounds: ${SND.fx()?'ON':'OFF'}</button><button class="btn tgl" id="bMus"><svg class=gi><use href=#g-lyre></use></svg> Music: ${SND.mu()?'ON':'OFF'}</button></div><button class="btn" id="bCoach" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-owl></use></svg> Show me what to tap: ${coachOn()?'ON':'OFF'}</button><p class="note">Or tap any topic to read it.</p><div class="guide">${ks.map(k=>`<button class="gtopic" data-tip="${k}">${ico(TIPS[k].i)}<b>${TIPS[k].t}</b></button>`).join('')}</div>
+    h=`<h2>${uico('help','ui')} Guide</h2><button class="btn pri" id="bTour" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-play></use></svg> Step-by-step walkthrough</button><div class="row" style="gap:8px;margin-bottom:8px"><button class="btn tgl" id="bSfx"><svg class=gi><use href=#g-speaker></use></svg> Sounds: ${SND.fx()?'ON':'OFF'}</button><button class="btn tgl" id="bMus"><svg class=gi><use href=#g-lyre></use></svg> Music: ${SND.mu()?'ON':'OFF'}</button></div><button class="btn" style="width:100%;margin-bottom:8px" onclick="reloadApp()">↻ Reload app</button><button class="btn" id="bCoach" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-owl></use></svg> Show me what to tap: ${coachOn()?'ON':'OFF'}</button><p class="note">Or tap any topic to read it.</p><div class="guide">${ks.map(k=>`<button class="gtopic" data-tip="${k}">${ico(TIPS[k].i)}<b>${TIPS[k].t}</b></button>`).join('')}</div>
       ${S.rpg&&S.rpg.k?'<button class="btn" id="bHow">Heroes mode — full rules</button>':''}<button class="btn" id="x">Close</button>`;
   }else if(kind==='emote'){
     h=`<h2>Say something</h2><div class="emogrid">${EMOTES.map((t,i)=>`<button class="emo-b ${t.length<=2?'big':''}" data-emo="${i}">${riz(esc(t))}</button>`).join('')}</div><button class="btn" id="x">Close</button>`;
