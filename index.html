@@ -2914,7 +2914,7 @@ function endState(st,who){                                     // finish a game 
   st.winner=st.seats.map((_,i)=>i).sort((a,b)=>vpOf(b)-vpOf(a))[0];st.phase='over';st.ended=true;st.sub=null;
   (st.log=st.log||[]).push(`Game ended early by <b>${esc(who||'a player')}</b>`);
 }
-function leave(){vcStop();document.body.classList.remove('ingame');ui.screen='home';unsubGame&&unsubGame();unsubMoves&&unsubMoves();unsubGame=unsubMoves=null;S=null;ui={d3:ui.d3,screen:'home'};render()}
+function leave(){vcStop();document.body.classList.remove('ingame');ui.screen='home';unsubGame&&unsubGame();unsubMoves&&unsubMoves();unsubGame=unsubMoves=null;S=null;ui={d3:ui.d3,screen:'home',user:ui.user,amode:ui.amode};   /* keep the signed-in account */render()}
 
 // =========================================================
 // UI
@@ -3516,7 +3516,10 @@ function renderLogin(){                                        // sign in / crea
   const msg=e=>({'auth/invalid-credential':'Wrong email or password','auth/wrong-password':'Wrong email or password','auth/user-not-found':'No account with that email','auth/email-already-in-use':'That email already has an account — sign in','auth/weak-password':'Password needs 6+ characters','auth/invalid-email':'That email looks wrong','auth/operation-not-allowed':'Accounts are not switched on yet'}[e.code]||e.message);
   app.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{ui.amode=b.dataset.am;renderLogin()});
   document.getElementById('aGo').onclick=async()=>{const em=val('aMail').trim(),pw=val('aPass');if(!em||!pw)return err('Enter email and password');err('…');
-    try{if(m==='up'){const n=val('aName').trim();if(!n)return err('Enter your name');ME.name=n;LS.set('st-name',n);await TAUTH.signUp(em,pw,n)}else await TAUTH.signIn(em,pw)}catch(e){err(msg(e))}};
+    const slow=new Promise((_,no)=>setTimeout(()=>no({code:'slow'}),12000));             // never hang on "…"
+    try{let c;if(m==='up'){const n=val('aName').trim();if(!n)return err('Enter your name');ME.name=n;LS.set('st-name',n);c=await Promise.race([TAUTH.signUp(em,pw,n),slow])}else c=await Promise.race([TAUTH.signIn(em,pw),slow]);
+      const u=c&&c.user;if(u&&!ui.user){ui.user={uid:u.uid,email:u.email,name:u.displayName||ME.name||''};ME.uid=u.uid;ui.authWait=false;renderLobby()}}  // go home now
+    catch(e){err(e&&e.code==='slow'?'Network is slow — tap again':(msg(e)||'Sign-in failed — try again'))}};
   const rs=document.getElementById('aReset');if(rs)rs.onclick=async()=>{const em=val('aMail').trim();if(!em)return err('Type your email first');try{await TAUTH.reset(em);err('Reset email sent')}catch(e){err(msg(e))}};
   document.getElementById('aGuest').onclick=()=>{LS.set('st-guest',1);renderLobby()};
 }
@@ -4669,10 +4672,13 @@ render();
     }
   }catch(e){db=null}
   dbState=db?'on':'off';
-  if(window.TAUTH){ui.authWait=true;TAUTH.on(async u=>{ui.user=u;
-    if(u){ME.uid=u.uid;if(u.name){ME.name=u.name;LS.set('st-name',u.name)}LS.del('st-guest');await cloudLoad()}
+  if(window.TAUTH){ui.authWait=true;
+    setTimeout(()=>{if(ui.authWait){ui.authWait=false;if(!S)renderLobby()}},6000);   // auth never answered (bad network): don't hang on "Loading"
+    TAUTH.on(async u=>{ui.user=u;
+    if(u){ME.uid=u.uid;if(u.name){ME.name=u.name;LS.set('st-name',u.name)}LS.del('st-guest')}
     else ME.uid=LS.get('st-uid',ME.uid);
-    ui.authWait=false;if(!S)renderLobby()})}
+    ui.authWait=false;if(!S)renderLobby();                          // show the home screen immediately
+    if(u){await Promise.race([cloudLoad().catch(()=>{}),new Promise(r=>setTimeout(r,5000))]);if(!S)renderLobby()}})}  // then refresh with the cloud save
   if(db){
     unsubList=db.collection('games').orderBy('upd','desc').limit(12).onSnapshot(s=>{games=s.docs.map(x=>({id:x.id,...x.data()}));if(!S)renderLobby()},()=>{});
   }
