@@ -4071,7 +4071,8 @@ function renderGame(){
     bn.innerHTML=(open?ban.join(''):ban[0])+`<button class="bchip bmore" data-banmore="1">${open?'▴ Hide':'▾ '+(ban.length-1)+' more'}</button>`}
   else{bn.classList.remove('open');bn.innerHTML=ban.join('')}
   bn.querySelectorAll('[data-banmore]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.banOpen=!ui.banOpen;renderGame()});bn.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>openSheet('world'));bn.querySelectorAll('[data-evpop]').forEach(b=>b.onclick=()=>eventPop(S.event));
-  bn.querySelectorAll('[data-tutskip]').forEach(b=>b.onclick=()=>{LS.set('st-tour-tw',true);LS.set('st-tour',true);LS.del('st-local');leave()});
+  bn.querySelectorAll('[data-tutskip]').forEach(b=>b.onclick=()=>{const tr=S&&S.tut&&S.tut.kind==='trial';LS.set('st-tour-tw',true);LS.set('st-tour',true);LS.del('st-local');leave();
+    if(tr&&!prof().trials)trialReward()});   /* skipping the Trials = finished: get the starter heroes, go to home */
   bn.querySelectorAll('[data-tut]').forEach(b=>b.onclick=()=>note(`<b>Hermes:</b> ${TG()[S.tut.step].d}`,6000));
   bn.querySelectorAll('[data-champ]').forEach(b=>b.onclick=()=>openSheet('champ'));
   bn.querySelectorAll('[data-quests]').forEach(b=>b.onclick=()=>openSheet('quests'));
