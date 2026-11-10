@@ -2,6 +2,10 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Titanomachy — a Greek-mythology island strategy game. Play with bots or friends.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
+<script>window.BUILD='20261109232051'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -415,6 +419,7 @@ h1,h2,h3{letter-spacing:.03em}
 .mythbtn{background-image:linear-gradient(90deg,#120a26e6,#120a2666),var(--mbg)!important;background-size:cover!important;background-position:center!important}
 .gi{width:1.35em;height:1.35em;vertical-align:-.3em;flex:none;filter:drop-shadow(0 1px 1px #0009)}
 .btn.pri .gi,.hbtn.gold .gi,.rv-tag .gi{color:#4a2d06;filter:none}
+#updbar{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));translate:-50% 0;z-index:10001;padding:10px 16px;border-radius:99px;border:1px solid #ffd86a;background:#0b1626ee;color:#ffd86a;font:800 14px system-ui;box-shadow:0 6px 20px #000a}
 /* promo code box */ .promo{display:flex;gap:8px;margin:6px auto 4px;max-width:340px}.promo input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #c9a24a88;background:#0b1626cc;color:#fff;font:700 14px system-ui;letter-spacing:.08em;text-transform:uppercase}
 /* ---- video reveal: only the clip, full screen; text fades in over its last frame ---- */
 .rvv{position:fixed;inset:0;z-index:9999;background:#000;overflow:hidden;cursor:pointer;color:#fff;animation:rvvin .25s ease}
@@ -2920,6 +2925,12 @@ function leave(){vcStop();document.body.classList.remove('ingame');ui.screen='ho
 // UI
 // =========================================================
 let ui={d3:LS.get('st-3d',false)};
+/* auto-update (website / home-screen app): compare this build with the one on the server */
+function checkUpdate(){if(!window.BUILD||location.protocol!=='https:')return;
+  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/window\.BUILD='(\d+)'/);
+    if(m&&m[1]!==window.BUILD&&!document.getElementById('updbar')){const b=document.createElement('button');b.id='updbar';b.textContent='New version ready — tap to update';
+      b.onclick=()=>location.reload();document.body.appendChild(b);if(!S)setTimeout(()=>location.reload(),600)}}).catch(()=>{})}   // not in a game: update right away
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});setTimeout(checkUpdate,3000);
 const app=document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ico=(id,cls='ic')=>`<svg class="${cls}" viewBox="-12 -12 24 24"><use href="#s-${id}" x="-12" y="-12" width="24" height="24"/></svg>`;
@@ -3494,8 +3505,9 @@ const UNL=[[2,'dice','marble','Marble dice'],[3,'frame','bronze','Bronze frame']
 const TITLES={sparta:'Hero of Sparta',zeusson:'Child of Zeus',titan:'Titan Slayer'};
 const KINDN={dice:'Dice',board:'Board',frame:'Frame',title:'Title',god:'Patron god',hero:'Hero'};
 const xpNeed=l=>60+40*l;                                       // XP from level l to l+1
-const prof=()=>LS.get('st-prof',null)||{xp:0,lv:1,sel:{},day:{},week:{}};
-const saveProf=p=>{LS.set('st-prof',p);cloudSave()};
+const PK=()=>(LS.get('st-guest',0)&&!ui.user)?'st-prof-guest':'st-prof';   /* guest = own save slot */
+const prof=()=>LS.get(PK(),null)||{xp:0,lv:1,sel:{},day:{},week:{}};
+const saveProf=p=>{LS.set(PK(),p);if(ui.user)cloudSave()};
 // ---- account: everything personal lives in users/<uid> when signed in ----
 let cloudT=0;
 function cloudSave(){if(!ui.user||!db)return;clearTimeout(cloudT);cloudT=setTimeout(()=>db.doc('users/'+ui.user.uid).set({name:ME.name,prof:prof(),hero:LS.get('st-hero','heracles'),hist:LS.get('st-hist',[]).slice(-60),tips:LS.get('st-tips',{}),upd:Date.now()}).catch(()=>{}),800)}
@@ -3521,7 +3533,8 @@ function renderLogin(){                                        // sign in / crea
       const u=c&&c.user;if(u&&!ui.user){ui.user={uid:u.uid,email:u.email,name:u.displayName||ME.name||''};ME.uid=u.uid;ui.authWait=false;renderLobby()}}  // go home now
     catch(e){err(e&&e.code==='slow'?'Network is slow — tap again':(msg(e)||'Sign-in failed — try again'))}};
   const rs=document.getElementById('aReset');if(rs)rs.onclick=async()=>{const em=val('aMail').trim();if(!em)return err('Type your email first');try{await TAUTH.reset(em);err('Reset email sent')}catch(e){err(msg(e))}};
-  document.getElementById('aGuest').onclick=()=>{LS.set('st-guest',1);renderLobby()};
+  document.getElementById('aGuest').onclick=()=>{LS.set('st-guest',1);ui.user=null;try{TAUTH.out()}catch(e){}   /* end any old account session */
+    ME.name=LS.get('st-gname','Guest');renderLobby()};
 }
 const unlocked=(p,kind,id)=>(kind==='hero'&&DG_OPEN)||UNL.some(u=>u[1]===kind&&u[2]===id&&u[0]<=p.lv);
 // ---- hero cards: prof().heroes = {key:{c:copies}}; stars from duplicates (1,2,3,4 more copies = ★2..★5) ----
