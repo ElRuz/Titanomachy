@@ -415,6 +415,7 @@ h1,h2,h3{letter-spacing:.03em}
 .mythbtn{background-image:linear-gradient(90deg,#120a26e6,#120a2666),var(--mbg)!important;background-size:cover!important;background-position:center!important}
 .gi{width:1.35em;height:1.35em;vertical-align:-.3em;flex:none;filter:drop-shadow(0 1px 1px #0009)}
 .btn.pri .gi,.hbtn.gold .gi,.rv-tag .gi{color:#4a2d06;filter:none}
+/* promo code box */ .promo{display:flex;gap:8px;margin:6px auto 4px;max-width:340px}.promo input{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #c9a24a88;background:#0b1626cc;color:#fff;font:700 14px system-ui;letter-spacing:.08em;text-transform:uppercase}
 /* ---- video reveal: only the clip, full screen; text fades in over its last frame ---- */
 .rvv{position:fixed;inset:0;z-index:9999;background:#000;overflow:hidden;cursor:pointer;color:#fff;animation:rvvin .25s ease}
 @keyframes rvvin{from{opacity:0}}
@@ -3038,11 +3039,24 @@ function sealSVG(){                                            // chains from th
     <path d="M39 70h3v-2h3v4h-3v2h-3zM55 70h3v-2h3v4h-3v2h-3z" fill="none" stroke="#5a3a0c" stroke-width=".55"/>
     <circle cx="50" cy="73" r="2.6" fill="#1a0f03"/><path d="M48.7 74.5h2.6l1 5.2h-4.6z" fill="#1a0f03"/>
     <circle cx="50" cy="73" r="3.6" fill="none" stroke="#fff3c4" stroke-width=".5" opacity=".7"/></svg>`}
+const TAPS={};                                                  // taps on each locked hero
+function tapUnlock(k){                                           // 3 taps on a locked hero = unlock it
+  TAPS[k]=(TAPS[k]||0)+1;if(TAPS[k]<3)return toast(`Tap ${3-TAPS[k]} more time${TAPS[k]===2?'':'s'} to unlock`);
+  TAPS[k]=0;const r=grantHero(k);cloudSave();
+  if(HVID[k])return revealHero(k,r,()=>renderLobby());           // hero with a clip: full video reveal
+  sfx('win');toast(`${HEROES[k].n} unlocked!`);renderLobby()}    // no clip yet: just unlock
+const PROMOS={OLYMPUS:'all'};                                    // promo codes -> reward
+function redeemPromo(code){
+  code=(code||'').trim().toUpperCase();if(!code)return toast('Enter a code');
+  const p=prof();p.used=p.used||[];if(!PROMOS[code])return toast('Invalid code');if(p.used.includes(code))return toast('Code already used');
+  p.used.push(code);p.heroes=p.heroes||{};Object.keys(HEROES).forEach(k=>{if(!p.heroes[k])p.heroes[k]={c:1}});   // every hero unlocked
+  p.packs=(p.packs||0)+99;p.xp=(p.xp||0)+5000;saveProf(p);cloudSave();sfx('win');toast('All heroes unlocked · +99 packs');renderLobby()}
 function heroesHTML(){                                         // the collection: owned cards, locked cards, mythic teaser
   const p=prof(),ord=['l','e','r','c'];
   return `<div class="box"><h2>Your heroes</h2>
     <div class="packimg ${p.packs>0?'':'off'}"></div><button class="btn pri packbtn" id="bPack" ${p.packs>0?'':'disabled'}><svg class=gi><use href=#g-scroll></use></svg> Open hero pack ${p.packs>0?`<b>${p.packs}</b>`:''}</button>
     <p class="note center">Packs: win a game or level up. Duplicates give stars (★ = +1 HP).</p>
+    <div class="promo"><input id="promoIn" placeholder="Promo code" autocapitalize="characters" autocomplete="off"><button class="btn sm pri" id="bPromo">Redeem</button></div>
     ${ord.map(ry=>`<h3 class="rhead" style="color:${RARITY[ry].col}">${RARITY[ry].n}</h3><div class="hgrid">${Object.keys(HEROES).filter(k=>HEROES[k].ry===ry).map(k=>{const H=HEROES[k],o=owns(k),st=heroStar(k);
       return `<button class="hc ry-${ry} ${o?'':'lock'} ${cfg.hero===k?'sel':''}" data-hc="${k}"><span class="cfr fr-${ry}"></span><img src="${o?heroImg(k):figImg(k)}" alt=""><span class="hn">${o?H.n:'???'}</span><span class="hs">${o?'★'.repeat(Math.max(1,st)):'<svg class=gi><use href=#g-lock></use></svg>'}</span></button>`}).join('')}</div>`).join('')}
     <h3 class="rhead mythic-t">Mythic · the gods</h3><div class="mythban"></div><div class="hgrid">${MYTHIC.map(g=>`<button class="hc mythic myth-${g.n.toLowerCase()}" data-myth="${g.n}"><i class="mchain a"></i><i class="mchain b"></i><i class="mlock"></i>${ico(g.i,'mic')}<span class="hn">${g.n}</span><span class="hs">SEALED</span></button>`).join('')}</div>
@@ -3068,7 +3082,8 @@ function renderLobby(){
     app.querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.equip.split(':'),p=prof();p.sel=p.sel||{};p.sel[k]=id;saveProf(p);applyCos();sfx('click');renderLobby()});return}
   if(sc==='heroes'){app.innerHTML=`<div class="lobby">${back}${heroesHTML()}</div>`;document.getElementById('bBack').onclick=()=>{ui.screen='home';renderLobby()};
     const bp=document.getElementById('bPack');if(bp)bp.onclick=()=>openPack();
-    app.querySelectorAll('[data-hc]').forEach(b=>b.onclick=()=>{const k=b.dataset.hc;if(!owns(k))return toast('Find this hero in a hero pack');cfg.hero=k;LS.set('st-hero',k);cloudSave();sfx('click');toast(`${HEROES[k].n} is your champion`);ui.screen='home';renderLobby()});
+    const bpromo=app.querySelector('#bPromo');if(bpromo)bpromo.onclick=()=>redeemPromo(app.querySelector('#promoIn').value);
+    app.querySelectorAll('[data-hc]').forEach(b=>b.onclick=()=>{const k=b.dataset.hc;if(!owns(k))return tapUnlock(k);cfg.hero=k;LS.set('st-hero',k);cloudSave();sfx('click');toast(`${HEROES[k].n} is your champion`);ui.screen='home';renderLobby()});
     app.querySelectorAll('[data-myth]').forEach(b=>b.onclick=()=>toast(`${b.dataset.myth} is sealed. Keys of Olympus are coming soon.`));return}
   if(sc==='stats'){app.innerHTML=`<div class="lobby">${back}${statsHTML()}</div>`;document.getElementById('bBack').onclick=()=>{ui.screen='home';renderLobby()};return}
   if(sc==='howto'){ui.screen='home';openTour('basics',0);return renderLobby()}
