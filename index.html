@@ -415,6 +415,30 @@ h1,h2,h3{letter-spacing:.03em}
 .mythbtn{background-image:linear-gradient(90deg,#120a26e6,#120a2666),var(--mbg)!important;background-size:cover!important;background-position:center!important}
 .gi{width:1.35em;height:1.35em;vertical-align:-.3em;flex:none;filter:drop-shadow(0 1px 1px #0009)}
 .btn.pri .gi,.hbtn.gold .gi,.rv-tag .gi{color:#4a2d06;filter:none}
+/* ---- video reveal: only the clip, full screen; text fades in over its last frame ---- */
+.rvv{position:fixed;inset:0;z-index:9999;background:#000;overflow:hidden;cursor:pointer;color:#fff;animation:rvvin .25s ease}
+@keyframes rvvin{from{opacity:0}}
+.rvv.out{opacity:0;transition:opacity .4s}
+.rvv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.rvv-pack{z-index:2}.rvv-pack.gone{display:none}
+.rvv::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity 1.2s;   /* dark fade at the bottom for the text */
+  background:linear-gradient(transparent 45%,#000a 68%,#000e 100%)}
+.rvv.done::after{opacity:1}
+.rvv-info{position:absolute;left:0;right:0;bottom:calc(9% + env(safe-area-inset-bottom));z-index:4;display:grid;justify-items:center;gap:3px;padding:0 22px;text-align:center}
+.rvv-info>*{opacity:0;translate:0 14px;transition:opacity .7s,translate .9s cubic-bezier(.2,.8,.2,1)}
+.rvv.done .rvv-info>*{opacity:1;translate:0 0}
+.rvv.done .rvv-name{transition-delay:.25s}.rvv.done .rvv-par{transition-delay:.45s}
+.rvv.done .rvv-pw{transition-delay:.7s}.rvv.done .rvv-wk{transition-delay:.85s}.rvv.done .rvv-new{transition-delay:1.05s}
+.rvv-ry{font:900 13px Cinzel,Georgia,serif;letter-spacing:.28em;color:var(--rc);text-shadow:0 0 14px var(--rc)}
+.rvv-ry i{font-style:normal;color:#ffd86a;letter-spacing:2px}
+.rvv-name{font:900 clamp(46px,14vw,72px)/1 Cinzel,Georgia,serif;letter-spacing:.04em;background:linear-gradient(#fff 10%,#ffe7a3 45%,var(--rc) 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #0009) drop-shadow(0 0 18px color-mix(in srgb,var(--rc) 60%,transparent))}
+.rvv-par{font:700 13px Cinzel,Georgia,serif;letter-spacing:.14em;color:#fffc;text-transform:uppercase}
+.rvv-pw,.rvv-wk{margin:0;font-size:13.5px;line-height:1.35;max-width:340px;color:#fffe}.rvv-wk{color:#ffb3a8}
+.rvv-pw .gi,.rvv-wk .gi{width:14px;height:14px;vertical-align:-2px}
+.rvv-new{margin-top:6px;font:900 15px Cinzel,Georgia,serif;letter-spacing:.12em;color:var(--rc);text-shadow:0 0 12px var(--rc)}
+.rvv-tap{position:absolute;bottom:calc(2.5% + env(safe-area-inset-bottom));left:0;right:0;z-index:5;text-align:center;font:700 13px system-ui;color:#fff9}
+.rvv.done .rvv-tap{color:#fff;animation:coachp 1.4s infinite}
 /* Greek buttons: deep Aegean enamel, gold hairline, meander strip */
 .btn{position:relative;font-family:Cinzel,Georgia,serif;letter-spacing:.02em;background:linear-gradient(#22406a,#132842 70%,#0e1f35);border:1px solid #c9a24a;color:#f6ead0;
   box-shadow:inset 0 0 0 1px #0007,inset 0 1px 0 #ffffff26,0 3px 0 #08131f,0 6px 14px #0007;text-shadow:0 1px 0 #0009}
@@ -437,7 +461,8 @@ h1,h2,h3{letter-spacing:.03em}
 .pbadge{animation:none!important;top:-9px!important;right:-7px!important}
 .packbtn{display:flex;align-items:center;justify-content:center;gap:10px}
 .home.themed{padding-top:min(58vh,520px)!important;touch-action:pan-y}
-.hdeco{position:fixed;inset:0;overflow:hidden;z-index:-1;pointer-events:none}.hdeco *{pointer-events:none!important}
+.hdeco{position:fixed;inset:0;overflow:hidden;z-index:-1;pointer-events:none}
+/* overscroll fix: hide the old temple background behind a themed home */ html:has(.home.themed),body:has(.home.themed){background:var(--hb,#0b1626)!important}.hdeco *{pointer-events:none!important}
 .hsplash{position:fixed;left:50%;top:0;width:min(118vw,620px);aspect-ratio:1;translate:calc(-50% + var(--px,0px)) calc(-6% + var(--py,0px));z-index:-1;pointer-events:none;transition:translate .25s ease-out}
 .hsplash img{width:100%;display:block;animation:hbreath 7s ease-in-out infinite;
   -webkit-mask:radial-gradient(circle at 50% 44%,#000 0 30%,#0009 37%,transparent 47%);mask:radial-gradient(circle at 50% 44%,#000 0 30%,#0009 37%,transparent 47%);
@@ -3055,6 +3080,7 @@ function renderLobby(){
   const cont=local&&local.phase!=='over';
   if(!owns(cfg.hero))cfg.hero=Object.keys(HEROES).find(owns)||'heracles';
   const HH=HEROES[cfg.hero],th=HH.th||['#ffd86a','#14243c','light'],RYH=RARITY[HH.ry||'c'];
+  /* hero colour for the page behind the home (overscroll area) */ document.documentElement.style.setProperty('--hb',WPBG[cfg.hero]||th[1]);
   app.innerHTML=`<div class="home themed ${WPBG[cfg.hero]?'haswp':''}" style="--h1:${th[0]};--h2:${WPBG[cfg.hero]||th[1]};--rc:${RYH.col}">
     ${WPBG[cfg.hero]?`<div class="hdeco wpmode" style="background:${WPBG[cfg.hero]}"><div class="hwall wp-${cfg.hero}" id="hsplash"></div><canvas id="hfx"></canvas></div>`
       :`<div class="hdeco"><div class="hbg" style="background-image:url('${heroImg(cfg.hero)}')"></div><div class="hrays"></div><div class="hsplash" id="hsplash"><img src="${heroImg(cfg.hero)}" alt="${HH.n}"></div><div class="hfog"></div><canvas id="hfx"></canvas></div>`}
@@ -3493,7 +3519,38 @@ function boltD(x0,y0,x1,y1,j){                                 // jagged lightni
   for(let i=1;i<=n;i++){const t=i/n,x=x0+(x1-x0)*t+(i<n?(Math.random()-.5)*j:0),y=y0+(y1-y0)*t;d+=` L${x.toFixed(1)} ${y.toFixed(1)}`;
     if(i>3&&i<n-2&&Math.random()<.28){let bx=x,by=y;br+=`M${bx.toFixed(1)} ${by.toFixed(1)}`;for(let k=0;k<4;k++){bx+=(Math.random()-.3)*j*.7*(Math.random()<.5?-1:1);by+=(y1-y0)/n*.8;br+=` L${bx.toFixed(1)} ${by.toFixed(1)}`}}}
   return [d,br]}
-function revealHero(k,r,cb){                                   // ground cracks → smoke → silhouette → strike → light → card
+/* ===== video reveal =====
+   HVID: hero clips (Google Flow, 9:16, 8 s).  PVID: pack-opening clips per rarity (c/r/e/l), played first when present. */
+const HVID={heracles:'rv/heracles.mp4',achilles:'rv/achilles.mp4',perseus:'rv/perseus.mp4',orion:'rv/orion.mp4',theseus:'rv/theseus.mp4',penthesilea:'rv/penthesilea.mp4',aeneas:'rv/aeneas.mp4'};
+const PVID={};
+function revealVideo(k,r,cb){
+  const H=HEROES[k],RY=RARITY[H.ry],seen=!r.isNew,el=document.createElement('div');   // first time = no skipping
+  el.className='rvv';el.style.setProperty('--rc',RY.col);
+  const mk=src=>{const v=document.createElement('video');v.src=src;v.preload='auto';v.playsInline=true;v.setAttribute('playsinline','');return v};
+  const pv=PVID[H.ry]?mk(PVID[H.ry]):null,hv=mk(HVID[k]);                             // pack clip (optional) + hero clip
+  hv.className='rvv-hero';if(pv){pv.className='rvv-pack';el.append(hv,pv)}else el.append(hv);
+  el.insertAdjacentHTML('beforeend',`<div class="rvv-info">
+      <div class="rvv-ry">${RY.n.toUpperCase()} <i>${'★'.repeat(Math.max(1,r.star))}</i></div>
+      <div class="rvv-name">${H.n}</div><div class="rvv-par">${H.par}</div>
+      <p class="rvv-pw"><svg class=gi><use href=#g-star></use></svg> ${H.pw}</p>
+      <p class="rvv-wk"><svg class=gi><use href=#g-cross></use></svg> ${H.wk}</p>
+      <div class="rvv-new">${r.isNew?'NEW HERO':r.up?'STAR UP! +1 HP':'Duplicate — progress to the next star'}</div></div>
+    <div class="rvv-tap">${seen?'Tap to skip':''}</div>`);
+  document.body.appendChild(el);
+  // start playing inside the tap so the sound is allowed (iPhone); if blocked, play muted
+  const go=v=>{v.muted=false;const pr=v.play();pr&&pr.catch(()=>{v.muted=true;v.play().catch(()=>{})})};
+  let ended=false,fails=0;
+  const finish=()=>{if(ended)return;ended=true;hv.pause();if(pv)pv.remove();el.classList.add('done');   // freeze on the last pose, show the name
+    sfx(H.ry==='l'||H.ry==='e'?'win':'shimmer');el.querySelector('.rvv-tap').textContent='';setTimeout(()=>el.querySelector('.rvv-tap').textContent='Tap to continue',1400)};
+  const close=()=>{el.classList.add('out');setTimeout(()=>{el.remove();cb&&cb()},400)};
+  const broken=()=>{if(++fails>0&&!ended){el.remove();revealHero(k,r,cb,true)}};            // clip failed to load -> drawn reveal
+  hv.onerror=broken;hv.onended=finish;
+  if(pv){pv.onended=()=>{pv.classList.add('gone');go(hv)};pv.onerror=()=>{pv.remove();go(hv)};go(pv);hv.load()}
+  else go(hv);
+  el.onclick=()=>{if(ended)return close();if(seen){hv.currentTime=Math.max(0,(hv.duration||8)-.05);finish()}};
+}
+function revealHero(k,r,cb,noVid){
+  if(HVID[k]&&!noVid)return revealVideo(k,r,cb);              // real video reveal when this hero has a clip                                   // ground cracks → smoke → silhouette → strike → light → card
   const H=HEROES[k],RY=RARITY[H.ry],el=document.createElement('div'),T=[];el.className='rv ry-'+H.ry;el.dataset.ph=0;
   el.style.setProperty('--rc',RY.col);el.style.setProperty('--rd',RY.deep);
   const cracks=Array.from({length:9},(_,i)=>{const a=Math.PI*(i/8)+(Math.random()-.5)*.25,len=120+Math.random()*90;let x=0,y=0,d='M0 0';
