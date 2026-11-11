@@ -7,7 +7,7 @@
 :root[data-theme="dark"]{--ink:#0b1626}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none}
-#app{position:fixed;inset:0;display:grid;grid-template-rows:62% 38%}
+#app{position:fixed;inset:0;display:grid;grid-template-rows:66% 34%}
 /* ---------- 3D view + HUD ---------- */
 #view{position:relative;overflow:hidden;background:#000}
 #view canvas{display:block;width:100%!important;height:100%!important}
@@ -43,34 +43,39 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
 .flash.on{animation:fl .18s ease-out}
 @keyframes fl{from{opacity:.55}to{opacity:0}}
 /* ---------- controls ---------- */
-#pad{position:relative;background:radial-gradient(ellipse at 50% 0%,#24476f,#0b1626 70%);border-top:3px solid #c9952e;
-  display:grid;grid-template-columns:1fr 1.25fr;align-items:center;padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);gap:10px}
-.move{display:flex;gap:12px;justify-content:center}
+#pad{position:relative;background:radial-gradient(ellipse at 50% 0%,#24476f,#0b1626 70%);border-top:3px solid #c9952e;--sb:env(safe-area-inset-bottom)}
+/* LEFT thumb: one wide rocker at the natural thumb rest (bottom-left) */
+.move{position:absolute;left:12px;bottom:calc(var(--sb) + 40px);display:flex;gap:6px}
 .btn{position:relative;border:0;border-radius:50%;display:grid;place-items:center;color:#2b1d0e;font:900 12px Cinzel,Georgia,serif;letter-spacing:.04em;
   background:radial-gradient(circle at 35% 28%,#fff3c4,#e2b55a 55%,#8a5f17);box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c9952e,0 6px 0 #2a1a06,0 10px 16px #000a;touch-action:none}
+/* invisible bigger touch zone around every button (fingers miss small circles) */
+.btn::after{content:'';position:absolute;inset:-7px;border-radius:inherit}
 .btn:active,.btn.dn{translate:0 4px;box-shadow:0 0 0 3px #3a2408,0 0 0 5px #ffd86a,0 2px 0 #2a1a06,0 0 18px #ffd86a}
-.btn.mv{width:64px;height:64px;font-size:22px}
-.acts{position:relative;height:100%;min-height:170px}
-.acts .btn{position:absolute}
-.b-atk{width:86px;height:86px;right:6px;bottom:18px;font-size:14px}
-.b-hvy{width:62px;height:62px;right:100px;bottom:8px}
-.b-blk{width:62px;height:62px;right:94px;bottom:86px;background:radial-gradient(circle at 35% 28%,#e6f2ff,#7aa6d9 55%,#1f3d66)!important;color:#08182b}
-.b-sp{width:62px;height:62px;right:16px;bottom:116px;background:radial-gradient(circle at 35% 28%,#f0e0ff,#a274e6 55%,#3d1f66)!important;color:#1a0b2b;opacity:.55}
+.btn.mv{width:68px;height:86px;font-size:26px;border-radius:44px 14px 14px 44px}
+.btn.mv+.btn.mv{border-radius:14px 44px 44px 14px}
+/* RIGHT thumb: arc around STRIKE (the thumb's resting spot), like mobile fighting games */
+.acts{position:absolute;right:0;bottom:var(--sb);width:230px;height:250px}
+.acts .btn{position:absolute;width:74px;height:74px;font-size:11px;letter-spacing:.02em}
+.b-atk{width:104px!important;height:104px!important;right:16px;bottom:28px;font-size:15px!important}   /* main button, biggest */
+.b-hvy{right:140px;bottom:58px}                                                                     /* left of strike */
+.b-blk{right:99px;bottom:130px;background:radial-gradient(circle at 35% 28%,#e6f2ff,#7aa6d9 55%,#1f3d66)!important;color:#08182b}
+.b-sp{right:20px;bottom:152px;background:radial-gradient(circle at 35% 28%,#f0e0ff,#a274e6 55%,#3d1f66)!important;color:#1a0b2b;opacity:.55}
 .b-sp.ready{opacity:1;animation:spr 1s infinite alternate}
 @keyframes spr{to{box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c88aff,0 6px 0 #2a1a06,0 0 22px #c88aff}}
-.hint{position:absolute;left:0;right:0;top:4px;text-align:center;font-size:10.5px;color:#fff9;pointer-events:none}
+.hint{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:10.5px;color:#fff8;pointer-events:none;white-space:nowrap}
 /* end screen + model loader */
 .end{position:absolute;inset:0;display:none;place-items:center;background:#000a;z-index:5}
 .end.on{display:grid}
 .end .card{display:grid;gap:10px;justify-items:center;padding:18px 20px;border-radius:16px;background:linear-gradient(#1d3557,#0b1626);box-shadow:0 0 0 2px #ffd86a,0 10px 30px #000}
 .end h2{margin:0;font:900 22px Cinzel,Georgia,serif;color:#ffe7a3}
 .pill{border:0;border-radius:99px;padding:10px 22px;font:900 14px Cinzel,Georgia,serif;color:#2b1d0e;background:linear-gradient(#ffe7a3,#d9a53a);box-shadow:0 4px 0 #6b4a1a}
-.gear{position:absolute;right:8px;bottom:8px;z-index:4;width:34px;height:34px;border-radius:50%;border:0;background:#0b1626cc;color:#ffe7a3;font-size:16px;box-shadow:0 0 0 1px #ffd86a77;pointer-events:auto}
-.load{position:absolute;right:8px;bottom:48px;z-index:4;display:none;gap:6px;flex-direction:column;padding:10px;border-radius:12px;background:#0b1626ee;box-shadow:0 0 0 1px #ffd86a77;font-size:12px}
+.gear{position:absolute;left:10px;top:calc(env(safe-area-inset-top) + 84px);z-index:4;width:34px;height:34px;border-radius:50%;border:0;background:#0b1626cc;color:#ffe7a3;font-size:16px;box-shadow:0 0 0 1px #ffd86a77;pointer-events:auto}
+.load{position:absolute;left:10px;top:calc(env(safe-area-inset-top) + 124px);z-index:4;display:none;gap:6px;flex-direction:column;padding:10px;border-radius:12px;background:#0b1626ee;box-shadow:0 0 0 1px #ffd86a77;font-size:12px}
 .load.on{display:flex}
 .load label{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .load input{font-size:11px;max-width:160px;color:#fff}
-@media (orientation:landscape){#app{grid-template-rows:1fr;grid-template-columns:1fr 300px}#pad{border-top:0;border-left:3px solid #c9952e;grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+@media (max-height:700px) and (orientation:portrait){.acts,.move{zoom:.86}}
+@media (orientation:landscape){.move{bottom:auto;top:34px;left:50%;translate:-50% 0}#app{grid-template-rows:1fr;grid-template-columns:1fr 300px}#pad{border-top:0;border-left:3px solid #c9952e;grid-template-columns:1fr;grid-template-rows:auto 1fr}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -100,7 +105,7 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
       <button class="btn b-hvy" id="bH">HEAVY</button>
       <button class="btn b-atk" id="bA">STRIKE</button>
     </div>
-    <div class="hint">Or on the arena: tap = strike · hold = heavy · swipe down = block · swipe up = special</div>
+    <div class="hint">Arena: tap strike · hold heavy · swipe ↓ block · ↑ special</div>
   </div>
 </div>
 <script type="module">
