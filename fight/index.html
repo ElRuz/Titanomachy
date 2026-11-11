@@ -7,7 +7,8 @@
 :root[data-theme="dark"]{--ink:#0b1626}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none}
-#app{position:fixed;inset:0;display:grid;grid-template-rows:66% 34%}
+#app{position:fixed;inset:0}
+#view{position:absolute!important;inset:0}
 /* ---------- 3D view + HUD ---------- */
 #view{position:relative;overflow:hidden;background:#000}
 #view canvas{display:block;width:100%!important;height:100%!important}
@@ -42,27 +43,41 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
 .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 .flash.on{animation:fl .18s ease-out}
 @keyframes fl{from{opacity:.55}to{opacity:0}}
-/* ---------- controls ---------- */
-#pad{position:relative;background:radial-gradient(ellipse at 50% 0%,#24476f,#0b1626 70%);border-top:3px solid #c9952e;--sb:env(safe-area-inset-bottom)}
-/* LEFT thumb: one wide rocker at the natural thumb rest (bottom-left) */
-.move{position:absolute;left:12px;bottom:calc(var(--sb) + 40px);display:flex;gap:6px}
-.btn{position:relative;border:0;border-radius:50%;display:grid;place-items:center;color:#2b1d0e;font:900 12px Cinzel,Georgia,serif;letter-spacing:.04em;
-  background:radial-gradient(circle at 35% 28%,#fff3c4,#e2b55a 55%,#8a5f17);box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c9952e,0 6px 0 #2a1a06,0 10px 16px #000a;touch-action:none}
+/* ---------- controls: overlay like Mortal Kombat / Injustice mobile ----------
+   --k  = UI scale (fixes hosts that render the page zoomed-out on phones)
+   --mx = side margin (clear of notch / rounded corners), --by = lift off the bottom edge (home bar zone) */
+#pad{position:absolute;inset:0;pointer-events:none;z-index:3;
+  --mx:max(26px,calc(env(safe-area-inset-left) + 14px));--mxr:max(26px,calc(env(safe-area-inset-right) + 14px));--by:calc(env(safe-area-inset-bottom) + 34px)}
+.move,.acts{position:absolute;pointer-events:none;zoom:var(--z,1)}
+.move{left:var(--mx);bottom:var(--by);width:212px;height:96px}
+.acts{right:var(--mxr);bottom:var(--by);width:250px;height:250px}
+.btn{position:absolute;pointer-events:auto;border:0;border-radius:50%;display:grid;place-items:center;color:#2b1d0e;font:900 12px Cinzel,Georgia,serif;letter-spacing:.02em;opacity:.9;
+  background:radial-gradient(circle at 35% 28%,#fff3c4,#e2b55a 55%,#8a5f17);box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c9952e,0 6px 0 #2a1a06,0 10px 18px #000b;touch-action:none}
 /* invisible bigger touch zone around every button (fingers miss small circles) */
-.btn::after{content:'';position:absolute;inset:-7px;border-radius:inherit}
-.btn:active,.btn.dn{translate:0 4px;box-shadow:0 0 0 3px #3a2408,0 0 0 5px #ffd86a,0 2px 0 #2a1a06,0 0 18px #ffd86a}
-.btn.mv{width:68px;height:86px;font-size:26px;border-radius:44px 14px 14px 44px}
-.btn.mv+.btn.mv{border-radius:14px 44px 44px 14px}
-/* RIGHT thumb: arc around STRIKE (the thumb's resting spot), like mobile fighting games */
-.acts{position:absolute;right:0;bottom:var(--sb);width:230px;height:250px}
-.acts .btn{position:absolute;width:74px;height:74px;font-size:11px;letter-spacing:.02em}
-.b-atk{width:104px!important;height:104px!important;right:16px;bottom:28px;font-size:15px!important}   /* main button, biggest */
-.b-hvy{right:140px;bottom:58px}                                                                     /* left of strike */
-.b-blk{right:99px;bottom:130px;background:radial-gradient(circle at 35% 28%,#e6f2ff,#7aa6d9 55%,#1f3d66)!important;color:#08182b}
-.b-sp{right:20px;bottom:152px;background:radial-gradient(circle at 35% 28%,#f0e0ff,#a274e6 55%,#3d1f66)!important;color:#1a0b2b;opacity:.55}
-.b-sp.ready{opacity:1;animation:spr 1s infinite alternate}
-@keyframes spr{to{box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c88aff,0 6px 0 #2a1a06,0 0 22px #c88aff}}
-.hint{position:absolute;left:0;right:0;top:6px;text-align:center;font-size:10.5px;color:#fff8;pointer-events:none;white-space:nowrap}
+.btn::after{content:'';position:absolute;inset:-9px;border-radius:inherit}
+.btn:active,.btn.dn{opacity:1;translate:0 4px;box-shadow:0 0 0 3px #3a2408,0 0 0 5px #ffd86a,0 2px 0 #2a1a06,0 0 22px #ffd86a}
+/* LEFT thumb: two big separate pads with a real gap (no mis-presses) */
+.btn.mv{width:88px;height:88px;bottom:4px}
+#bL{left:0}#bR{left:118px}
+.btn.mv svg{width:34px;height:34px;fill:#2b1d0e}
+/* RIGHT thumb: arc around STRIKE — 180° / 135° / 90°, radius 128 px, every gap ≥ 22 px */
+.acts .btn{width:76px;height:76px}
+.b-atk{width:100px!important;height:100px!important;right:0;bottom:0;font-size:15px!important}   /* thumb rest = main button */
+.b-hvy{right:140px;bottom:12px}                                                                  /* left */
+.b-blk{right:102px;bottom:103px;background:radial-gradient(circle at 35% 28%,#e6f2ff,#7aa6d9 55%,#1f3d66)!important;color:#08182b}   /* up-left */
+.b-sp{right:12px;bottom:140px;background:radial-gradient(circle at 35% 28%,#f0e0ff,#a274e6 55%,#3d1f66)!important;color:#1a0b2b;opacity:.5}   /* up */
+.b-sp.ready{opacity:.95;animation:spr 1s infinite alternate}
+@keyframes spr{to{box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c88aff,0 6px 0 #2a1a06,0 0 24px #c88aff}}
+/* gesture tip: under the timer, fades after a few seconds */
+.hint{position:absolute;left:50%;translate:-50% 0;top:calc(env(safe-area-inset-top) + 74px);zoom:var(--k,1);padding:4px 10px;border-radius:99px;background:#0008;font-size:11px;color:#fffc;pointer-events:none;white-space:nowrap;transition:opacity 1s}
+.hint.off{opacity:0}
+/* portrait: suggest turning the phone (fighting games play sideways) */
+.rot{position:absolute;left:50%;translate:-50% 0;top:calc(env(safe-area-inset-top) + 104px);zoom:var(--k,1);display:none;padding:6px 12px;border-radius:99px;border:0;
+  background:#0b1626dd;color:#ffe7a3;font:700 11px system-ui;white-space:nowrap;box-shadow:0 0 0 1px #ffd86a88;pointer-events:auto;z-index:4}
+@media (orientation:portrait){.rot{display:block}.move{bottom:calc(var(--by) + 40px)}.acts{bottom:calc(var(--by) + 40px)}}
+.rot.off{display:none!important}
+/* HUD and pop-ups follow the same UI scale */
+.hud,.gear,.load,.end .card,.big,.stamp{zoom:var(--k,1)}
 /* end screen + model loader */
 .end{position:absolute;inset:0;display:none;place-items:center;background:#000a;z-index:5}
 .end.on{display:grid}
@@ -74,8 +89,6 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
 .load.on{display:flex}
 .load label{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .load input{font-size:11px;max-width:160px;color:#fff}
-@media (max-height:700px) and (orientation:portrait){.acts,.move{zoom:.86}}
-@media (orientation:landscape){.move{bottom:auto;top:34px;left:50%;translate:-50% 0}#app{grid-template-rows:1fr;grid-template-columns:1fr 300px}#pad{border-top:0;border-left:3px solid #c9952e;grid-template-columns:1fr;grid-template-rows:auto 1fr}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -98,14 +111,15 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
     <div class="end" id="end"><div class="card"><h2 id="endt">Victory</h2><span id="ends" style="color:#fffc;font-size:13px"></span><button class="pill" id="again">Fight again</button></div></div>
   </div>
   <div id="pad">
-    <div class="move"><button class="btn mv" id="bL">◀</button><button class="btn mv" id="bR">▶</button></div>
+    <div class="move"><button class="btn mv" id="bL" aria-label="Left"><svg viewBox="0 0 24 24"><path d="M16 4 6 12l10 8z"/></svg></button><button class="btn mv" id="bR" aria-label="Right"><svg viewBox="0 0 24 24"><path d="m8 4 10 8-10 8z"/></svg></button></div>
     <div class="acts">
       <button class="btn b-sp" id="bS">SPECIAL</button>
       <button class="btn b-blk" id="bB">BLOCK</button>
       <button class="btn b-hvy" id="bH">HEAVY</button>
       <button class="btn b-atk" id="bA">STRIKE</button>
     </div>
-    <div class="hint">Arena: tap strike · hold heavy · swipe ↓ block · ↑ special</div>
+    <button class="rot" id="rot">↻ Turn sideways for full arena  ✕</button>
+    <div class="hint" id="hint">Arena: tap strike · hold heavy · swipe ↓ block · ↑ special</div>
   </div>
 </div>
 <script type="module">
@@ -269,7 +283,17 @@ const loader=new GLTFLoader();
 
 /* ================= main loop ================= */
 const clock=new THREE.Clock();let time=0;
-function size(){const r=view.getBoundingClientRect();R.setSize(r.width,r.height,false);cam.aspect=r.width/r.height;cam.updateProjectionMatrix()}
+function size(){const r=view.getBoundingClientRect();R.setSize(r.width,r.height,false);cam.aspect=r.width/r.height;cam.updateProjectionMatrix();uiScale()}
+/* UI scale: some hosts show the page zoomed-out on phones (layout wider than the real screen).
+   k = layout px per real screen px, so buttons keep their real finger size; z also shrinks the
+   two thumb clusters when they would not fit side by side (portrait). */
+function uiScale(){const W=innerWidth,H=innerHeight,land=W>H,
+    sw=land?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height),
+    k=Math.min(3,Math.max(1,W/sw)),rw=W/k,rh=H/k,
+    z=k*Math.min(1,(rw-72)/462,(rh-96)/250);
+  const st=document.documentElement.style;st.setProperty('--k',k.toFixed(3));st.setProperty('--z',Math.max(.55*k,z).toFixed(3))}
+setTimeout(()=>$('hint').classList.add('off'),6000);                 // gesture tip fades out
+$('rot').onclick=()=>$('rot').classList.add('off');                  // rotate tip can be dismissed
 addEventListener('resize',size);size();
 function step(f,o,dt){f.t+=dt;
   if(f===A&&G.state==='fight'){if(f.canAct()){if(IN.blk)f.st!=='block'&&f.set('block');else if(IN.R)f.st!=='walkF'&&f.set('walkF');else if(IN.L)f.st!=='walkB'&&f.set('walkB');else if(f.st!=='idle')f.set('idle')}}
@@ -290,7 +314,7 @@ function loop(){requestAnimationFrame(loop);const raw=Math.min(.05,clock.getDelt
   const mid=(A.x+B.x)/2,span=Math.abs(A.x-B.x)+2.6,hf=Math.tan(THREE.MathUtils.degToRad(cam.fov/2));
   let z=Math.max(4.2,(span/2)/(hf*cam.aspect)+.6);if(G.zoom)z=THREE.MathUtils.lerp(z,3.2,.6);
   const sx=(Math.random()-.5)*G.shake,sy=(Math.random()-.5)*G.shake;G.shake*=.86;
-  wall.position.x=cam.position.x*.6;cam.position.lerp(new THREE.Vector3(mid+sx,1.55+sy+(G.zoom?-.2:0),z),.12);cam.lookAt(mid,1.15,0);
+  wall.position.x=cam.position.x*.6;cam.position.lerp(new THREE.Vector3(mid+sx,1.55+sy+(G.zoom?-.2:0),z),.12);cam.lookAt(mid,1.15,0);scene.fog.near=cam.position.z+3;scene.fog.far=cam.position.z+8;
   hud();R.render(scene,cam)}
 reset();loop();
 </script>
