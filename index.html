@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111142603'</script>
+<script>window.BUILD='20261111143714'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -4212,6 +4212,18 @@ function renderWait(){
 const hexPts=(x,y,r)=>[0,1,2,3,4,5].map(i=>{const a=Math.PI/180*(60*i-30);return (x+r*Math.cos(a)).toFixed(1)+','+(y+r*Math.sin(a)).toFixed(1)}).join(' ');
 const TEMPLE='M-14,11 H14 V7 H12 V-3 H13 V-6 L0,-14 L-13,-6 V-3 H-12 V7 H-14 Z';
 const SETTLE='M-8,9 L-8,-1 L0,-9 L8,-1 L8,9 Z',CITY='M-13,9 L-13,-2 L-6,-9 L1,-2 L1,0 L13,0 L13,9 Z';
+/* redraw the board without rebuilding unchanged pieces: identical nodes are kept (no image re-decode → no flicker / jumping tiles) */
+function morphBoard(html){
+  const bh=document.getElementById('bh'),old=bh.firstElementChild;
+  if(!old||old.tagName.toLowerCase()!=='svg'){bh.innerHTML=html;return}
+  const t=document.createElement('div');t.innerHTML=html;const nw=t.firstElementChild;if(!nw){bh.innerHTML=html;return}
+  for(const a of [...nw.attributes])if(old.getAttribute(a.name)!==a.value)old.setAttribute(a.name,a.value);
+  const key=n=>n.nodeType===1?n.outerHTML:n.textContent,pool=new Map();
+  [...old.childNodes].forEach(o=>{const k=key(o);if(!pool.has(k))pool.set(k,[]);pool.get(k).push(o)});
+  [...nw.childNodes].forEach((n,i)=>{const arr=pool.get(key(n)),node=arr&&arr.length?arr.shift():n;   // reuse an identical old node if there is one
+    if(old.childNodes[i]!==node)old.insertBefore(node,old.childNodes[i]||null)});
+  pool.forEach(arr=>arr.forEach(o=>{if(o.parentNode===old)o.remove()}));                               // drop pieces that are gone
+}
 function boardSVG(){
   const me=mySeat(),mine=myMove(),hot={v:[],e:[],h:[],c:[],k:[]};
   if(mine){                                                   // which spots are tappable right now
@@ -5027,7 +5039,7 @@ function renderGame(){
     sp.innerHTML=it('road',P.rd,40,30,'Roads')+it('house',P.st,40,37,'Villages')+it('temple',P.ct,40,37,'Cities')+(S.rpg.k?`<div class="sp-i sp-g" title="Gold">${ico('coin','ic sm')}<b>${P.gold}</b></div>`:'');sp.hidden=false}else sp.hidden=true;
   {const sb=document.getElementById('bSnd');sb.innerHTML=SND.fx()?'<svg class=gi><use href=#g-speaker></use></svg>':'<svg class=gi><use href=#g-muted></use></svg>';sb.onclick=()=>{LS.set('st-sfx',!SND.fx());if(!SND.fx())LS.set('st-mus',false);else sfx('click');renderGame()}}
   const d3b=document.getElementById('d3btn');d3b.setAttribute('aria-pressed',!!ui.d3);d3b.textContent=ui.d3?'3D on':'3D off';
-  document.getElementById('bh').innerHTML=boardSVG();if(ui.zapply)ui.zapply();   // keep the zoom after every redraw
+  morphBoard(boardSVG());if(ui.zapply)ui.zapply();   // keep the zoom after every redraw
   {const hn=document.getElementById('hint');hn.textContent=ui.pend?'Sending your move…':hintText();
    if(S.phase==='over'&&ui.viewBoard){hn.textContent='Game over — tap here for the results';hn.onclick=()=>{ui.viewBoard=0;openSheet('over')}}else hn.onclick=null;
    const Q=!ui.pend&&!ui.build&&!ui.pick&&!ui.sheet&&quickMoves(me);
