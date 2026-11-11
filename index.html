@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111144025'</script>
+<script>window.BUILD='20261111144235'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -4228,7 +4228,8 @@ function start(online){
   if(!online&&seats.filter(s=>s.kind==='human').length===1)ui.lastHuman=0;
   if(online)openGame(id);
   log('New game — place your first village and road');save();
-  if(!S.tut){const k=S.tw?'st-tour-tw':'st-tour';if(!LS.get(k,false)){LS.set(k,true);setTimeout(()=>openTour(S.tw?'titan':'basics',0),600)}}
+  if(!S.tut){const k=S.tw&&S.tw.br?'st-tour-br':S.tw?'st-tour-tw':'st-tour';if(!LS.get(k,false)){LS.set(k,true);setTimeout(()=>openTour(S.tw&&S.tw.br?'royale':S.tw?'titan':'basics',0),600)}}
+  else if(S.tut.kind!=='trial'||!LS.get('st-tour-learn',false)){LS.set('st-tour-learn',true);setTimeout(()=>openTour('basics',0),500)}   // tutorials start with how the game works
 }
 
 // ---------- Waiting room ----------
@@ -4475,16 +4476,16 @@ function updateDice(){
 
 // ---------- Titan War tutorial: 10 guided goals in a short 1-vs-1 game ----------
 const TUT=[
-  {t:'Place 2 villages and 2 roads',d:'Tap a glowing corner, then ✓. Your first village claims that island for you. Then a road next to it. You do this twice.',ok:()=>S.phase==='main'},
-  {t:'Roll the dice',d:'Press Roll. Every tile with that number pays the villages touching it.',ok:()=>S.rolled||S.round>1},
-  {t:'Build a road',d:'Press Build → Road, tap a glowing edge, then ✓. A road costs Clay + Timber.',ok:()=>Object.values(S.er).filter(x=>x===0).length>=3},
-  {t:'Train your hero',d:'Press Hero → Train & equip, then tap the price next to any stat.',ok:()=>Object.values(S.pl[0].hs||{}).some(v=>v>0)},
-  {t:'Buy gear at the Forge',d:'Hero → Move hero → tap the Forge (the anvil tile on Olympus, in the middle). Dotted lines are sea routes: 1 step each. Then Train & equip → buy an item with gold.',ok:()=>Object.keys(S.pl[0].gear||{}).length>0},
-  {t:'Buy a battle card',d:'Hero → Train & equip → Buy a battle card. You can play it in a duel.',ok:()=>(S.pl[0].bc||[]).length>0||S.tut.duel},
-  {t:'Hold the Shrine',d:'Move your hero onto the Shrine (temple in the clouds) and end your turn. When the next round starts it pays you.',ok:()=>S.tut.shrine},
-  {t:'War! Beat the enemy hero',d:'From round 3 everyone is at war. Move your hero onto the enemy Capital (their hero waits there) and press Duel. Pick a stance each round.',ok:()=>S.tut.duel},
-  {t:'Siege their Capital',d:'Their hero is in the Underworld. Stand on their Capital and press Siege until it falls.',ok:()=>cs(1).fallen},
-  {t:'You win!',d:'Conquering every other Capital wins the Titan War. Play a full game from the home screen.',ok:()=>S.phase==='over'}];
+  {t:'Place 2 villages and 2 roads',d:'Tap a glowing corner, then ✓. Your first village claims that island for you. Then a road next to it. You do this twice.',w:'Villages collect from the 3 tiles they touch. Pick busy numbers (6 and 8 have the most leaves) and different resources.',ok:()=>S.phase==='main'},
+  {t:'Roll the dice',d:'Press Roll. Every tile with that number pays the villages touching it.',w:'Every roll pays everyone whose villages touch that number — even on other players’ turns. A 7 wakes the Cyclops instead.',ok:()=>S.rolled||S.round>1},
+  {t:'Build a road',d:'Press Build → Road, tap a glowing edge, then ✓. A road costs Clay + Timber.',w:'Roads reach new corners for villages. The longest road (5+) is a 2 VP bonus.',ok:()=>Object.values(S.er).filter(x=>x===0).length>=3},
+  {t:'Train your hero',d:'Press Hero → Train & equip, then tap the price next to any stat.',w:'Your hero fights monsters, duels rival heroes and sieges Capitals. Health, Strength, Defense and Stamina all matter in fights.',ok:()=>Object.values(S.pl[0].hs||{}).some(v=>v>0)},
+  {t:'Buy gear at the Forge',d:'Hero → Move hero → tap the Forge (the anvil tile on Olympus, in the middle). Dotted lines are sea routes: 1 step each. Then Train & equip → buy an item with gold.',w:'Gear gives lasting bonuses. Gold comes from monsters, raids, the Shrine and selling cards.',ok:()=>Object.keys(S.pl[0].gear||{}).length>0},
+  {t:'Buy a battle card',d:'Hero → Train & equip → Buy a battle card. You can play it in a duel.',w:'Battle cards are one-shot tricks in a duel: extra damage, a shield or a heal.',ok:()=>(S.pl[0].bc||[]).length>0||S.tut.duel},
+  {t:'Hold the Shrine',d:'Move your hero onto the Shrine (temple in the clouds) and end your turn. When the next round starts it pays you.',w:'Holding the Shrine at the start of a round pays Ambrosia, a card and gold. 5 Ambrosia can be offered for 1 VP.',ok:()=>S.tut.shrine},
+  {t:'War! Beat the enemy hero',d:'From round 3 everyone is at war. Move your hero onto the enemy Capital (their hero waits there) and press Duel. Pick a stance each round.',w:'At war any enemy hero can be duelled. The loser’s hero goes to the Underworld for 2 rounds — their Capital is unguarded.',ok:()=>S.tut.duel},
+  {t:'Siege their Capital',d:'Their hero is in the Underworld. Stand on their Capital and press Siege until it falls.',w:'A Capital with no hero at home can be besieged. When it falls you take VP, cards, gold and their best city.',ok:()=>cs(1).fallen},
+  {t:'You win!',d:'Conquering every other Capital wins the Titan War. Play a full game from the home screen.',w:'Every mode has a goal: VP, conquest, or (in the Battle Royale) the Sanctum offering.',ok:()=>S.phase==='over'}];
 const TRIAL=[                                                 // first game: one idea at a time, learn by doing
   {t:'Claim your land',d:'Tap a glowing corner for a village, then a road beside it. Twice.',ok:()=>S.phase==='main'},
   {t:'Roll the dice',d:'Tiles with that number pay the villages touching them.',ok:()=>S.rolled||S.round>1},
@@ -4832,6 +4833,7 @@ const TOUR={
     {i:'anchor',t:'Trading',l:['<b>Bank</b>: give 4 of one resource for 1 of any other.','<b>Harbours</b> on the coast: 3:1 or 2:1 if you have a village on them.','<b>Players</b>: post an offer; others accept, decline or counter.'],tip:'Unlucky? After 3 rolls with nothing, Hermes gives you a free card.'},
     {i:'cyclops',t:'Rolling a 7: the Cyclops',l:['Nobody collects on a 7.','Anyone holding more than 9 cards gives back half.','The roller moves the Cyclops onto a tile: that tile makes nothing until he leaves.','The roller steals 1 card from someone next to it.'],tip:'Ambrosia is never stolen or discarded.'},
     {i:'bolt',t:'Cards, gods and bonuses',l:['<b>Oracle cards</b>: Hoplite (move the Cyclops), Laurel (+1 VP), free roads, free resources and more. Play one per turn.','<b>Gods</b> (<svg class=gi><use href=#g-bolt></use></svg> button): spend Ambrosia for a blessing, once per turn.','<b>Royal Highway</b>: the longest road of 6+ = +2 VP.','<b>Favour of Ares</b>: most hoplites played + monsters slain (3+) = +2 VP.'],tip:'Tap any card or icon in the game to read what it does.'},
+    {i:'ambrosia',t:'Between your turns',l:['<b>Mini-games</b> while others play: catch Ambrosia, the Sirens\' song, the chariot race — one try each per round.','<b>Ambrosia</b> buys blessings from the gods; <b>5 Ambrosia</b> can be offered to Olympus for <b>+1 VP</b>.','Rolls pay you on every turn, so watch the dice even when it is not your move.'],tip:'Everything that happens goes into the 🔔 event feed at the top — tap it to read it again.'},
     {i:'vp',t:'How to win',l:['Village 1 VP · City 2 VP · Laurel card 1 VP · each bonus 2 VP.','Reach the goal on your turn and you win at once.','Easy plan: villages first, then cities on your best tiles.'],tip:'Stuck? Open the book icon for rules and the Guide.'}
   ],
   titan:[
@@ -4846,20 +4848,26 @@ const TOUR={
     {i:'defend',t:'Duels',l:['Up to 3 rounds. Each round both secretly pick a stance:','<b>Attack</b> beats Feint · <b>Defend</b> beats Attack · <b>Feint</b> beats Defend.','Winning the stance = +3 damage. Losing it = half damage.','You may add one <b>battle card</b> (costs stamina). Then dice decide the damage.'],tip:'At 0 HP a hero goes to the Underworld for 1 round (or pay 2 Ambrosia to return).'},
     {i:'rebel',t:'Conquering a Capital',l:['At war, move your hero onto an enemy Capital while their hero is <b>away</b>.','Press <b>Siege</b> to set up camp; from the next turn every Siege lowers its HP.','At 0 HP it falls: you take half their cards, <b>+2 VP</b> and their best city.','They become your vassal — until they beat your hero in a duel and rebel.'],tip:'Keep your hero near home when enemies are close.'},
     {i:'crown',t:'How to win Titan War',l:['Reach the VP goal, <b>or</b>','conquer every other Capital, <b>or</b>','have the most VP after round 15 (if that ending is on).'],tip:'Simple plan: grow early, buy gear, hold the Shrine, defend at round 10, strike when an enemy hero is away.'}
+  ],
+  royale:[
+    {i:'crown',t:'Battle Royale',l:['<b>3 god clans</b> — Zeus, Poseidon, Hades — of 2 players each.','One big continent of 12 islands; each clan starts at a corner.','Your clan-mate shares your victory: no pacts, no fighting each other.'],tip:'Your clan is the glowing group on the player bar.'},
+    {i:'temple',t:'The Sanctum',l:['The <b>Shrine</b> in the middle is the Sanctum.','Hold it through a <b>full round</b> with no enemy hero on it → you make an <b>offering</b> (✦ on your banner).','When <b>every</b> clan-mate has offered, your god answers and your clan <b>wins at once</b>.'],tip:'One hero holds the altar, the other guards the tiles around it.'},
+    {i:'attack',t:'Getting there',l:['War starts in round 3 — enemy heroes can be duelled anywhere.','<b>Titans</b> (Kronos, Atlas, Hyperion, Typhon) are tough bosses with big rewards.','<b>Zeus supply chests</b> fall on the wild islands every 3 rounds: gold, Ambrosia, resources.'],tip:'Build up first, then march on the Sanctum together.'},
+    {i:'vp',t:'Other ways to win',l:['Conquer every rival clan\'s Capital, <b>or</b>','have the most clan VP after round 30.'],tip:'Everything is announced to all players — watch the 🔔 feed.'}
   ]};
 function openTour(track,pg){                                 // full-screen walkthrough; works on the home screen and in game
   let el=document.getElementById('tour');if(!el){el=document.createElement('div');el.id='tour';el.className='tour';document.body.appendChild(el)}
   const T=TOUR[track],P=T[pg],last=pg===T.length-1;
   el.innerHTML=`<div class="tcard" role="dialog" aria-label="Walkthrough">
-    <div class="ttabs"><button data-ttrack="basics" aria-pressed="${track==='basics'}">The basics</button><button data-ttrack="titan" aria-pressed="${track==='titan'}">Titan War</button></div>
+    <div class="ttabs"><button data-ttrack="basics" aria-pressed="${track==='basics'}">The basics</button><button data-ttrack="titan" aria-pressed="${track==='titan'}">Titan War</button><button data-ttrack="royale" aria-pressed="${track==='royale'}">Battle Royale</button></div>
     <div class="tic">${ico(P.i)}</div><div class="tstep">Step ${pg+1} of ${T.length}</div><h2>${P.t}</h2>
     <ul>${P.l.map(x=>`<li>${riz(x)}</li>`).join('')}</ul>${P.tip?`<div class="ttip"><svg class=gi><use href=#g-owl></use></svg> ${riz(P.tip)}</div>`:''}
     <div class="tdots">${T.map((_,i)=>`<i class="${i===pg?'on':''}"></i>`).join('')}</div>
-    <div class="tnav"><button class="btn" id="tBack" ${pg?'':'disabled'}>‹ Back</button><button class="btn pri" id="tNext">${last?(track==='basics'?'Titan War rules ›':'Done'):'Next ›'}</button></div>
+    <div class="tnav"><button class="btn" id="tBack" ${pg?'':'disabled'}>‹ Back</button><button class="btn pri" id="tNext">${last?(track==='basics'?'Titan War rules ›':track==='titan'?'Battle Royale ›':'Done'):'Next ›'}</button></div>
     <button class="btn" id="tClose" style="width:100%;margin-top:8px">Skip tour ✕</button></div>`;
   const close=()=>el.remove();
   el.querySelector('#tBack').onclick=()=>openTour(track,pg-1);
-  el.querySelector('#tNext').onclick=()=>last?(track==='basics'?openTour('titan',0):close()):openTour(track,pg+1);
+  el.querySelector('#tNext').onclick=()=>last?(track==='basics'?openTour('titan',0):track==='titan'?openTour('royale',0):close()):openTour(track,pg+1);
   el.querySelector('#tClose').onclick=close;
   el.querySelectorAll('[data-ttrack]').forEach(b=>b.onclick=()=>openTour(b.dataset.ttrack,0));
   el.onclick=e=>{if(e.target===el)close()};
@@ -5021,7 +5029,7 @@ function renderGame(){
         <div class="rail" id="rail">
           <button title="Game log" data-rail="log">${uico('log')}</button><button title="Dice stats" data-rail="stats">${uico('chart')}</button>
           <button title="Cards & costs" data-rail="rules">${uico('book')}</button><button title="Secret missions" data-rail="contracts">${uico('task')}</button><button title="The gods" data-rail="gods">${ico('bolt','ui')}</button>
-          <button title="Guide: how everything works" data-rail="howto">${uico('help')}</button>${S.online&&db?`<button id="vcbtn" title="Voice chat" data-rail="voice" class="${VC.on?'von':''}">${uico('mic')}<i class="vcnt">${VC.roster.length||''}</i></button>`:''}<button title="Zoom in" data-rail="zin">${uico('plus')}</button>
+          <button title="How to play (rules)" data-rail="tour">${uico('book')}</button><button title="Guide: how everything works" data-rail="howto">${uico('help')}</button>${S.online&&db?`<button id="vcbtn" title="Voice chat" data-rail="voice" class="${VC.on?'von':''}">${uico('mic')}<i class="vcnt">${VC.roster.length||''}</i></button>`:''}<button title="Zoom in" data-rail="zin">${uico('plus')}</button>
           <button title="Zoom out" data-rail="zout">${uico('minus')}</button><button title="Fit board" data-rail="fit">${uico('fit')}</button>
           <button title="3D / flat" data-rail="view">${uico('cube')}</button><button title="Back to lobby" data-rail="lobby">${uico('exit')}</button>
         </div>
@@ -5037,6 +5045,7 @@ function renderGame(){
     document.querySelectorAll('[data-rail]').forEach(b=>b.onclick=()=>{const k=b.dataset.rail;
       if(k==='lobby')return S.phase==='over'?leave():openSheet('exit');if(k==='zin')return ui.zoom(1.25);if(k==='zout')return ui.zoom(.8);if(k==='fit')return ui.zoom(0);
       if(k==='view')return toggle3d();
+      if(k==='tour')return openTour(S&&S.tw&&S.tw.br?'royale':S&&S.tw?'titan':'basics',0);
       if(k==='voice')return openSheet('voice');
       openSheet(k==='howto'?'guide':k)});
     setupZoom();
@@ -5133,7 +5142,7 @@ function renderGame(){
   bn.querySelectorAll('[data-banmore]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.banOpen=!ui.banOpen;if(ui.banOpen)feedUnread=0;renderGame()});bn.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>openSheet('world'));bn.querySelectorAll('[data-evpop]').forEach(b=>b.onclick=()=>eventPop(S.event));
   bn.querySelectorAll('[data-tutskip]').forEach(b=>b.onclick=()=>{const tr=S&&S.tut&&S.tut.kind==='trial';LS.set('st-tour-tw',true);LS.set('st-tour',true);LS.del('st-local');leave();
     if(tr&&!prof().trials)trialReward()});   /* skipping the Trials = finished: get the starter heroes, go to home */
-  bn.querySelectorAll('[data-tut]').forEach(b=>b.onclick=()=>note(`<b>Hermes:</b> ${TG()[S.tut.step].d}`,6000));
+  bn.querySelectorAll('[data-tut]').forEach(b=>b.onclick=()=>{const T=TG()[S.tut.step];feedPush('tip',`<b>Hermes:</b> ${T.d}${T.w?` <i>Why: ${T.w}</i>`:''}`);if(ui.feedHide){ui.feedHide=0;renderGame()}});
   bn.querySelectorAll('[data-champ]').forEach(b=>b.onclick=()=>openSheet('champ'));
   bn.querySelectorAll('[data-quests]').forEach(b=>b.onclick=()=>openSheet('quests'));
   bn.querySelectorAll('[data-twc]').forEach(b=>b.onclick=()=>toast(S.tw.on?'The Titan War is on: every island is at war.':`Titan clock: total war starts at round ${S.tw.war}. Build your island and hero now.`));
