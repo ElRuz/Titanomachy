@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111132150'</script>
+<script>window.BUILD='20261111142318'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1458,6 +1458,36 @@ body.mgopen .stage *,body.mgopen .stage{animation-play-state:paused!important}
 .chal.yum i{animation:cupglow .45s ease-out}
 @keyframes cupglow{0%{filter:drop-shadow(0 0 18px #e9b8ff) brightness(1.25)}100%{filter:drop-shadow(0 0 8px #ffd86a77)}}
 .chal.full i{filter:drop-shadow(0 0 16px #e9b8ff)!important}
+
+/* Battle Royale: the god's answer */
+.brcine{position:fixed;inset:0;z-index:9700;pointer-events:none;display:grid;place-items:center;overflow:hidden}
+.brcine b{position:relative;z-index:2;font:900 clamp(34px,11vw,84px) Cinzel,Georgia,serif;letter-spacing:.12em;color:#fff;text-shadow:0 0 30px var(--g),0 4px 10px #000;animation:brt 2.6s ease-out both}
+.brcine i{position:absolute;inset:0}
+.brcine.c0{--g:#ffd86a}.brcine.c0 i{background:linear-gradient(105deg,#0000 47%,#fff 49.5%,#ffe7a3 50%,#fff 50.5%,#0000 53%),radial-gradient(ellipse at 50% 0,#ffd86a66,#0b162600 60%);animation:brz .6s steps(2) 3,brfade 2.6s ease-out both}
+.brcine.c1{--g:#4fd2e0}.brcine.c1 i{background:linear-gradient(#0000,#1fa2c8cc 40%,#0b3a5aee);transform:translateY(100%);animation:brflood 2.4s cubic-bezier(.2,.8,.2,1) forwards}
+.brcine.c2{--g:#b07aff}.brcine.c2 i{background:radial-gradient(circle at 30% 70%,#1a0b2bee,#0000 50%),radial-gradient(circle at 70% 40%,#120820ee,#0000 55%),radial-gradient(circle at 50% 50%,#2a1046cc,#05030aee);animation:brsmoke 2.6s ease-out both}
+.brcine.out{opacity:0;transition:opacity .8s}
+@keyframes brt{0%{opacity:0;scale:.6}25%{opacity:1;scale:1.08}100%{opacity:1;scale:1}}
+@keyframes brz{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes brfade{0%{filter:brightness(3)}100%{filter:none}}
+@keyframes brflood{to{transform:translateY(0)}}
+@keyframes brsmoke{0%{opacity:0;scale:1.4}100%{opacity:1;scale:1}}
+
+/* Battle Royale player bar: three clan groups, compact banners */
+.pbar.br{gap:6px}
+.clanb{flex:1 1 0;min-width:0;display:grid;gap:2px;padding:2px 4px 4px;border-radius:10px;background:linear-gradient(#0b1626cc,#0b162688);box-shadow:inset 0 0 0 1.5px var(--cc)}
+.clanb.mine{box-shadow:inset 0 0 0 2px var(--cc),0 0 12px color-mix(in srgb,var(--cc) 50%,#0000)}
+.clanb>em{font:900 10px Cinzel,Georgia,serif;letter-spacing:.08em;color:var(--cc);text-align:center;font-style:normal}
+.clanb>div{display:flex;gap:4px}
+.pbar.br .pban{min-width:0;max-width:none;flex:1 1 0}
+.pbar.br .avw{width:34px;height:38px;border-width:2px}
+.pbar.br .pmore,.pbar.br .ribbon i,.pbar.br .ribbon b{display:none}
+.pbar.br .ribbon span{font-size:10px}
+.poff{position:absolute;right:2px;bottom:1px;font-size:12px;color:#fff6;z-index:2}.poff.on{color:var(--cc,#ffd86a);text-shadow:0 0 6px currentColor}
+
+.brclans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.brc{display:grid;gap:2px;justify-items:center;padding:10px 6px;border-radius:12px;background:#0b1626aa;box-shadow:inset 0 0 0 2px var(--cc)}
+.brc b{font:900 15px Cinzel,Georgia,serif;color:var(--cc)}.brc span{font-size:11px;color:#fffc;text-align:center}
 </style>
 </head><body>
 
@@ -1803,8 +1833,8 @@ const GOALS={
   army:{n:'Field Marshal',d:'Play 3 Hoplite cards',classic:1},spread:{n:'Diversifier',d:'Touch all 5 resource types with your buildings'}
 };
 const PIPS={2:1,3:2,4:3,5:4,6:5,8:5,9:4,10:3,11:2,12:1};
-const PCOL=[{n:'Crimson',c:'#e5342a',pip:'#fff'},{n:'Aegean',c:'#2a7ff0',pip:'#fff'},{n:'Ivory',c:'#f7f2e6',pip:'#222'},{n:'Saffron',c:'#f7a21b',pip:'#fff'}];
-const BOTNAMES=['Nikias','Thalia','Leonidas','Ione'];
+const PCOL=[{n:'Crimson',c:'#e5342a',pip:'#fff'},{n:'Aegean',c:'#2a7ff0',pip:'#fff'},{n:'Ivory',c:'#f7f2e6',pip:'#222'},{n:'Saffron',c:'#f7a21b',pip:'#fff'},{n:'Emerald',c:'#22b573',pip:'#fff'},{n:'Violet',c:'#9b5de5',pip:'#fff'}];   // 5th/6th for the Battle Royale
+const BOTNAMES=['Nikias','Thalia','Leonidas','Ione','Kleon','Daphne'];
 const LVL=['Easy','Medium','Hard'];
 const DEV={
   knight:{n:'Hoplite',d:'Move the Cyclops to any tile and steal 1 random card from a player there. Hoplites played + monsters slain: 3 or more (and the most) wins the Favour of Ares (+2 VP).'},
@@ -1871,7 +1901,8 @@ const R=56,S3=Math.sqrt(3);
 const HEX=[],V=[],E=[],HN=[],HADJ0=[],HADJ=[],COAST=[],PORTS=[],TWC=[],ROUTES=[],RSET=new Set(),XADJ=[],WH=[],NB={};/* WH: sea hexes (cell id 1000+j); NB: hero travel graph */let vmap={},emap={},GEO='',SEA='',VBOX='';
 const SHIPC={lumber:1,wool:1};                                 // a ship: Timber + Fleece
 const BARREN=new Set(['desert','shrine','forge','vault','capital']);   // tiles that never produce
-const TWLAY={'3x':[[-3,2],[2,-3],[2,2]],'4x':[[-2,-1],[-2,4],[3,-3],[3,1]],'5x':[[-3,1],[-2,4],[1,-3],[2,2],[4,-2]],'2v':[[-2,4],[2,-3]],2:[[-2,-1],[2,2]],3:[[-3,2],[2,-3],[2,2]],4:[[-2,-1],[-2,4],[3,-3],[3,1]]};   // Titan War home-island centres around Olympus
+const TWLAY={'12x':[[4,2],[-6,4],[2,-6],[1,4],[-5,1],[4,-5],[2,1],[-3,2],[1,-3],[-1,3],[-2,-1],[3,-2]],   // Battle Royale: 6 clan homes (Zeus, Poseidon, Hades ×2) + 6 wild/highland islands
+  '3x':[[-3,2],[2,-3],[2,2]],'4x':[[-2,-1],[-2,4],[3,-3],[3,1]],'5x':[[-3,1],[-2,4],[1,-3],[2,2],[4,-2]],'2v':[[-2,4],[2,-3]],2:[[-2,-1],[2,2]],3:[[-3,2],[2,-3],[2,2]],4:[[-2,-1],[-2,4],[3,-3],[3,1]]};   // Titan War home-island centres around Olympus
 const HDIR=[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
 function buildGeo(shape){
   if(GEO===shape)return;GEO=shape;
@@ -1915,7 +1946,7 @@ function buildGeo(shape){
     else HEX.forEach((a,i)=>HEX.forEach((b,j)=>{if(j>i&&a.isl!==b.isl&&hd(a,b)===2){HADJ[i].push(j);HADJ[j].push(i)}}));
     const ol=HEX.filter(h=>h.isl===tn),ox=ol.reduce((t,h)=>t+h.x,0)/3,oy=ol.reduce((t,h)=>t+h.y,0)/3;
     for(let k=0;k<tn;k++){const c=HEX[TWC[k]],out=Math.atan2(c.y-oy,c.x-ox),ce=COAST.filter(e=>HEX[E[e].h[0]].isl===k);
-      [-.9,.9].forEach(off=>{let best=-1,bd=9;ce.forEach(e=>{const t=Math.atan2((V[E[e].a].y+V[E[e].b].y)/2-c.y,(V[E[e].a].x+V[E[e].b].x)/2-c.x)-out-off,d=Math.abs(Math.atan2(Math.sin(t),Math.cos(t)));if(d<bd){bd=d;best=e}});PORTS.push(best)})}
+      [-.9,.9].forEach(off=>{let best=-1,bd=9;ce.forEach(e=>{if(PORTS.includes(e))return;const t=Math.atan2((V[E[e].a].y+V[E[e].b].y)/2-c.y,(V[E[e].a].x+V[E[e].b].x)/2-c.x)-out-off,d=Math.abs(Math.atan2(Math.sin(t),Math.cos(t)));if(d<bd){bd=d;best=e}});if(best>=0)PORTS.push(best)})}   // inner islands may have no shore
   }
   if(shape==='classic'){[0,3,6,10,13,16,20,23,26].forEach(k=>PORTS.push(COAST[k]));SEA=[0,1,2,3,4,5].map(i=>{const a=Math.PI/3*i;return (318*Math.cos(a)).toFixed(1)+','+(318*Math.sin(a)).toFixed(1)}).join(' ');VBOX='-335 -300 670 600';return}
   if(shape==='arch'){
@@ -2307,14 +2338,15 @@ function rematch(){
   ui={d3:ui.d3,screen:ui.screen,user:ui.user,amode:ui.amode};closeSheet();log('Rematch! New game — place your first village and road');save();
   if(S.online)openGame(S.id);render()}
 function newState(cfg){
-  const twn=cfg.tw?cfg.seats.length:0;buildGeo(twn?'tw'+(twn+1)+'x':'arch');   // one island per player + one free island
+  const twn=cfg.tw?cfg.seats.length:0;buildGeo(cfg.br?'tw12x':twn?'tw'+(twn+1)+'x':'arch');   // one island per player + one free island (Battle Royale: the big 12-island map)
   RES=BASE.concat(SPEC,cfg.ck?COMS:[]);
   const b=genBoard(),n=cfg.seats.length,deck=[];
   const r0=cfg.rpg||{},rpg={k:!!r0.k,ev:!!r0.ev,goals:!!r0.goals&&!r0.k&&!cfg.tw,hero:!!r0.k,mon:!!r0.k,relic:!!r0.k},gk=shuffle(Object.keys(GOALS).filter(k=>!(GOALS[k].ck&&!cfg.ck)&&!(GOALS[k].classic&&cfg.ck)&&!(GOALS[k].mon&&!rpg.mon))),hk=Object.keys(HEROES);
   [['knight',10],['vp',4],['road',2],['yop',2],['mono',2],['trojan',2],['oracle',2]].forEach(([t,k])=>{for(let i=0;i<k;i++)deck.push(t)});
   return {
-    v:1,shape:GEO,tw:twn?{end:cfg.twEnd||'r15',war:10,on:false,claim:true,ni:twn+1,own:{},cap:[],cy:{}}:null,id:cfg.id,online:!!cfg.online,phase:cfg.online?'wait':'setup',host:ME.uid,created:Date.now(),
-    seats:cfg.seats,dice:cfg.dice,goal:cfg.vp||((cfg.ck?13:10)-(cfg.speed?2:0)+(rpg.goals?1:0)+(rpg.k?2:0)),   // kingdom & goals add extra VP sources
+    v:1,shape:GEO,tw:cfg.br?{br:1,end:'sanctum',war:3,on:false,claim:true,ni:12,own:Object.fromEntries(cfg.seats.map((_,i)=>[i,i])),cap:cfg.seats.map((_,i)=>TWC[i]),cy:{},clan:cfg.seats.map((_,i)=>i%3),off:{}}   // clans: seats 0,3 Zeus · 1,4 Poseidon · 2,5 Hades
+      :twn?{end:cfg.twEnd||'r15',war:10,on:false,claim:true,ni:twn+1,own:{},cap:[],cy:{}}:null,id:cfg.id,online:!!cfg.online,phase:cfg.online?'wait':'setup',host:ME.uid,created:Date.now(),
+    seats:cfg.seats,dice:cfg.dice,goal:cfg.br?99:cfg.vp||((cfg.ck?13:10)-(cfg.speed?2:0)+(rpg.goals?1:0)+(rpg.k?2:0)),   // kingdom & goals add extra VP sources
     ck:!!cfg.ck,rpg,
     hexes:b.tl.map((r,i)=>({r,n:b.n[i]})),robber:b.rob??b.tl.indexOf('desert'),ports:b.ports,
     tasks:!!cfg.tasks,tdrawn:false,
@@ -2514,7 +2546,11 @@ function twClaim(p,v){                                          // first buildin
 }
 const capRes=p=>(S.tw&&S.tw.cy&&S.tw.cy[p])||BASE.slice().sort((a,b)=>S.pl[p].res[a]-S.pl[p].res[b])[0];   // chosen, else the one you have least of
 // ---------- Titan War: war state ----------
-const pact=(p,q)=>!!S.tw&&(S.tw.pacts||[]).some(x=>((x.a===p&&x.b===q)||(x.a===q&&x.b===p))&&x.until>=S.round);   // alliance
+const sameClan=(p,q)=>!!(S&&S.tw&&S.tw.clan)&&p!==q&&S.tw.clan[p]===S.tw.clan[q];   // Battle Royale teammates
+const CLANS=[{n:'Zeus',c:'#ffd86a',i:'bolt'},{n:'Poseidon',c:'#4fd2e0',i:'wave'},{n:'Hades',c:'#b07aff',i:'skull'}];
+const clanOf=p=>S.tw&&S.tw.clan?S.tw.clan[p]:-1;
+const isWin=p=>p===S.winner||sameClan(p,S.winner);              // a clan wins together
+const pact=(p,q)=>sameClan(p,q)||!!S.tw&&(S.tw.pacts||[]).some(x=>((x.a===p&&x.b===q)||(x.a===q&&x.b===p))&&x.until>=S.round);   // alliance
 const atWar=(p,q)=>!!S.tw&&!pact(p,q)&&(S.tw.on||(S.tw.wars||[]).some(([a,b])=>(a===p&&b===q)||(a===q&&b===p)));
 const FORT={wall:{n:'Walls',d:'+5 Capital HP',max:3,c:{brick:2,ore:1}},tower:{n:'Watchtower',d:'half of all raids on your island fail',max:1,c:{lumber:2,ore:1}},
   gar:{n:'Garrison',d:'−2 siege damage per level',max:3,c:{grain:1,wool:1,ore:1}}};
@@ -2540,7 +2576,7 @@ function capFall(p,q){                                        // a Capital falls
   if(mine.length){const v=mine[0];c.city=+v;S.vb[v].p=p;if(S.vb[v].c)S.pl[q].ct++;else S.pl[q].st++}
   S.capEv={p,q,rebel:false,id:(S.capEv?S.capEv.id:0)+1};
   log(`<b>${pname(p)}</b> conquers <b>${pname(q)}</b>'s Capital! +2 VP, half their cards${mine.length?' and a '+(S.vb[mine[0]].c?'city':'village'):''}. ${pname(q)} becomes a vassal.`);
-  if(S.seats.every((_,o)=>o===p||cs(o).fallen)&&!cs(p).fallen){S.phase='over';S.winner=p;log(`<b>${pname(p)}</b> has conquered every Capital and wins the Titan War!`);return}
+  if(S.seats.every((_,o)=>o===p||sameClan(o,p)||cs(o).fallen)&&!cs(p).fallen){S.phase='over';S.winner=p;log(`<b>${pname(p)}</b> has conquered every Capital and wins the Titan War!`);return}
   checkWin(p);
 }
 function rebel(w,l){                                          // a vassal beats its conqueror in a duel: freedom
@@ -2642,10 +2678,15 @@ function roundStart(){
       const c=cs(p);if(!c.fallen)c.hp=Math.min(capMax(p),c.hp+3)});                       // walls are repaired a little each round
     S.tw.pacts=(S.tw.pacts||[]).filter(x=>x.until>=S.round);
     const sh=S.hexes.findIndex(h=>h.r==='shrine'),on=S.seats.map((_,p)=>p).filter(p=>S.pl[p].hx===sh);
-    S.tw.holder=on.length===1?on[0]:-1;                       // alone on the Shrine = its holder
+    S.tw.holder=on.length===1||(S.tw.br&&on.length&&on.every(q=>sameClan(q,on[0])||q===on[0]))?on[0]:-1;   // alone (or only with clan-mates) on the Shrine = its holder
+    if(S.tw.br&&S.tw.holder>=0){const p=on.find(q=>!S.tw.off[q]);if(p!=null){S.tw.off[p]=1;const c=clanOf(p),mates=S.seats.map((_,q)=>q).filter(q=>clanOf(q)===c),n=mates.filter(q=>S.tw.off[q]).length;
+      S.offEv={p,c,n,of:mates.length,id:(S.offEv?S.offEv.id:0)+1};log(`<b>${pname(p)}</b> makes an offering to <b>${CLANS[c].n}</b> at the Sanctum (${n}/${mates.length})`);
+      if(n>=mates.length){S.phase='over';S.winner=p;S.brWin={c,id:Date.now()};log(`<b>${CLANS[c].n} answers!</b> The ${CLANS[c].n} clan wins the Battle Royale!`);return}}}
     if(S.tut){if(S.tw.holder===0)S.tut.shrine=true;const r=BASE[rnd(5)],r2=BASE[rnd(5)];gain(0,r,1);gain(0,r2,1);S.pl[0].gold++}   // tutorial: keep the player moving
     if(S.tw.holder>=0){const p=S.tw.holder,r=BASE[rnd(5)];gain(p,'ambrosia',1);gain(p,r,1);S.pl[p].gold++;log(`The Shrine blesses <b>${pname(p)}</b>: Ambrosia, ${RNAME[r]} and 1 gold`)}
     else if(on.length>1)log('Several heroes stand on the Shrine — nobody is blessed until one wins');
+    if(S.tw.br&&S.round>30&&S.phase==='main'){const cv=c=>S.seats.reduce((t,_,q)=>t+(clanOf(q)===c?vp(q,true):0),0),c=[0,1,2].sort((a,b)=>cv(b)-cv(a))[0];
+      S.phase='over';S.winner=S.seats.findIndex((_,q)=>clanOf(q)===c);S.brWin={c,id:Date.now()};log(`Round 30 is over — the <b>${CLANS[c].n}</b> clan wins with the most VP`);return}
     if(S.tw.end==='r15'&&S.round>15&&S.phase==='main'){               // time is up: highest VP wins (ties: most cards)
       const sc=p=>vp(p,true)*100+tot(p),w=S.seats.map((_,p)=>p).sort((a,b)=>sc(b)-sc(a))[0];
       S.phase='over';S.winner=w;log(`Round 15 is over — <b>${pname(w)}</b> wins with ${vp(w,true)} VP!`);return}
@@ -3087,6 +3128,7 @@ const RULES={
     log(`<b>${pname(p)}</b>'s hero burns a road of <b>${pname(q)}</b>`);
   },
   war(p,q){                                                   // declare war early on one rival
+    if(sameClan(p,q))return bad('You never fight your own clan');
     if(!S.tw||S.tw.on||!S.rolled||S.sub||q===p||!S.seats[q])return bad("Can't declare war now");
     if(atWar(p,q))return bad('Already at war');
     if(pact(p,q))breakPact(p,q);
@@ -3137,7 +3179,7 @@ const RULES={
     pay(p,{ambrosia:dg(p).uwx?1:2});pl.uw=0;pl.hx=S.tw.cap[p];pl.hp=hpMax(p);log(`<b>${pname(p)}</b> strikes a bargain with Hades — the hero returns at full health`);
   },
   pactoffer(p,q){                                             // offer an alliance for 3 rounds
-    if(!S.tw||q===p||!S.seats[q])return bad('Pick a player');if(pact(p,q))return bad('Already allies');
+    if(!S.tw||q===p||!S.seats[q])return bad('Pick a player');if(S.tw.br)return bad('In the Battle Royale your clan is your only ally');if(pact(p,q))return bad('Already allies');
     if(dg(p).noPact||dg(q).noPact)return bad('Penthesilea never makes pacts');
     if((S.tw.pofs||[]).some(o=>(o.from===p&&o.to===q)||(o.from===q&&o.to===p)))return bad('An offer is already waiting');
     (S.tw.pofs=S.tw.pofs||[]).push({from:p,to:q});log(`<b>${pname(p)}</b> offers a pact to <b>${pname(q)}</b>`);
@@ -3278,7 +3320,7 @@ function buildRec(){
   const ports=i=>new Set(S.ports.filter(pt=>[E[pt.e].a,E[pt.e].b].some(v=>S.vb[v]&&S.vb[v].p===i)).map(pt=>pt.e)).size;
   return {id:S.id,date:Date.now(),turns:S.turn,dice:S.dice,goal:S.goal,
     players:S.seats.map((s,i)=>({name:s.name,uid:s.uid||null,kind:s.kind,level:s.level??null,persona:s.persona||null,
-      vp:vp(i,true),won:i===S.winner,kn:S.pl[i].kn,lr:S.lr===i,la:S.la===i,ports:ports(i),heroLv:S.rpg.hero?hlv(i):0,metro:S.ck?Object.values(S.metro).filter(x=>x===i).length:0,...S.tr[i]}))};
+      vp:vp(i,true),won:isWin(i),kn:S.pl[i].kn,lr:S.lr===i,la:S.la===i,ports:ports(i),heroLv:S.rpg.hero?hlv(i):0,metro:S.ck?Object.values(S.metro).filter(x=>x===i).length:0,...S.tr[i]}))};
 }
 function record(){
   S.recorded=true;say(S.winner,'win');
@@ -3377,7 +3419,7 @@ function botExtras(p,lvl,spots,myS){
     const of=(S.tw.pofs||[]).find(o=>o.to===p);if(of)return A('pactans',{from:of.from,ok:!isLeader(of.from)&&vp(of.from)<=vp(p)+1&&lvl<2||(lvl===2&&vp(of.from)<vp(p))});
     if(pl.uw&&lvl>0&&pl.res.ambrosia>=2&&S.tw.on)return A('hades');
     const ally=(S.tw.pacts||[]).find(x=>x.a===p||x.b===p);if(ally&&lvl===2){const q=ally.a===p?ally.b:ally.a;if(vp(q)>=S.goal-2)return A('pactbreak',q)}
-    if(lvl>0&&!ally&&!dg(p).noPact&&S.round>=3&&!rnd(10)){const q=S.seats.map((_,q)=>q).filter(q=>q!==p&&!dg(q).noPact&&!isLeader(q)&&!atWar(p,q)).sort((a,b)=>vp(a)-vp(b))[0];if(q!=null&&!(S.tw.pofs||[]).some(o=>o.from===p))return A('pactoffer',q)}
+    if(lvl>0&&!ally&&!S.tw.br&&!dg(p).noPact&&S.round>=3&&!rnd(10)){const q=S.seats.map((_,q)=>q).filter(q=>q!==p&&!dg(q).noPact&&!isLeader(q)&&!atWar(p,q)).sort((a,b)=>vp(a)-vp(b))[0];if(q!=null&&!(S.tw.pofs||[]).some(o=>o.from===p))return A('pactoffer',q)}
     const c=cs(p);if(!c.fallen&&lvl>0&&(S.tw.on||S.round>=6)){const k=['wall','gar','tower','wall','gar','wall'].find(k=>c[k]<FORT[k].max&&afford(p,FORT[k].c));if(k&&!rnd(2))return A('fort',k)}
   }
   if(S.tw&&S.rolled&&!S.sub&&pl.hx>=0){const gear=pl.gear||{},hs=pl.hs||{};
@@ -3423,6 +3465,11 @@ function botExtras(p,lvl,spots,myS){
         if(per(p).n==='Bully'&&HEX[h].v.some(v=>S.vb[v]&&S.vb[v].p!==p))s+=2;
         if(S.tw&&pl.hp>hpMax(p)/2){const rivals=S.seats.map((_,q)=>q).filter(q=>q!==p&&S.pl[q].hx===h);
           if(S.hexes[h].r==='shrine')s+=rivals.length?(lvl===2&&rivals.every(q=>hpow(p)>hpow(q)+1)?6:-3):5;          // take (Hard: contest) the Shrine
+          if(S.tw.br){const sh=S.hexes[h].r==='shrine',foes=rivals.filter(q=>!sameClan(p,q)),mateOn=S.seats.some((_,q)=>sameClan(p,q)&&S.hexes[S.pl[q].hx]&&S.hexes[S.pl[q].hx].r==='shrine');
+            if(sh&&!S.tw.off[p])s+=foes.length?(foes.every(q=>hpow(p)>=hpow(q))?10:-2):(S.round>=2?14:6);     // go make my offering
+            if(sh&&h===pl.hx&&!S.tw.off[p])s+=20;                                                              // hold until the round turns
+            if(isOly(h)&&!sh&&mateOn&&S.tw.off[p])s+=9;                                                        // guard a clan-mate at the altar
+            if(foes.length&&isOly(h)&&mateOn&&foes.every(q=>hpow(p)>=hpow(q)))s+=8}                            // drive enemies off the Sanctum
           if(rivals.some(q=>atWar(p,q)&&aggro(p,q,lvl)&&hpow(p)>hpow(q)+1))s+=4;                         // hunt a weaker enemy hero
           if(HEX[h].v.some(v=>S.vb[v]&&S.vb[v].p!==p&&atWar(p,S.vb[v].p)&&aggro(p,S.vb[v].p,lvl)))s+=3;  // raid enemy villages
           S.seats.forEach((_,q)=>{if(q!==p&&h===S.tw.cap[q]&&atWar(p,q)&&aggro(p,q,lvl)&&!cs(q).fallen&&S.pl[q].hx!==h)s+=7+(cs(q).hp<=atk(p)+3?4:0)});   // siege an empty Capital
@@ -3788,7 +3835,13 @@ function siegeSlams(){                                         // siege camp + h
   if(S.siegeEv&&ui.seenSiege!==S.siegeEv.id){const first=ui.seenSiege===undefined;ui.seenSiege=S.siegeEv.id;if(!first){const e=S.siegeEv;
     slam(e.q===me?'threat':'swing','claw',e.q===me?`${nm(e.p)} besieges your Capital!`:`${nm(e.p)} besieges ${nm(e.q)}'s Capital`,e.q===me?'Blockade: no Capital income, no building at home, no victory — bring your hero home!':'Blockade — no victory for them until the siege breaks')}}
   if(S.hold&&ui.seenHold!==S.hold.id){const first=ui.seenHold===undefined;ui.seenHold=S.hold.id;if(!first){const e=S.hold;
-    slam('race','hglass',e.p===me?'Victory held!':`${nm(e.p)} has enough VP!`,e.p===me?`Break ${nm(e.q)}'s siege to win`:`Only the siege by ${nm(e.q)} stops them`)}}}
+    slam('race','hglass',e.p===me?'Victory held!':`${nm(e.p)} has enough VP!`,e.p===me?`Break ${nm(e.q)}'s siege to win`:`Only the siege by ${nm(e.q)} stops them`)}}
+  if(S.offEv&&ui.seenOff!==S.offEv.id){const first=ui.seenOff===undefined;ui.seenOff=S.offEv.id;if(!first){const e=S.offEv,mine=clanOf(me)===e.c;
+    slam(mine?'swing':'threat','crown',`Offering to ${CLANS[e.c].n} · ${e.n}/${e.of}`,mine?(e.n<e.of?'Your clan is close — the next clan-mate must hold the Sanctum a full round':'The god answers!'):`${nm(e.p)} holds the Sanctum — stop the ${CLANS[e.c].n} clan!`)}}
+  if(S.brWin&&ui.seenBr!==S.brWin.id){ui.seenBr=S.brWin.id;const c=S.brWin.c;brCine(c);slam(clanOf(me)===c?'swing':'threat','crown',`${CLANS[c].n} answers!`,clanOf(me)===c?'Your clan wins the Battle Royale':`The ${CLANS[c].n} clan wins`)}}
+function brCine(c){                                             // the god's answer: flood (Poseidon), lightning split (Zeus), dark smoke (Hades)
+  const el=document.createElement('div');el.className='brcine c'+c;el.innerHTML='<i></i><b>'+CLANS[c].n.toUpperCase()+'</b>';document.body.appendChild(el);
+  sfx(c===0?'thunder':'win');setTimeout(()=>el.classList.add('out'),2600);setTimeout(()=>el.remove(),3400)}
 function slamCheck(){siegeSlams();                                           // compare with the last state this phone saw
   if(!S||!S.pl||S.tut){slamPrev=null;return}
   const me=mySeat(),nm=i=>esc(pname(i)),mine=h=>me>=0&&Object.keys(S.vb).some(v=>S.vb[v].p===me&&V[v].h.includes(h));
@@ -3852,10 +3905,11 @@ function statsHTML(){
 }
 // ======== Home screen + game setup ========
 const PRESETS={
-  quick:{n:'Quick',d:'Short game to 8 VP, no extras',i:'road',set:{tw:false,speed:true,ck:false,tasks:false,friendly:true,rpg:{k:false,ev:false,goals:false}}},
-  classic:{n:'Classic',d:'The familiar island game to 10 VP',i:'house',set:{tw:false,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:false,ev:false,goals:false}}},
-  olympus:{n:'Olympus',d:'Gods, heroes, monsters, missions',i:'temple',set:{tw:false,speed:false,ck:false,tasks:true,friendly:true,rpg:{k:true,ev:true,goals:true}}},
-  titan:{n:'Titan War',d:'Own islands, hero duels, war & conquest',i:'attack',set:{tw:true,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:true,ev:true,goals:false}}}
+  br:{n:'Battle Royale',d:'3 god clans of 2 race to the Sanctum',i:'crown',set:{br:true,tw:true,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:true,ev:true,goals:false}}},
+  quick:{n:'Quick',d:'Short game to 8 VP, no extras',i:'road',set:{br:false,tw:false,speed:true,ck:false,tasks:false,friendly:true,rpg:{k:false,ev:false,goals:false}}},
+  classic:{n:'Classic',d:'The familiar island game to 10 VP',i:'house',set:{br:false,tw:false,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:false,ev:false,goals:false}}},
+  olympus:{n:'Olympus',d:'Gods, heroes, monsters, missions',i:'temple',set:{br:false,tw:false,speed:false,ck:false,tasks:true,friendly:true,rpg:{k:true,ev:true,goals:true}}},
+  titan:{n:'Titan War',d:'Own islands, hero duels, war & conquest',i:'attack',set:{br:false,tw:true,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:true,ev:true,goals:false}}}
 };
 const TOGGLES=[                                               // [key, title, one line, icon]
   ['rpg.k','Heroes & Monsters','Your hero walks the island, fights monsters, explores ruins','sword'],
@@ -3870,7 +3924,7 @@ const getCfg=k=>k.startsWith('rpg.')?!!cfg.rpg[k.slice(4)]:!!cfg[k];
 const setCfg=(k,v)=>{if(k.startsWith('rpg.'))cfg.rpg[k.slice(4)]=v;else cfg[k]=v};
 const autoTarget=()=>(cfg.ck?13:10)-(cfg.speed?2:0)+(cfg.rpg.goals?1:0)+(cfg.rpg.k?2:0);
 const target=()=>cfg.vp||autoTarget();   // cfg.vp is set only when the player moves the slider
-const presetOn=k=>{const P=PRESETS[k].set;return ['tw','speed','ck','tasks','friendly'].every(x=>!!cfg[x]===P[x])&&['k','ev','goals'].every(x=>!!cfg.rpg[x]===P.rpg[x])};
+const presetOn=k=>{const P=PRESETS[k].set;return ['br','tw','speed','ck','tasks','friendly'].every(x=>!!cfg[x]===!!P[x])&&['k','ev','goals'].every(x=>!!cfg.rpg[x]===P.rpg[x])};
 function homeFX(type,c1){                                      // living background for the hero-themed home screen
   const cv=document.getElementById('hfx');if(!cv)return;const cx=cv.getContext('2d'),dpr=Math.min(2,devicePixelRatio||1);
   const rs=()=>{cv.width=cv.clientWidth*dpr;cv.height=cv.clientHeight*dpr};rs();const W=()=>cv.width,Hh=()=>cv.height;
@@ -4048,9 +4102,10 @@ function renderSetup(){
     <div class="setbar"><button class="backbtn" id="bBack">‹ Home</button><h2>New game</h2></div>
     <div class="box"><h3 class="lbl">1 · MODE</h3><div class="presets">${Object.entries(PRESETS).filter(([k])=>k!=='olympus'||isAdmin()).map(([k,P])=>`<button class="preset" data-preset="${k}" aria-pressed="${presetOn(k)}">${ico(P.i,'pic')}<b>${P.n}</b><i>${P.d}</i></button>`).join('')}</div>${(()=>{const k=Object.keys(PRESETS).find(presetOn);return k?`<p class="note" style="margin-top:8px"><b>${PRESETS[k].n}:</b> ${PRESETS[k].d}</p>`:'<p class="note" style="margin-top:8px">Custom mix — see More options.</p>'})()}</div>
     <div class="box"><h3 class="lbl">2 · WHERE</h3><div class="pills">${pill('data-where','local',online?'online':'local','<svg class=gi><use href=#g-phone></use></svg> This device')}${pill('data-where','online',online?'online':'local','<svg class=gi><use href=#g-globe></use></svg> Online — friends join on their phones')}</div>${!db?'<p class="note">Online play is unavailable in this view.</p>':''}</div>
-    <div class="box"><h3 class="lbl">3 · PLAYERS</h3><div class="seats">${cfg.seats.map(seatCard).join('')}</div>
+    <div class="box"><h3 class="lbl">3 · PLAYERS</h3>${cfg.br?`<div class="brclans">${CLANS.map((c,k)=>`<div class="brc" style="--cc:${c.c}"><b>${c.n}</b><span>${k===0?'You + a bot clan-mate':'2 bots'}</span></div>`).join('')}</div>
+      <p class="note" style="margin:6px 2px 0">Clan-mates share victory. Hold the <b>Sanctum</b> at the centre for a full round to make an offering — when both of you have offered, your god answers and your clan wins. War starts in round 3.</p>`:`<div class="seats">${cfg.seats.map(seatCard).join('')}</div>`}
       ${cfg.rpg.k||cfg.tw?`<h3 class="lbl" style="margin-top:8px">YOUR HERO</h3>${heroChips(cfg.hero,'data-hero')}`:''}
-      ${cfg.tw?`<div class="optrow" style="margin-top:6px"><b>War ends</b><div class="pills">${pill('data-twe','r15',cfg.twEnd||'r15','After round 15')}${pill('data-twe','conquest',cfg.twEnd||'r15','Until conquest')}</div></div>`:''}</div>
+      ${cfg.tw&&!cfg.br?`<div class="optrow" style="margin-top:6px"><b>War ends</b><div class="pills">${pill('data-twe','r15',cfg.twEnd||'r15','After round 15')}${pill('data-twe','conquest',cfg.twEnd||'r15','Until conquest')}</div></div>`:''}</div>
     <details class="box more" ${ui.more?'open':''}><summary class="lbl">MORE OPTIONS</summary>
       <div class="togs" style="margin-top:8px">${TOGGLES.filter(([k])=>(!cfg.tw||!['ck'].includes(k))&&(k!=='ck'||isAdmin())).map(([k,t,d,ic])=>`<button class="tog" data-tog="${k}" aria-pressed="${getCfg(k)}">${ico(ic,'tic')}<span><b>${t}</b><i>${d}</i></span><span class="sw"></span></button>`).join('')}</div>
       <div class="optrow"><b>Points to win</b><div class="vpslide"><input type="range" id="vpr" min="5" max="20" step="1" value="${target()}" aria-label="Victory points to win">
@@ -4059,7 +4114,7 @@ function renderSetup(){
       <div class="optrow"><b>Dice</b><div class="pills">${pill('data-cv','dice:random',cfg.dice,'True random')}${pill('data-cv','dice:deck',cfg.dice,'Balanced deck')}</div></div>
       <div class="optrow"><b>Turn timer</b><div class="pills">${[0,60,90,120].map(t=>pill('data-cv','timer:'+t,cfg.timer,t?t+'s':'Off')).join('')}</div></div>
       <p class="note">${cfg.dice==='random'?'True random: two fair dice, exactly 1 in 6 per face.':'Balanced deck: all 36 dice results drawn like cards, so the odds even out.'}</p></details>
-    <div class="startbar"><span><b>${n} players</b> · first to <b>${target()} VP</b></span>
+    <div class="startbar"><span>${cfg.br?'<b>6 players</b> · 3 clans · race to the Sanctum':`<b>${n} players</b> · first to <b>${target()} VP</b>`}</span>
       <button class="btn pri big" id="bStart" ${n<2?'disabled':''}>${online?'Create online game':'Start game'}</button></div>
   </div>`;
   const re=()=>renderSetup();
@@ -4090,12 +4145,13 @@ function start(online){
     s.kind==='me'?{kind:'human',name:ME.name,uid:ME.uid,hero:cfg.hero,star:Math.max(1,heroStar(cfg.hero)),cos:myCos(),rank:heroRank(cfg.hero),en:((prof().heroes||{})[cfg.hero]||{}).en||null}:
     s.kind==='bot'?{kind:'bot',level:s.level,name:BOTNAMES[bi++],persona:s.persona&&s.persona!=='random'?s.persona:pk[rnd(pk.length)]}:
     {kind:'human',name:online?'':'Player '+(++hi),uid:online?null:'local'+hi});
+  if(cfg.br){seats.length=1;for(let i=1;i<6;i++)seats.push({kind:'bot',level:i===3?1:Math.max(1,cfg.seats[1]&&cfg.seats[1].level||1),name:BOTNAMES[(i-1)%BOTNAMES.length],persona:pk[rnd(pk.length)]})}   // Battle Royale: 3 clans of 2
   if(seats.length<2)return toast('Add at least one more player');
   const id=Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('');
   const rpg={};for(const k in cfg.rpg)if(cfg.rpg[k])rpg[k]=true;
   if(cfg.tw)rpg.k=true;                                         // Titan War always has heroes
   const tut=cfg.tut;cfg.tut=false;
-  S=newState({seats,dice:cfg.dice,online,id,timer:cfg.timer,speed:cfg.speed,friendly:cfg.friendly,ck:cfg.ck,tasks:cfg.tasks,rpg,vp:cfg.vp||0,tw:!!cfg.tw,twEnd:cfg.twEnd});
+  S=newState({seats,dice:cfg.dice,online,id,timer:cfg.timer,speed:cfg.speed,friendly:cfg.friendly,ck:cfg.ck,tasks:cfg.tasks,rpg,vp:cfg.vp||0,tw:!!cfg.tw,twEnd:cfg.twEnd,br:!!cfg.br});
   if(!tut&&!cfg.trial)S.cfg0={dice:cfg.dice,timer:cfg.timer,speed:cfg.speed,friendly:cfg.friendly,ck:cfg.ck,tasks:cfg.tasks,rpg,vp:cfg.vp||0,tw:!!cfg.tw,twEnd:cfg.twEnd};   // for Play again
   if(S.rpg&&S.rpg.k&&!tut&&!cfg.trial){S.story={act:0,done:S.seats.map(()=>[[0,0,0],[0,0,0],[0,0,0]])};storyBase()}
   if(cfg.trial){cfg.trial=false;S.tut={kind:'trial',step:0};S.goal=99;S.pl[0].hero='heracles';S.story=null;S.lair=-1;S.mons=[]}
@@ -4810,7 +4866,7 @@ function quickMoves(me){                                       // your 2-3 most 
   return out}
 function hintText(){
   const a=actor(),me=mySeat();
-  if(S.phase==='over')return `${pname(S.winner)} wins!`;
+  if(S.phase==='over')return S.brWin?`The ${CLANS[S.brWin.c].n} clan wins!`:`${pname(S.winner)} wins!`;
   if(a<0)return '';
   const who=a===me?'You':pname(a);
   if(S.sub==='market'&&S.mk&&S.mk.from!==me&&me>=0&&!S.mk.resp[me])return `${pname(S.mk.from)} offers a trade`;
@@ -4912,7 +4968,7 @@ function renderGame(){
     };
   }
   // ---- player banners: avatar, VP, colour ribbon, piece counts ----
-  document.getElementById('players').innerHTML=S.seats.map((s,i)=>{
+  const bans=S.seats.map((s,i)=>{
     const pl=S.pl[i],on=actor()===i,setl=Object.values(S.vb).filter(b=>b.p===i&&!b.c).length,cts=cities(i),roads=15-pl.rd,nt=(pl.tasks||[]).length;
     return `<div class="pban ${on?'on':''}" style="--pc:${PCOL[i].c};--pi:${PCOL[i].pip}" id="pc${i}">
       <div class="avw ${s.cos&&s.cos.fr?'fr-'+s.cos.fr:''}">${avatar(i)}${s.cos&&s.cos.god&&GODS[s.cos.god]?`<span class="pgod" title="Patron: ${GODS[s.cos.god].n}">${COSART.em[s.cos.god]?`<i class="pgodi" style="background-image:var(--em-${s.cos.god})"></i>`:ico(GODS[s.cos.god].i)}</span>`:''}<span class="vpb" title="Victory points" onclick="event.stopPropagation();ui.vpOf=${i};openSheet('vp')">${vp(i,i===me)}</span>${S.lr===i?'<span class="aw lr" title="Royal Highway">RH</span>':''}${S.la===i?'<span class="aw la" title="Favour of Ares">FA</span>':''}</div>
@@ -4924,7 +4980,10 @@ function renderGame(){
           ${S.ck?`<span title="Active hoplites / total levels">${ico('sword','ic sm')}${kActive(i)}/${kLevels(i)}</span>`:`<span title="Oracle cards · hoplites played">${ico('knight','ic sm')}${pl.dev.length}·${pl.kn}</span>`}
           ${S.rpg.k?`<span title="Hero level · HP">${ico(HEROES[pl.hero].i,'ic sm')}${hlv(i)}·${pl.hp}</span><span title="Gold">${ico('coin','ic sm')}${pl.gold}</span>`:''}
           <span title="Ambrosia">${ico('ambrosia','ic sm')}${pl.res.ambrosia||0}</span>${nt?`<span title="Secret missions">${ico('flag','ic sm')}${nt}</span>`:''}${pl.goal&&pl.goal.done?'<span class="badge">GOAL</span>':''}</span>
-        </div></div></div>`}).join('');
+        </div></div>${S.tw&&S.tw.br?`<span class="poff ${S.tw.off[i]?'on':''}" title="${S.tw.off[i]?'Offering made':'No offering yet'}">${S.tw.off[i]?'✦':'·'}</span>`:''}</div>`});
+  const pbar=document.getElementById('players');pbar.classList.toggle('br',!!(S.tw&&S.tw.br));
+  if(S.tw&&S.tw.br){const mc=me>=0?clanOf(me):0;pbar.innerHTML=[mc,(mc+1)%3,(mc+2)%3].map(c=>`<div class="clanb ${c===mc?'mine':''}" style="--cc:${CLANS[c].c}"><em>${CLANS[c].n}${c===mc?' · YOU':''}</em><div>${S.seats.map((_,i)=>i).filter(i=>clanOf(i)===c).map(i=>bans[i]).join('')}</div></div>`).join('')}   // Battle Royale: banners grouped by clan
+  else pbar.innerHTML=bans.join('');
   // tap another player's banner: their full numbers in one line
   document.querySelectorAll('#players .pban').forEach((b,i)=>{if(i===me)return;b.onclick=()=>{const pl=S.pl[i];
     toast(`${pname(i)}: ${tot(i)} cards · ${Object.values(S.vb).filter(x=>x.p===i&&!x.c).length} villages · ${cities(i)} cities · ${15-pl.rd} roads${S.rpg.k?` · Lv${hlv(i)} ${pl.hp}HP · ${pl.gold} gold`:''}`)}});
@@ -5565,7 +5624,7 @@ function drawSheet(){
     h=`<h2>Dice this game</h2><p class="note">${n} rolls · ${S.dice==='deck'?'Balanced deck':'True random (crypto)'} · dashed line = what the odds predict.</p>
       <svg class="hist" viewBox="0 0 ${W} ${H}">${bars}</svg><button class="btn" id="x">Close</button>`;
   }else if(kind==='over'){
-    const me=mySeat(),win=S.winner,lost=me>=0&&win!==me&&S.seats.filter(x=>x.kind!=='bot').length===1;   // defeat view only for a single human who lost
+    const me=mySeat(),win=S.winner,lost=me>=0&&!isWin(me)&&S.seats.filter(x=>x.kind!=='bot').length===1;   // defeat view only for a single human who lost
     const order=S.seats.map((x,i)=>i).sort((a,b)=>vp(b,true)-vp(a,true)),hk=i=>S.pl[i]&&S.pl[i].hero;
     const scene=S.tw&&hk(win)&&HEROES[hk(win)]
       ? `<div class="vic-tw"><div class="vic-rays"></div><div class="vic-wall wp-${hk(win)}"></div>
@@ -5575,7 +5634,7 @@ function drawSheet(){
     const X=ui.xpRes,need=X&&X.need||1,from=X?(X.up?0:Math.max(0,X.xp-X.gain)):0;
     const ag=S.again||{v:{}},humans=S.seats.map((x,i)=>x.kind==='bot'?-1:i).filter(i=>i>=0),waitFor=humans.filter(i=>!ag.v[i]).map(i=>esc(pname(i))),hasBots=S.seats.some(x=>x.kind==='bot');
     h=`<div class="vic ${lost?'lost':'won'}">${scene}
-      <div class="vic-title">${lost?'DEFEAT':'VICTORY'}</div><div class="vic-sub">${lost?`${esc(pname(win))} claims the isles`:`${esc(pname(win))} rules the isles`}</div>
+      <div class="vic-title">${lost?'DEFEAT':'VICTORY'}</div><div class="vic-sub">${S.brWin?`${CLANS[S.brWin.c].n} answers — the ${CLANS[S.brWin.c].n} clan wins`:lost?`${esc(pname(win))} claims the isles`:`${esc(pname(win))} rules the isles`}</div>
       <div class="vic-list">${order.map((i,k)=>`<div class="vrow ${i===win?'w':''}"><span class="rk">${k+1}</span><span class="dot" style="background:${PCOL[i].c}"></span><b>${esc(pname(i))}</b><em>${vp(i,true)} VP</em></div>`).join('')}</div>
       ${got.length?`<h3 class="vic-h">Trophies</h3><div class="medals">${got.map((a,k)=>`<div class="medal" style="--d:${.5+k*.35}s"><div class="mdisc"><svg class=gi><use href=#g-medal></use></svg></div><b>${a[1]}</b><span>${a[2]}</span></div>`).join('')}</div>`:''}
       ${X?`<div class="xpbox"><div class="xph"><span>+${X.gain} XP</span><b>Level ${X.lv}</b></div><div class="xpbar"><i style="--from:${from/need*100}%;--to:${X.xp/need*100}%" class="${X.up?'up':''}"></i></div>${X.up?`<div class="lvup">LEVEL UP!</div>`:''}<p class="note">${X.lines.map(l=>`${l[0]} +${l[1]}`).join(' · ')}${X.nu.length?`<br><b>Unlocked: ${X.nu.join(', ')}</b>`:''}</p></div>`:''}
