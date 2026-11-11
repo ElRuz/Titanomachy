@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111144235'</script>
+<script>window.BUILD='20261111144403'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -4367,7 +4367,7 @@ function boardSVG(){
     s+=`<polygon points="${hexPts(h.x,h.y,R-5)}" fill="#c0261c22" stroke="#ff5a4a" stroke-width="3" stroke-dasharray="7 5"/>
     <g transform="translate(${h.x+20},${h.y-14})" ${can?`class="hot" data-k="battle" data-id="${mi}"`:''}><ellipse rx="16" ry="5" cy="20" fill="#000" opacity=".5"/><use href="#s-${m.t}" ${MONS[m.t].titan?'x="-40" y="-56" width="80" height="80"':'x="-26" y="-32" width="52" height="52"'}/>
     <g transform="translate(0,28)"><rect x="-19" y="-6" width="38" height="12" rx="6" fill="#1c0d10" stroke="url(#g-goldrim)" stroke-width="1.2"/><rect x="-16" y="-3" width="32" height="6" rx="3" fill="#0008"/><rect x="-16" y="-3" width="${32*m.hp/m.max}" height="6" rx="3" fill="#e2483c"/><text x="22" y="4" font-family="Cinzel,Georgia,serif" font-size="9" font-weight="900" fill="#f6e3a1">${m.hp}</text></g></g>`});
-  (S.drops||[]).forEach(d=>{const h=HEX[d],can=mine&&S.rolled&&!S.sub&&!S.hacted&&S.pl[me].hx===d;   // Zeus supply chests
+  (S.tw&&S.tw.br&&S.drops||[]).filter(d=>HEX[d]).forEach(d=>{const h=HEX[d],can=mine&&S.rolled&&!S.sub&&!S.hacted&&S.pl[me].hx===d;   // Zeus supply chests
     s+=`<g transform="translate(${h.x-18},${h.y-16})" class="sdrop ${can?'hot':''}" ${can?'data-k="sdrop"':''}><circle r="20" fill="#ffd86a33"/><use href="#s-sdrop" x="-22" y="-26" width="44" height="44"/></g>`});
   // Cyclops
   const rh=HEX[S.robber];
