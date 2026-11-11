@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111114856'</script>
+<script>window.BUILD='20261111123756'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1382,11 +1382,58 @@ body[data-board="winter"] #board{background-image:var(--sea-winter)}
   .pban{background:var(--mg-pcard) center/100% 100% no-repeat!important;border:0!important;box-shadow:0 4px 10px #0007!important;padding:6px 8px 8px 7px!important}
   .pban.on{box-shadow:0 0 0 1.5px #f6e3a1,0 0 16px #f6e3a188!important;border-radius:12px}
 }
+
+
+/* ===== g79: close ✕ on sheets; sheets fit one phone screen ===== */
+.sheet{position:relative}
+.shx{position:sticky;top:0;justify-self:end;margin:-6px -6px -40px 0;z-index:5;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,#d8b25a 60%,#8a5f17);color:#2b1d0e;font:900 16px system-ui;box-shadow:0 0 0 2px #3a2408,0 3px 8px #000a}
+.sheet>h2:first-of-type{padding-right:40px}
+@media (max-width:600px){
+  .sheet{max-height:96vh!important;gap:8px!important;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px))!important}
+  .sheet h2{font-size:18px!important}
+  .sheet .panel{padding:8px 10px!important;gap:6px!important}
+  .sheet .panel h3{font-size:11.5px}
+  .sheet .note{font-size:12px;line-height:1.35}
+  .sheet .btn{padding:9px 12px}
+  .ptile{padding:3px 2px!important;gap:2px!important}
+  .ptile .tap{padding:2px 0!important}
+  .ptile .tap svg,.ptile .tap .ic{width:22px!important;height:22px!important}
+  .ptile .q{font-size:17px!important}
+  .ptile .minus{padding:1px 8px}
+  .after{padding:4px 6px!important;gap:4px!important}
+  .after .ic{width:18px;height:18px}
+  .tabs{gap:4px!important}.tabs button{padding:5px 10px!important;font-size:12.5px}
+}
+
+
+/* story/act banners never cover an open sheet (its ✕ lives up there) */
+body:has(.scrim) #toasts .toast.act{display:none}
+/* g79b: compact pieces so sheets fit */
+@media (max-width:600px){
+  .invstrip{flex-wrap:nowrap!important;overflow-x:auto;justify-content:flex-start!important;padding:2px 4px!important;margin:-2px 0 4px!important;scrollbar-width:none}
+  .invstrip::-webkit-scrollbar{display:none}
+  .invstrip .ivl{width:auto!important;font-size:9.5px;white-space:nowrap}
+  .invstrip .iv{padding:1px 4px}.invstrip .iv .ic,.invstrip .iv svg{width:17px!important;height:17px!important}.invstrip .iv b{font-size:12px}
+  .ptabs{display:flex;flex-wrap:wrap}
+  .ggrid{gap:6px!important}
+  .ggrid>*{padding:6px!important;gap:3px!important;font-size:11.5px}
+  .ggrid .note,.ggrid p{font-size:11px!important;line-height:1.25}
+  .cosgrid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important}
+  .costile{padding:4px 2px!important;font-size:9.5px!important}
+  .costile .ci{width:44px!important;height:44px!important}
+  .cosprev{padding:6px!important}
+  .sheet h4{margin:4px 0 2px!important;font-size:12px}
+  .god{padding:6px!important;gap:2px!important}.god .g-ic svg,.god .g-ic .ic{width:36px!important;height:36px!important}
+  .god i{display:none!important}.god span{font-size:10.5px!important;line-height:1.2!important}.god b{font-size:13px}
+  .sheet .glist{gap:4px!important}.sheet .hd-list{gap:3px!important}
+}
 /* the table always fills the whole screen (iOS standalone reports a short 100dvh) */
 body.ingame .table{height:auto!important;top:0!important;bottom:0!important}
 html:has(body.ingame),body.ingame{background:#1d140c!important}
 /* hero card: short two-line label */
 .mcard.champ span{line-height:1.15;white-space:nowrap}
+.fighttest{text-decoration:none;border-color:#c0392b!important;box-shadow:0 0 14px #c0392b88}
 </style>
 </head><body>
 
@@ -2270,12 +2317,14 @@ function rollDice(){
 function canSettle(p,v,setup){
   if(S.vb[v]||S.kn[v]||V[v].adj.some(u=>S.vb[u]))return false;   // distance rule; hoplites also occupy corners
   if(S.tw&&!twCanBuild(p,V[v].h))return false;                 // Titan War: build only on islands you hold
+  if(!setup&&sieged(p,[v]))return false;                        // siege camp blocks home-island building
   return setup||V[v].e.some(e=>S.er[e]===p);
 }
 function canRoad(p,e,setup){
   if(S.er[e]!=null)return false;
   if(S.tw&&!twCanBuild(p,E[e].h))return false;
   const {a,b}=E[e];
+  if(!setup&&sieged(p,[a,b]))return false;                      // siege camp blocks home-island roads
   if(setup)return a===S.last||b===S.last;
   return [a,b].some(v=>{const bd=S.vb[v]||S.kn[v];if(bd)return bd.p===p;return V[v].e.some(x=>x!==e&&S.er[x]===p)});
 }
@@ -2314,7 +2363,13 @@ function updLA(p){
   const ar=q=>S.pl[q].kn+((S.tr[q]&&S.tr[q].kills)||0),k=ar(p);   // hoplites + monsters slain
   if(k>=3&&S.la!==p&&(S.la<0||k>ar(S.la))){S.la=p;log(`<b>${pname(p)}</b> wins the Favour of Ares`)}
 }
-function checkWin(p){if(S.phase==='main'&&vp(p,true)>=S.goal){S.phase='over';S.winner=p;log(`<b>${pname(p)}</b> wins with ${vp(p,true)} VP!`)}}
+const besieger=p=>{if(!S.tw||!S.tw.cap||S.tw.cap[p]==null)return -1;const c=cs(p);   // who is camped on p's Capital right now (-1 = nobody)
+  if(c.fallen||c.camp<0||c.camp===p)return -1;return S.pl[c.camp].hx===S.tw.cap[p]?c.camp:-1};
+const sieged=(p,vs)=>besieger(p)>=0&&onHome(p,vs);            // true = this spot is blockaded
+const onHome=(p,vs)=>S.tw&&S.tw.cap&&S.tw.cap[p]!=null&&vs.some(v=>V[v].h.some(h=>HEX[h].isl===HEX[S.tw.cap[p]].isl));   // any of these corners on p's home island
+function checkWin(p){if(S.phase==='main'&&vp(p,true)>=S.goal){
+  const q=besieger(p);if(q>=0){if(!S.hold||S.hold.p!==p||S.hold.q!==q){S.hold={p,q,id:(S.hold?S.hold.id:0)+1};log(`<b>${pname(p)}</b> has ${vp(p,true)} VP but is besieged by <b>${pname(q)}</b> — no victory until the siege is broken!`)}return}
+  S.phase='over';S.winner=p;log(`<b>${pname(p)}</b> wins with ${vp(p,true)} VP!`)}}
 
 // ---------- Production ----------
 function produce(n){
@@ -2322,7 +2377,7 @@ function produce(n){
   HEX.forEach((h,i)=>{
     if(S.hexes[i].n!==n)return;
     const r=S.hexes[i].r,m=evMult(r);
-    h.v.forEach(v=>{const b=S.vb[v];if(!b||blocked(i,b.p))return;
+    h.v.forEach(v=>{const b=S.vb[v];if(!b||blocked(i,b.p))return;if(r==='capital'&&besieger(b.p)>=0)return;   // blockade: besieged Capital gives nothing
       const add=(x,k)=>(want[x]=want[x]||[]).push([b.p,k*m,i]),rr=r==='capital'?capRes(b.p):r;   // Capital: the resource its owner chose
       if(b.c&&S.ck&&COMOF[rr]){add(rr,1);add(COMOF[rr],1)}else add(rr,b.c?2:1);   // C&K city: 1 resource + 1 commodity
       if(S.temples&&S.temples.includes(i))add('ambrosia',1);                // sacred tile: +1 Ambrosia
@@ -2699,6 +2754,7 @@ const RULES={
     if(humans.every(i=>S.again.v[i])&&!S.next)S.next=Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[rnd(23)]).join('')},
   roll(p){
     if(S.phase!=='main'||S.rolled||S.sub)return bad('Cannot roll now');
+    if(S.hold&&S.hold.p===p){checkWin(p);if(S.phase==='over')return}   // siege broken since last turn: the held victory comes now
     let [a,b]=S.alch||rollDice();S.alch=null;if(!b)b=d6();settleBets(a+b);          // Oracle fixes only one die
     if(S.tut&&S.tut.kind==='trial'){const ns=[...new Set(Object.keys(S.vb).filter(v=>S.vb[v].p===0).flatMap(v=>V[v].h).map(h=>S.hexes[h].n).filter(n=>n&&n!==7))];
       if(ns.length){const t=ns[rnd(ns.length)];a=Math.max(1,t-6);b=t-a}else if(a+b===7)b=b===6?5:b+1}
@@ -2755,6 +2811,7 @@ const RULES={
       S.er[id]=p;if(E[id].br)S.tr[p].bridges=(S.tr[p].bridges||0)+1;pl.rd--;S.free--;S.tr[p].roads++;xp(p,1);if(S.free<=0||pl.rd<1)S.sub=null;updLR();checkWin(p);return;
     }
     if(!S.rolled||S.sub)return bad('Roll the dice first');
+    if(besieger(p)>=0&&onHome(p,k==='road'?[E[id].a,E[id].b]:[+id]))return bad(`Your island is under siege by ${pname(besieger(p))} — break the siege first`);
     if(k==='road'){const c=costFor(p,'road');if(pl.rd<1||!canRoad(p,id)||!afford(p,c))return bad("Can't build a road there");pay(p,c);S.er[id]=p;if(E[id].br)S.tr[p].bridges=(S.tr[p].bridges||0)+1;pl.rd--;S.tr[p].roads++;xp(p,1);log(`<b>${pname(p)}</b> built a ${E[id].br?'bridge road':'road'}`)}
     else if(k==='settle'){const c=costFor(p,'settle');if(pl.st<1||!canSettle(p,id)||!afford(p,c))return bad("Can't settle there");pay(p,c);S.tr[p].builds++;xp(p,3);S.vb[id]={p,c:0};pl.st--;twClaim(p,id);log(`<b>${pname(p)}</b> built a village`)}
     else if(k==='city'){const b=S.vb[id],free=S.freeCity===p;if(!b||b.p!==p||b.c||pl.ct<1||(!free&&!afford(p,COST.city)))return bad("Can't upgrade that");if(free)S.freeCity=-1;else pay(p,COST.city);S.tr[p].builds++;xp(p,4);b.c=1;pl.ct--;pl.st++;S.tr[p].cities++;say(p,'city');log(`<b>${pname(p)}</b> built a city`)}
@@ -3043,7 +3100,7 @@ const RULES={
   siege(p,q){                                                 // hit an enemy Capital whose hero is away
     if(!S.tw||!S.rolled||S.sub||S.hacted||!tileActions(p).some(a=>a.k==='siege'&&a.q===q))return bad("Can't siege here");
     S.hacted=true;const c=cs(q);markGr(q,p);
-    if(c.camp!==p&&!S.tut){c.camp=p;xp(p,1);return log(`<b>${pname(p)}</b> sets up a siege camp at <b>${pname(q)}</b>'s Capital — the attack starts next turn`)}   // must hold 2 turns
+    if(c.camp!==p&&!S.tut){c.camp=p;xp(p,1);S.siegeEv={p,q,id:(S.siegeEv?S.siegeEv.id:0)+1};return log(`<b>${pname(p)}</b> sets up a siege camp at <b>${pname(q)}</b>'s Capital — blockade: it gives nothing, no building on that island and no victory until the siege is broken`)}   // must hold 2 turns
     const r=d6(),dmg=Math.max(1,r+atk(p)-2*c.gar);c.hp=Math.max(0,c.hp-dmg);xp(p,2);S.tr[p].raids=(S.tr[p].raids||0)+1;
     log(`<b>${pname(p)}</b> besieges <b>${pname(q)}</b>'s Capital: ${dmg} damage (${c.hp}/${capMax(q)})`);
     if(c.hp<=0)capFall(p,q);
@@ -3149,10 +3206,10 @@ function steal(p,q,times){
 // ======== Online sync: ONE device (the host) owns the game state ========
 // Other devices never overwrite the game; they send their moves to games/<id>/moves,
 // the host applies them in order and saves. Nothing can be lost to two phones saving at once.
-const allowed=(who,type)=>(type==='emote'||type==='dev'||type==='again'||type==='bet'||type==='toss'||type==='helpAns'||type==='altar'||type==='cos'||type==='roar'||type==='siren'||type==='race')?(who>=0&&!!S.seats[who]):type==='mkresp'?(S.sub==='market'&&S.mk&&who!==S.mk.from&&!S.mk.resp[who]&&!!S.seats[who])
+const allowed=(who,type)=>(type==='emote'||type==='dev'||type==='again'||type==='bet'||type==='toss'||type==='helpAns'||type==='cy'||type==='altar'||type==='cos'||type==='roar'||type==='siren'||type==='race')?(who>=0&&!!S.seats[who]):type==='mkresp'?(S.sub==='market'&&S.mk&&who!==S.mk.from&&!S.mk.resp[who]&&!!S.seats[who])
   :type==='cancel'?(S.mk&&S.mk.from===who):actor()===who;
 // what a person may use in each early round (bots are not slowed down; the trials and tutorial have their own flow)
-const UNLOCK={2:['bank','mkoffer','buydev','play','siren','race'],3:['hmove','battle','explore','raid','duel','htrain','hgear','bcbuy','colony','ship','gtravel','siege','fort','war','pactoffer','ferry'],4:['pray','altar','tdraw','ttake']};
+const UNLOCK={2:['bank','mkoffer','buydev','play','siren','race'],3:['battle','explore','raid','duel','htrain','hgear','bcbuy','colony','ship','gtravel','siege','fort','war','pactoffer','ferry'],4:['pray','altar','tdraw','ttake']};
 const unlockRound=t=>+(Object.keys(UNLOCK).find(r=>UNLOCK[r].includes(t))||1);
 const gated=(p,t)=>!!S&&!S.tut&&S.phase==='main'&&S.seats[p]&&S.seats[p].kind==='human'&&S.round<unlockRound(t);
 const opened=k=>!S||S.tut||S.round>=k;                        // is this feature open yet (for the buttons)
@@ -3436,7 +3493,7 @@ function botStep(p){
   }
   if(++S.botActs>14)return A('end');
   // --- build what we can, best first ---
-  const myS=Object.keys(S.vb).map(Number).filter(v=>S.vb[v].p===p&&!S.vb[v].c);
+  const myS=Object.keys(S.vb).map(Number).filter(v=>S.vb[v].p===p&&!S.vb[v].c&&!sieged(p,[v]));
   if(lvl===0&&rnd(4)===0)return A('end');
   if(myS.length&&S.freeCity===p)return A('place',{k:'city',id:pickBest(myS,v=>V[v].h.reduce((t,h)=>t+pipsOf(h),0),2)});
   if(pl.ct>0&&myS.length&&afford(p,COST.city))return A('place',{k:'city',id:pickBest(myS,v=>V[v].h.reduce((t,h)=>t+pipsOf(h),0),lvl)});
@@ -3699,7 +3756,13 @@ function slamNext(){
   if(it.kind==='threat'){document.body.classList.remove('slamshake');void document.body.offsetWidth;document.body.classList.add('slamshake')}
   let gone=false;const done=()=>{if(gone)return;gone=true;el.classList.add('out');setTimeout(()=>{el.remove();slamNext()},380)};
   el.onclick=done;setTimeout(done,2600)}
-function slamCheck(){                                           // compare with the last state this phone saw
+function siegeSlams(){                                         // siege camp + held victory announcements
+  if(!S||!S.tw||S.tut)return;const me=mySeat(),nm=i=>esc(pname(i));
+  if(S.siegeEv&&ui.seenSiege!==S.siegeEv.id){const first=ui.seenSiege===undefined;ui.seenSiege=S.siegeEv.id;if(!first){const e=S.siegeEv;
+    slam(e.q===me?'threat':'swing','claw',e.q===me?`${nm(e.p)} besieges your Capital!`:`${nm(e.p)} besieges ${nm(e.q)}'s Capital`,e.q===me?'Blockade: no Capital income, no building at home, no victory — bring your hero home!':'Blockade — no victory for them until the siege breaks')}}
+  if(S.hold&&ui.seenHold!==S.hold.id){const first=ui.seenHold===undefined;ui.seenHold=S.hold.id;if(!first){const e=S.hold;
+    slam('race','hglass',e.p===me?'Victory held!':`${nm(e.p)} has enough VP!`,e.p===me?`Break ${nm(e.q)}'s siege to win`:`Only the siege by ${nm(e.q)} stops them`)}}}
+function slamCheck(){siegeSlams();                                           // compare with the last state this phone saw
   if(!S||!S.pl||S.tut){slamPrev=null;return}
   const me=mySeat(),nm=i=>esc(pname(i)),mine=h=>me>=0&&Object.keys(S.vb).some(v=>S.vb[v].p===me&&V[v].h.includes(h));
   const cur={id:S.id,mons:(S.mons||[]).map(m=>m.id),robber:S.robber,hx:S.pl.map(x=>x.hx),myV:me>=0?Object.keys(S.vb).filter(v=>S.vb[v].p===me).length:0,
@@ -3843,6 +3906,7 @@ function heroesHTML(){                                         // the collection
     <p class="note center mythic-t">No weakness. They reshape the board, the sky and your whole world. Sealed by the Fates — for now.</p></div>`}
 const isApp=()=>{try{return navigator.standalone||matchMedia('(display-mode: standalone)').matches}catch(e){return false}};   // opened from the home screen
 function reloadApp(){toast('Reloading…');setTimeout(()=>location.reload(),250)}
+const FIGHT_URL=/github\.io$/.test(location.hostname)?'fight/':'https://claude.ai/artifact/Vjaz9u5XCR8umuSDQJzVX7';   // TEMP fight test link
 function renderLobby(){setTimeout(()=>{let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
     if(!b){b=document.createElement('button');b.id='rfbtn';b.setAttribute('aria-label','Reload');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.onclick=reloadApp;document.body.appendChild(b)}
     b.hidden=!!(S&&S.phase)},0);
@@ -3856,6 +3920,7 @@ function renderLobby(){setTimeout(()=>{let b=document.getElementById('rfbtn');  
     app.innerHTML=`<div class="home trials"><div class="brand"><svg viewBox="-12 -12 24 24" class="brand-ic"><use href="#s-logo" x="-12" y="-12" width="24" height="24"/></svg><h1>Titanomachy</h1>
       <p class="sub">The gods are watching. Prove yourself, and a hero will answer your call.</p></div>
       <button class="hbtn gold trialbtn" data-go="trial">${ico('bolt','hic')}<span><b>Start your trials</b><i>About 5 minutes · learn by playing</i></span></button>
+      <a class="hbtn sm fighttest" style="margin-top:12px" href="${FIGHT_URL}" target="_blank" rel="noopener">${ico('sword','hic')}<span><b>⚔ Test Fight (temp)</b></span></a>
       ${ui.user?'<button class="linkbtn" id="bOut">Sign out</button>':''}</div>`;
     app.querySelector('[data-go]').onclick=()=>{ui.mode='trial';ui.screen='setup';const P=PRESETS.classic.set;Object.assign(cfg,{...P,rpg:{k:true},tasks:false,trial:true,tw:false});
       cfg.seats=[{kind:'me'},{kind:'bot',level:0,persona:'builder'},{kind:'none'},{kind:'none'}];ui.screen='home';LS.set('st-tour',true);start(false)};
@@ -3905,6 +3970,7 @@ function renderLobby(){setTimeout(()=>{let b=document.getElementById('rfbtn');  
         <button class="hbtn sm mythbtn" data-scr="heroes">${ico('bolt','hic')}<span><b>Mythic gods</b><i>Sealed</i></span></button></div>
       <div class="hrow"><button class="hbtn sm" data-scr="profile">${ico('vp','hic')}<span><b>Profile · Lv ${prof().lv}</b></span></button>
         <button class="hbtn sm" data-scr="stats">${ico('crown','hic')}<span><b>Stats & trophies</b></span></button></div>
+      <a class="hbtn sm fighttest" href="${FIGHT_URL}" target="_blank" rel="noopener">${ico('sword','hic')}<span><b>⚔ Test Fight (temp)</b><i>3D arena prototype · opens in a new tab</i></span></a>
     </div>
     ${db&&vis.length?`<div class="box"><h2>Your online games</h2><div class="glist">${vis.map(g=>{
         const st=g.s,seated=st.seats.some(x=>x.uid===ME.uid);
@@ -5068,6 +5134,17 @@ function showBubble({p,t}){
 
 // ---------- Sheets (bottom drawers) ----------
 const miniHand=me=>me<0?'':`<div class="minihand">${RES.filter(r=>r!=='ambrosia'||S.pl[me].res.ambrosia).map(r=>`<span title="${RNAME[r]}">${ico(r,'ic sm')}<b>${S.pl[me].res[r]||0}</b></span>`).join('')}${S.rpg&&S.rpg.k?`<span title="Gold">${ico('coin','ic sm')}<b>${S.pl[me].gold}</b></span>`:''}</div>`;   // your cards, shown on choice screens
+function sheetTabs(sc,kind){                                    // phones: if a sheet still scrolls, its titled panels become tabs
+  const sh=sc.querySelector('.sheet');if(!sh||innerWidth>600||(S&&S.tut))return;
+  const ps=[...sh.children].filter(c=>c.classList.contains('panel')&&c.querySelector('h3'));
+  if(ps.length<2||sh.scrollHeight<=sh.clientHeight+4)return;
+  ui.ptab=ui.ptab||{};const cur=Math.min(ui.ptab[kind]||0,ps.length-1);
+  const nm=t=>{t=t.replace(/^\s+/,'').split(/ · |—|:| costs/)[0].trim().toLowerCase();t=t.replace(/(^|\s)\S/g,x=>x.toUpperCase());return t.length>16?t.slice(0,15)+'…':t};
+  const bar=document.createElement('div');bar.className='tabs ptabs';
+  bar.innerHTML=ps.map((p,i)=>`<button data-pt="${i}" aria-pressed="${i===cur}">${esc(nm(p.querySelector('h3').textContent))}</button>`).join('');
+  ps[0].before(bar);ps.forEach((p,i)=>{if(i!==cur)p.style.display='none'});
+  bar.onclick=e=>{const b=e.target.closest('[data-pt]');if(!b)return;ui.ptab[kind]=+b.dataset.pt;ps.forEach((p,i)=>p.style.display=i===+b.dataset.pt?'':'none');
+    bar.querySelectorAll('[data-pt]').forEach(x=>x.setAttribute('aria-pressed',x===b));sh.scrollTop=0}}
 function closeSheet(){ui.sheet=null;ui.back=null;const s=document.getElementById('scrim');if(s)s.remove();requestAnimationFrame(placeCoach);
   const q=ui.pendFx;ui.pendFx=null;if(q&&q.length&&S){const me=mySeat();setTimeout(()=>q.slice(0,6).forEach(([r,k],j)=>flyFromCenter(me,r,k,j,Math.min(6,q.length),0,me)),250)}}   // loot you won while a menu was open
 function needSheet(){                                         // the decision screen this player still owes, if any
@@ -5146,13 +5223,20 @@ function drawSheet(){
      :`<h2>${esc(pname(m.from))} wants to trade</h2>${handAfter(m.get,m.give)}<div class="offer"><div><span class="tag">YOU GET</span>${costBig(m.give)}</div><div><span class="tag">YOU GIVE</span>${costBig(m.get)}</div></div>
       <div class="row"><button class="btn pri" id="acc" ${can?'':'disabled'}>Accept</button><button class="btn" id="ctr">Counter</button><button class="btn" id="dec">Decline</button></div>${can?'':'<p class="note">You don\'t have enough to accept — you can still counter.</p>'}
       ${theirSide(m.from,m.give,m.get)}`;
+  }else if(kind==='tradeui'&&ui.tt==='gold'){                // gold tab: buy a resource for 3 gold
+    const can=myMove()&&S.rolled&&!S.sub;
+    h=`<h2>Trade</h2>
+      <div class="tabs"><button data-tt="bank">Bank / Harbour</button><button data-tt="market">Offer to everyone</button><button data-tt="gold" aria-pressed="true">${ico('coin','ic sm')} Gold</button></div>
+      <div class="panel"><h3>YOUR GOLD: ${pl.gold} — tap a resource to buy it for 3 gold</h3>
+      <div class="picker">${BASE.map(r=>`<div class="ptile"><button class="tap" style="--rc:${RCOL[r]}" data-buy="${r}" ${pl.gold>=3&&can&&S.bank[r]>0?'':'disabled'}>${ico(r)}<span class="have" style="color:#fff">have ${pl.res[r]}</span></button></div>`).join('')}</div></div>
+      ${can?'':'<p class="note">Buy on your turn, after rolling.</p>'}`;
   }else if(kind==='tradeui'){
     const rt=rates(me),bank=ui.tt!=='market';
     let valid,units=0;
     if(bank){units=RES.reduce((t,r)=>t+((ui.pk.a[r]||0)/rt[r]),0);valid=units>0&&Number.isInteger(units)&&RES.every(r=>!(ui.pk.a[r]%rt[r]))&&units===cnt('b')&&RES.every(r=>!(ui.pk.a[r]&&ui.pk.b[r]))}
     else valid=cnt('a')>0&&cnt('b')>0&&RES.every(r=>!(ui.pk.a[r]&&ui.pk.b[r]));
     h=`<h2>Trade</h2>${handAfter(ui.pk.a,ui.pk.b)}
-      <div class="tabs"><button data-tt="bank" aria-pressed="${bank}">Bank / Harbour</button><button data-tt="market" aria-pressed="${!bank}">Offer to everyone</button></div>
+      <div class="tabs"><button data-tt="bank" aria-pressed="${bank&&ui.tt!=='gold'}">Bank / Harbour</button><button data-tt="market" aria-pressed="${ui.tt==='market'}">Offer to everyone</button>${S.rpg&&S.rpg.k?`<button data-tt="gold" aria-pressed="${ui.tt==='gold'}">${ico('coin','ic sm')} Gold</button>`:''}</div>
       ${!bank&&S.tw?`<div class="tabs"><button data-tto="-1" aria-pressed="${(ui.tto??-1)<0}">Everyone</button>${S.seats.map((_,q)=>q).filter(q=>q!==me).map(q=>`<button data-tto="${q}" aria-pressed="${ui.tto===q}"><svg class=gi><use href=#g-lock></use></svg> ${esc(pname(q))}</button>`).join('')}</div><p class="note">${(ui.tto??-1)<0?'Everyone sees this offer.':'Private deal: only they see it. Others just see that you made a deal.'}</p>`:''}
       <div class="panel"><h3>YOU GIVE${bank?' — tap adds a full harbour lot':''}</h3>${picker('a',pl.res,{rate:bank?rt:null,label:r=>'have '+pl.res[r]})}</div>
       <div class="panel"><h3>YOU GET${bank?` — ${units} to pick`:''}</h3>${picker('b',bank?S.bank:{brick:19,lumber:19,wool:19,grain:19,ore:19})}</div>
@@ -5241,6 +5325,7 @@ function drawSheet(){
     h=`<h2>${ico('ptower')} ${own?'Your':esc(pname(o))+"'s"} Capital</h2>
       <div class="hpbar mon" style="margin:6px 0"><i style="width:${c.fallen?0:c.hp/capMax(o)*100}%"></i><span>${c.fallen?'FALLEN to '+esc(pname(c.by)):'HP '+c.hp+'/'+capMax(o)}</span></div>
       <p class="note">${ico('pwall','ic sm')} Walls ${c.wall}/3 · ${ico('ptower','ic sm')} Tower ${c.tower?'yes':'no'} · ${ico('pgar','ic sm')} Garrison ${c.gar} (each blocks 2 damage per Siege)${c.camp>=0?` · <svg class=gi><use href=#g-tent></use></svg> ${esc(pname(c.camp))} is camped here`:''}</p>
+      ${own&&!c.fallen?`<div class="panel"><h3>YOUR CAPITAL GIVES</h3><div class="tabs">${['',...BASE].map(r=>`<button data-cy="${r}" aria-pressed="${((S.tw.cy||{})[me]||'')===r}">${r?RNAME[r]:'Auto'}</button>`).join('')}</div><p class="note">When its number is rolled, every building touching it gets this. Auto = what you have least of.</p></div>`:''}
       ${own?`<div class="panel"><h3>DEFEND IT</h3><p class="note">Keep your hero home when enemies are near. Build walls, a tower and a garrison in Hero → Train & equip → Capital.</p></div>`
         :`<div class="panel"><h3>HOW TO CONQUER IT</h3><div class="glist">${st.map(([b,t])=>`<div class="gitem"><span>${ok(b)} ${t}</span></div>`).join('')}</div>
           <p class="note">When it falls: <b>+2 VP</b>, half their cards, their best city, and you may build on their island. They become your vassal until they beat your hero.</p></div>`}
@@ -5272,7 +5357,7 @@ function drawSheet(){
       ${S.prayed?'<p class="note">You have prayed this turn.</p>':!post?'<p class="note">Prayers are made on your turn, after rolling.</p>':''}<button class="btn" id="x">Close</button>`;
   }else if(kind==='vp'){
     const q=ui.vpOf??mySeat(),P=vpParts(q);
-    h=`<h2>${esc(pname(q))} · ${vp(q,q===mySeat())} VP</h2><p class="note">Victory points come only from buildings, titles and Oracle VP cards — plus the rare Laurel of the Gods from monsters and ruins. First to ${S.goal} wins.</p>
+    h=`<h2 id="vpTitle">${esc(pname(q))} · ${vp(q,q===mySeat())} VP</h2><p class="note">Victory points come only from buildings, titles and Oracle VP cards — plus the rare Laurel of the Gods from monsters and ruins. First to ${S.goal} wins.</p>
       <div class="hd-list">${P.map(([n,c,v])=>`<div class="${v?'on':''}"><em>+${v}</em>${n}${c&&n!=='Royal Road'&&n!=='Mightiest Army'?` <small>×${c}</small>`:''}</div>`).join('')}</div>
       <p class="note" style="margin-top:8px"><b>Royal Road</b> (+2): longest road, at least 5. <b>Mightiest Army</b> (+2): hoplites + monsters slain, at least 3.</p>
       <div class="row"><button class="btn" id="x">Close</button></div>`;
@@ -5476,7 +5561,10 @@ function drawSheet(){
   }
   // explanation screens get resource pictures inline; pickers already show them
   if(!['discard','yop','mono','tradeui','mresp','market','gold','stats'].includes(kind))h=riz(h);
-  sc.innerHTML=`<div class="sheet ${oldSheet?'still':''}" role="dialog" aria-modal="true">${S&&S.phase!=='over'&&!['over','menu','help','looks','guide','watch'].includes(kind)?invStrip():''}${h}</div>`;
+  const noX=['discard','steal','mono','yop','over','trial','mresp','alch','duel','battle','court','threat'].includes(kind);   // these must be answered
+  sc.innerHTML=`<div class="sheet ${oldSheet?'still':''}" role="dialog" aria-modal="true">${noX?'':'<button class="shx" aria-label="Close" title="Close">✕</button>'}${S&&S.phase!=='over'&&!['over','menu','help','looks','guide','watch','tradeui','gold'].includes(kind)?invStrip():''}${h}</div>`;
+  sc.querySelectorAll('.shx').forEach(b=>b.onclick=()=>closeSheet());
+  sheetTabs(sc,kind);                                        // long sheets on phones: one panel at a time
   if(oldSheet)sc.querySelector('.sheet').scrollTop=keepScroll;
   // wiring
   sc.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const [k,r]=b.dataset.add.split(':');const step=kind==='tradeui'&&ui.tt==='bank'&&k==='a'?rates(me)[r]:1;ui.pk[k][r]=(ui.pk[k][r]||0)+step;drawSheet()});
@@ -5522,7 +5610,9 @@ function drawSheet(){
   on('tdraw',()=>act(me,'tdraw'));on('bImp',()=>openSheet('imp'));on('bDev',()=>{act(me,'buydev');closeSheet()});on('bGold',()=>openSheet('gold'));on('bHero2',()=>openSheet('hero'));on('exLater',()=>{closeSheet();leave()});
   on('exEnd',()=>{closeSheet();endState(S,pname(mySeat()));if(S.online)save();else LS.del('st-local');leave()});on('bArm',()=>openSheet('armory'));on('bBuyBC',()=>{act(me,'bcbuy');drawSheet()});
   sc.querySelectorAll('[data-court]').forEach(b=>b.onclick=()=>act(me,'court',b.dataset.court));
-  sc.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>act(me,'buy',b.dataset.buy));
+  {const vt=sc.querySelector('#vpTitle');if(vt&&!LS.get('st-nodev',0))vt.onclick=()=>{const t=Date.now();ui.taps=(ui.taps||[]).filter(x=>t-x<4000);ui.taps.push(t);   // secret dev menu
+    if(ui.taps.length>=7){ui.taps=[];ui.dev?openSheet('dev'):openSheet('devcode')}}}
+  sc.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{act(me,'buy',b.dataset.buy);if(ui.sheet)drawSheet()});
   on('strike',()=>{act(me,'battle');drawSheet()});
   ui.tb0=performance.now();                                    // timing bar: marker runs 0→1→0 every 1.2 s (matches the CSS animation)
   const tq=()=>{const t=((performance.now()-ui.tb0)%1200)/1200,x=t<.5?t*2:2-t*2,d=Math.abs(x-.5);return d<.07?1:d<.2?.5:0};
