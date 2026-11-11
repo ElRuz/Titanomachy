@@ -43,38 +43,43 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
 .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 .flash.on{animation:fl .18s ease-out}
 @keyframes fl{from{opacity:.55}to{opacity:0}}
-/* ---------- controls: overlay like Mortal Kombat / Injustice mobile ----------
-   --k  = UI scale (fixes hosts that render the page zoomed-out on phones)
-   --mx = side margin (clear of notch / rounded corners), --by = lift off the bottom edge (home bar zone) */
-#pad{position:absolute;inset:0;pointer-events:none;z-index:3;
-  --mx:max(26px,calc(env(safe-area-inset-left) + 14px));--mxr:max(26px,calc(env(safe-area-inset-right) + 14px));--by:calc(env(safe-area-inset-bottom) + 34px)}
-.move,.acts{position:absolute;pointer-events:none;zoom:var(--z,1)}
-.move{left:var(--mx);bottom:var(--by);width:212px;height:96px}
-.acts{right:var(--mxr);bottom:var(--by);width:250px;height:250px}
-.btn{position:absolute;pointer-events:auto;border:0;border-radius:50%;display:grid;place-items:center;color:#2b1d0e;font:900 12px Cinzel,Georgia,serif;letter-spacing:.02em;opacity:.9;
+/* ---------- controls: Shadow Fight / Mortal Kombat style overlay ----------
+   Everything is drawn for a 400 px reference screen and zoomed by --z, which JS sets from the real
+   screen size (short side in landscape, width in portrait) — so buttons are the same share of the
+   screen on every phone, even when a host renders the page zoomed out. */
+#pad{position:absolute;inset:0;pointer-events:none;z-index:3}
+.acts,.joy{position:absolute;pointer-events:none;zoom:var(--z,1)}
+/* LEFT: floating joystick — touch anywhere in the left zone, it appears under your thumb */
+.jzone{position:absolute;left:0;bottom:0;width:42%;height:70%;pointer-events:auto;touch-action:none}
+.joy{left:30px;bottom:30px;width:150px;height:150px;border-radius:50%;transition:opacity .2s;
+  background:radial-gradient(circle,#0b162655 40%,#0b1626aa 70%);box-shadow:inset 0 0 0 3px #c9952eaa,0 0 0 2px #3a2408aa,0 8px 20px #0007}
+.joy::before,.joy::after{content:'';position:absolute;top:50%;translate:0 -50%;border:10px solid transparent;opacity:.75}   /* ◀ ▶ marks */
+.joy::before{left:10px;border-right:14px solid #ffd86a;border-left:0}.joy::after{right:10px;border-left:14px solid #ffd86a;border-right:0}
+.knob{position:absolute;left:50%;top:50%;width:66px;height:66px;margin:-33px 0 0 -33px;border-radius:50%;
+  background:radial-gradient(circle at 35% 28%,#fff3c4,#e2b55a 55%,#8a5f17);box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c9952e,0 6px 14px #000a}
+.joy.on{box-shadow:inset 0 0 0 3px #ffd86a,0 0 0 2px #3a2408,0 0 22px #ffd86a66}
+/* RIGHT: big STRIKE at the thumb rest, three smaller buttons on an arc (180° / 135° / 90°, radius 124) */
+.acts{right:calc(env(safe-area-inset-right) / var(--z,1) + 30px);bottom:30px;width:240px;height:240px}
+.btn{position:absolute;pointer-events:auto;border:0;border-radius:50%;display:grid;place-items:center;color:#2b1d0e;font:900 13px Cinzel,Georgia,serif;letter-spacing:.02em;opacity:.92;
   background:radial-gradient(circle at 35% 28%,#fff3c4,#e2b55a 55%,#8a5f17);box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c9952e,0 6px 0 #2a1a06,0 10px 18px #000b;touch-action:none}
-/* invisible bigger touch zone around every button (fingers miss small circles) */
-.btn::after{content:'';position:absolute;inset:-9px;border-radius:inherit}
+.btn::after{content:'';position:absolute;inset:-8px;border-radius:inherit}     /* touch zone a bit bigger than the art */
 .btn:active,.btn.dn{opacity:1;translate:0 4px;box-shadow:0 0 0 3px #3a2408,0 0 0 5px #ffd86a,0 2px 0 #2a1a06,0 0 22px #ffd86a}
-/* LEFT thumb: two big separate pads with a real gap (no mis-presses) */
-.btn.mv{width:88px;height:88px;bottom:4px}
-#bL{left:0}#bR{left:118px}
-.btn.mv svg{width:34px;height:34px;fill:#2b1d0e}
-/* RIGHT thumb: arc around STRIKE — 180° / 135° / 90°, radius 128 px, every gap ≥ 22 px */
-.acts .btn{width:76px;height:76px}
-.b-atk{width:100px!important;height:100px!important;right:0;bottom:0;font-size:15px!important}   /* thumb rest = main button */
-.b-hvy{right:140px;bottom:12px}                                                                  /* left */
-.b-blk{right:102px;bottom:103px;background:radial-gradient(circle at 35% 28%,#e6f2ff,#7aa6d9 55%,#1f3d66)!important;color:#08182b}   /* up-left */
-.b-sp{right:12px;bottom:140px;background:radial-gradient(circle at 35% 28%,#f0e0ff,#a274e6 55%,#3d1f66)!important;color:#1a0b2b;opacity:.5}   /* up */
+.acts .btn{width:78px;height:78px}
+.b-atk{width:110px!important;height:110px!important;right:0;bottom:0;font-size:17px!important}
+.b-hvy{right:140px;bottom:16px}
+.b-blk{right:104px;bottom:104px;background:radial-gradient(circle at 35% 28%,#e6f2ff,#7aa6d9 55%,#1f3d66)!important;color:#08182b}
+.b-sp{right:16px;bottom:140px;background:radial-gradient(circle at 35% 28%,#f0e0ff,#a274e6 55%,#3d1f66)!important;color:#1a0b2b;opacity:.5}
 .b-sp.ready{opacity:.95;animation:spr 1s infinite alternate}
 @keyframes spr{to{box-shadow:0 0 0 3px #3a2408,0 0 0 5px #c88aff,0 6px 0 #2a1a06,0 0 24px #c88aff}}
+/* portrait: lift both clusters off the bottom edge into the thumb zone */
+@media (orientation:portrait){.joy{left:22px;bottom:110px}.acts{right:22px;bottom:110px}}
 /* gesture tip: under the timer, fades after a few seconds */
 .hint{position:absolute;left:50%;translate:-50% 0;top:calc(env(safe-area-inset-top) + 74px);zoom:var(--k,1);padding:4px 10px;border-radius:99px;background:#0008;font-size:11px;color:#fffc;pointer-events:none;white-space:nowrap;transition:opacity 1s}
 .hint.off{opacity:0}
 /* portrait: suggest turning the phone (fighting games play sideways) */
 .rot{position:absolute;left:50%;translate:-50% 0;top:calc(env(safe-area-inset-top) + 104px);zoom:var(--k,1);display:none;padding:6px 12px;border-radius:99px;border:0;
   background:#0b1626dd;color:#ffe7a3;font:700 11px system-ui;white-space:nowrap;box-shadow:0 0 0 1px #ffd86a88;pointer-events:auto;z-index:4}
-@media (orientation:portrait){.rot{display:block}.move{bottom:calc(var(--by) + 40px)}.acts{bottom:calc(var(--by) + 40px)}}
+@media (orientation:portrait){.rot{display:block}}
 .rot.off{display:none!important}
 /* HUD and pop-ups follow the same UI scale */
 .hud,.gear,.load,.end .card,.big,.stamp{zoom:var(--k,1)}
@@ -111,7 +116,7 @@ html,body{margin:0;height:100%;background:#0b0806;color:#fff;font-family:system-
     <div class="end" id="end"><div class="card"><h2 id="endt">Victory</h2><span id="ends" style="color:#fffc;font-size:13px"></span><button class="pill" id="again">Fight again</button></div></div>
   </div>
   <div id="pad">
-    <div class="move"><button class="btn mv" id="bL" aria-label="Left"><svg viewBox="0 0 24 24"><path d="M16 4 6 12l10 8z"/></svg></button><button class="btn mv" id="bR" aria-label="Right"><svg viewBox="0 0 24 24"><path d="m8 4 10 8-10 8z"/></svg></button></div>
+    <div class="jzone" id="jzone"></div><div class="joy" id="joy"><div class="knob" id="knob"></div></div>
     <div class="acts">
       <button class="btn b-sp" id="bS">SPECIAL</button>
       <button class="btn b-blk" id="bB">BLOCK</button>
@@ -184,7 +189,7 @@ class Fighter{
     this.cur=null;this.play('idle');return gltf.animations.map(a=>a.name)}
   play(k){if(!this.mixer)return;const ck=k==='light'&&this.acts.kick&&(this.alt=!this.alt)?'kick':k;   // every other strike is a kick
     const a=this.acts[ck]||this.acts.idle;if(!a||(a===this.cur&&!MOVES[k]&&k!=='hit'))return;
-    a.reset().setEffectiveWeight(1).fadeIn(.1).play();if(this.cur&&this.cur!==a)this.cur.fadeOut(.1);this.cur=a;a.timeScale=1;
+    const fd=MOVES[k]||k==='hit'?.07:.2;a.reset().setEffectiveWeight(1).play();if(this.cur&&this.cur!==a)a.crossFadeFrom(this.cur,fd,false);else a.fadeIn(fd);this.cur=a;a.timeScale=1;
     if(MOVES[k]&&a.getClip().duration){const m=MOVES[k];a.timeScale=Math.max(.8,a.getClip().duration/(m.w+m.a+m.r))}   // fit the clip to the move timing
     if(k==='hit')a.timeScale=1.6}       // fit the clip to the move timing
   set(st,t=0){this.st=st;this.t=t;this.play(st)}
@@ -232,20 +237,20 @@ function popDmg(f,n,cls){const v=new THREE.Vector3(f.x,1.9*f.look.scale,0).proje
   d.className='dmg '+(cls||'');d.textContent=cls==='blk'?'BLOCK':'−'+n;d.style.left=(v.x+1)/2*r.width+'px';d.style.top=(1-v.y)/2*r.height+'px';view.appendChild(d);setTimeout(()=>d.remove(),800)}
 
 /* ================= the fight ================= */
-const G={time:30,state:'intro',slow:1,shake:0,zoom:0};
+const G={time:30,state:'intro',slow:1,shake:0,zoom:0,stop:0};
 function resolve(at,df){const m=MOVES[at.move],dist=Math.abs(at.x-df.x);if(dist>m.reach*(at.look.scale>1?1.08:1))return;
   at.hitDone=true;const blocked=df.st==='block'&&at.move!=='special';let d=blocked?Math.round(m.dmg*.15):m.dmg;
   const hx=(at.x+df.x)/2,hy=1.35*df.look.scale;
-  if(blocked){sfx('block');burst(hx,hy,14,0x9cc8ff);popDmg(df,0,'blk');df.x+=at.dir*m.push*.5}
+  if(blocked){sfx('block');burst(hx,hy,14,0x9cc8ff);popDmg(df,0,'blk');df.vx+=at.dir*m.push*3}
   else{sfx('hit',at.move==='light'?.5:1);burst(hx,hy,at.move==='light'?18:40,at.move==='special'?0xc88aff:0xffc86a);popDmg(df,d,at.move!=='light'?'crit':'');
-    df.move=null;df.set('hit');df.x+=at.dir*m.push;G.shake=at.move==='light'?.08:.22;if(at.move!=='light'){$('flash').classList.remove('on');void $('flash').offsetWidth;$('flash').classList.add('on')}
+    df.move=null;df.set('hit');df.vx+=at.dir*m.push*6;G.stop=at.move==='light'?.05:.09;G.shake=at.move==='light'?.08:.22;if(at.move!=='light'){$('flash').classList.remove('on');void $('flash').offsetWidth;$('flash').classList.add('on')}
     at.meter=Math.min(100,at.meter+(at.move==='light'?12:18));df.meter=Math.min(100,df.meter+6)}
   df.hp-=d;if(df.hp<=0)finish(at,df)}
 function finish(w,l){if(G.state!=='fight')return;G.state='ko';l.hp=0;l.move=null;l.set('ko');sfx('ko');G.slow=.22;G.zoom=1;big('K.O.',1600);
   setTimeout(()=>{G.slow=1;w.move=null;w.set('win')},1300);
   setTimeout(()=>{const won=w===A,s=$('stamp');s.className='stamp '+(won?'':'lose');s.textContent=won?'VICTORY':'DEFEATED';void s.offsetWidth;s.classList.add('on')},1500);
   setTimeout(()=>{$('endt').textContent=w===A?'Victory!':'Defeated';$('ends').textContent=`${A.look.name} ${Math.max(0,Math.round(A.hp))} HP · ${B.look.name} ${Math.max(0,Math.round(B.hp))} HP`;$('end').classList.add('on')},3000)}
-function reset(){[A,B].forEach((f,i)=>{f.hp=100;f.meter=0;f.x=i?1.3:-1.3;f.move=null;f.set('idle')});G.time=30;G.state='intro';G.zoom=0;
+function reset(){[A,B].forEach((f,i)=>{f.hp=100;f.meter=0;f.x=i?1.3:-1.3;f.vx=f.wv=0;f.move=null;f.set('idle')});G.time=30;G.state='intro';G.zoom=0;
   $('end').classList.remove('on');$('stamp').classList.remove('on');hud();big('ROUND 1',900);setTimeout(()=>{big('FIGHT!',700);G.state='fight'},1100)}
 
 /* ================= bot brain (the Minotaur) ================= */
@@ -265,11 +270,21 @@ function bot(dt){botT-=dt;const d=Math.abs(A.x-B.x);
 /* ================= input: buttons + gestures ================= */
 const IN={L:0,R:0,blk:0};
 function hold(id,on,off){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();ac();b.classList.add('dn');on()});['pointerup','pointercancel','pointerleave'].forEach(t=>b.addEventListener(t,()=>{b.classList.remove('dn');off&&off()}))}
-hold('bL',()=>IN.L=1,()=>IN.L=0);hold('bR',()=>IN.R=1,()=>IN.R=0);
-hold('bB',()=>IN.blk=1,()=>IN.blk=0);hold('bA',()=>act('light'));hold('bH',()=>act('heavy'));hold('bS',()=>act('special'));
+/* joystick: the base jumps under the thumb; knob offset drives IN.L / IN.R, pulling down blocks */
+(()=>{const zone=$('jzone'),joy=$('joy'),knob=$('knob');let id=null,cx=0,cy=0;
+  const z=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z'))||1;
+  const setK=(dx,dy)=>{knob.style.translate=`${dx}px ${dy}px`};
+  const rest=()=>{joy.style.left=joy.style.bottom='';joy.classList.remove('on');setK(0,0);IN.L=IN.R=0;IN.blk=IN.bB||0;IN.jb=0};
+  zone.addEventListener('pointerdown',e=>{e.preventDefault();ac();id=e.pointerId;zone.setPointerCapture(id);const Z=z();
+    cx=e.clientX;cy=e.clientY;joy.style.left=Math.max(8,cx/Z-75)+'px';joy.style.bottom=Math.max(8,(innerHeight-cy)/Z-75)+'px';   // keep the base fully on screen
+    cx=Math.max(cx,(8+75)*Z);cy=Math.min(cy,innerHeight-(8+75)*Z);joy.classList.add('on');move(e)});
+  const move=e=>{if(e.pointerId!==id)return;const Z=z();let dx=(e.clientX-cx)/Z,dy=(e.clientY-cy)/Z;const r=Math.hypot(dx,dy),mx=48;
+    if(r>mx){dx*=mx/r;dy*=mx/r}setK(dx,dy);IN.R=dx>14?1:0;IN.L=dx<-14?1:0;IN.jb=dy>30&&Math.abs(dx)<30?1:0;IN.blk=IN.jb||IN.bB||0};
+  zone.addEventListener('pointermove',move);['pointerup','pointercancel'].forEach(t=>zone.addEventListener(t,e=>{if(e.pointerId===id){id=null;rest()}}))})();
+hold('bB',()=>{IN.bB=1;IN.blk=1},()=>{IN.bB=0;IN.blk=IN.jb||0});hold('bA',()=>act('light'));hold('bH',()=>act('heavy'));hold('bS',()=>act('special'));
 function act(k){if(G.state!=='fight')return;A.start(k)}
 let g0=null;                                                    // arena gestures
-R.domElement.addEventListener('pointerdown',e=>{ac();g0={x:e.clientX,y:e.clientY,t:performance.now(),blk:false}});
+R.domElement.addEventListener('pointerdown',e=>{ac();if(e.clientX<innerWidth*.42)return;g0={x:e.clientX,y:e.clientY,t:performance.now(),blk:false}});
 R.domElement.addEventListener('pointermove',e=>{if(!g0)return;const dy=e.clientY-g0.y;if(dy>40&&!g0.blk){g0.blk=true;IN.blk=1}});
 R.domElement.addEventListener('pointerup',e=>{if(!g0)return;const dy=e.clientY-g0.y,dt=performance.now()-g0.t;
   if(g0.blk)IN.blk=0;else if(dy<-40)act('special');else if(dt>350)act('heavy');else act('light');g0=null});
@@ -288,23 +303,24 @@ function size(){const r=view.getBoundingClientRect();R.setSize(r.width,r.height,
    k = layout px per real screen px, so buttons keep their real finger size; z also shrinks the
    two thumb clusters when they would not fit side by side (portrait). */
 function uiScale(){const W=innerWidth,H=innerHeight,land=W>H,
-    sw=land?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height),
-    k=Math.min(3,Math.max(1,W/sw)),rw=W/k,rh=H/k,
-    z=k*Math.min(1,(rw-72)/462,(rh-96)/250);
-  const st=document.documentElement.style;st.setProperty('--k',k.toFixed(3));st.setProperty('--z',Math.max(.55*k,z).toFixed(3))}
+    u=land?H/400:W/400,                                   // reference: 400 px short side (landscape) / width (portrait)
+    z=Math.min(3,Math.max(.5,land?u:u*.82)),k=Math.min(3,Math.max(.6,land?Math.min(u,W/760):u));
+  const st=document.documentElement.style;st.setProperty('--k',k.toFixed(3));st.setProperty('--z',z.toFixed(3))}
 setTimeout(()=>$('hint').classList.add('off'),6000);                 // gesture tip fades out
 $('rot').onclick=()=>$('rot').classList.add('off');                  // rotate tip can be dismissed
 addEventListener('resize',size);size();
 function step(f,o,dt){f.t+=dt;
   if(f===A&&G.state==='fight'){if(f.canAct()){if(IN.blk)f.st!=='block'&&f.set('block');else if(IN.R)f.st!=='walkF'&&f.set('walkF');else if(IN.L)f.st!=='walkB'&&f.set('walkB');else if(f.st!=='idle')f.set('idle')}}
-  if(f.st==='walkF')f.x+=f.dir*1.6*dt;if(f.st==='walkB')f.x-=f.dir*1.2*dt;
+  const tv=f.st==='walkF'?f.dir*1.6:f.st==='walkB'?-f.dir*1.2:0;f.wv=(f.wv||0)+(tv-(f.wv||0))*Math.min(1,dt*12);   // walk speed eases in/out
+  f.x+=(f.wv+f.vx)*dt;f.vx*=Math.exp(-dt*9);                                       // knockback slides and settles
   if(f.move){const m=MOVES[f.move];if(!f.hitDone&&f.t>m.w&&f.t<m.w+m.a&&G.state==='fight')resolve(f,o);if(f.t>=m.w+m.a+m.r){f.move=null;f.set('idle')}}
   if(f.st==='hit'&&f.t>.32)f.set('idle');
   const gap=.9*(f.look.scale+o.look.scale)/2;                    // fighters never overlap
   f.x=THREE.MathUtils.clamp(f.x,-4.2,4.2);if(f.side===0)f.x=Math.min(f.x,o.x-gap);else f.x=Math.max(f.x,o.x+gap);
   f.root.position.x=f.x;f.root.rotation.y=f.mixer?(f.dir>0?0:Math.PI):(f.dir>0?Math.PI/2:-Math.PI/2);
   if(f.mixer)f.mixer.update(dt);else f.pose(dt,time)}
-function loop(){requestAnimationFrame(loop);const raw=Math.min(.05,clock.getDelta()),dt=raw*G.slow;time+=dt;
+function loop(){requestAnimationFrame(loop);const raw=Math.min(.05,clock.getDelta());let dt=raw*G.slow;
+  if(G.stop>0){G.stop-=raw;dt*=.08}                                                   // hit-stop: impacts feel heavy, not jerkytime+=dt;
   if(G.state==='fight'){G.time-=dt;bot(dt);if(G.time<=0)finish(A.hp>=B.hp?A:B,A.hp>=B.hp?B:A)}
   step(A,B,dt);step(B,A,dt);
   torches.forEach((l,i)=>l.intensity=5.5+Math.sin(time*9+i*2)*1.2+Math.random()*.6);
@@ -313,9 +329,9 @@ function loop(){requestAnimationFrame(loop);const raw=Math.min(.05,clock.getDelt
   // camera: keep both fighters framed, push in on the K.O., shake on big hits
   const mid=(A.x+B.x)/2,span=Math.abs(A.x-B.x)+2.6,hf=Math.tan(THREE.MathUtils.degToRad(cam.fov/2));
   let z=Math.max(4.2,(span/2)/(hf*cam.aspect)+.6);if(G.zoom)z=THREE.MathUtils.lerp(z,3.2,.6);
-  const sx=(Math.random()-.5)*G.shake,sy=(Math.random()-.5)*G.shake;G.shake*=.86;
-  wall.position.x=cam.position.x*.6;cam.position.lerp(new THREE.Vector3(mid+sx,1.55+sy+(G.zoom?-.2:0),z),.12);cam.lookAt(mid,1.15,0);scene.fog.near=cam.position.z+3;scene.fog.far=cam.position.z+8;
+  const sx=(Math.random()-.5)*G.shake,sy=(Math.random()-.5)*G.shake;G.shake*=Math.exp(-raw*9);
+  wall.position.x=cam.position.x*.6;cam.position.lerp(new THREE.Vector3(mid+sx,1.55+sy+(G.zoom?-.2:0),z),1-Math.exp(-raw*7));cam.lookAt(mid,1.15,0);scene.fog.near=cam.position.z+3;scene.fog.far=cam.position.z+8;
   hud();R.render(scene,cam)}
-reset();loop();
+reset();loop();window.FT={A,B,G,IN};   // handle for automated tests
 </script>
 
