@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261110232449'</script>
+<script>window.BUILD='20261110232703'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2327,6 +2327,7 @@ function checkGoals(){
 // ---------- Rules: every action goes through here ----------
 const bad=m=>{if(ui.remote){S.lastErr={uid:ui.remote,m,id:(S.lastErr?S.lastErr.id:0)+1};S.v++;save()}else toast(m);return false};
 const RULES={
+  cos(p,a){const ok=v=>typeof v==='string'&&v.length<20;if(!a||!ok(a.fr)||!ok(a.ti)||!ok(a.god))return bad('?');S.seats[p].cos={fr:a.fr,ti:a.ti,god:a.god}},   // my frame/title/god, seen by everyone
   help(p,a){                                                    // ask another hero to join my monster fight
     const F=S.mf,q=a&&+a.q;if(S.sub!=='mfight'||!F||F.p!==p||F.done||F.help)return bad('Not now');
     if(!(q>=0&&q!==p&&S.pl[q]&&S.pl[q].hero))return bad('Pick a hero');const pl=S.pl[p];if((pl.gold||0)<1)return bad('Calling a hero costs 1 gold');
@@ -2793,7 +2794,7 @@ function steal(p,q,times){
 // ======== Online sync: ONE device (the host) owns the game state ========
 // Other devices never overwrite the game; they send their moves to games/<id>/moves,
 // the host applies them in order and saves. Nothing can be lost to two phones saving at once.
-const allowed=(who,type)=>(type==='emote'||type==='dev'||type==='again'||type==='bet'||type==='toss'||type==='pray'||type==='helpAns')?(who>=0&&!!S.seats[who]):type==='mkresp'?(S.sub==='market'&&S.mk&&who!==S.mk.from&&!S.mk.resp[who]&&!!S.seats[who])
+const allowed=(who,type)=>(type==='emote'||type==='dev'||type==='again'||type==='bet'||type==='toss'||type==='pray'||type==='helpAns'||type==='cos')?(who>=0&&!!S.seats[who]):type==='mkresp'?(S.sub==='market'&&S.mk&&who!==S.mk.from&&!S.mk.resp[who]&&!!S.seats[who])
   :type==='cancel'?(S.mk&&S.mk.from===who):actor()===who;
 // what a person may use in each early round (bots are not slowed down; the trials and tutorial have their own flow)
 const UNLOCK={2:['bank','mkoffer','buydev','play'],3:['hmove','battle','explore','raid','duel','htrain','hgear','bcbuy','colony','ship','gtravel','siege','fort','war','pactoffer','ferry'],4:['pray','tdraw','ttake']};
@@ -4881,9 +4882,19 @@ function drawSheet(){
       <div class="ggrid">${godsFor().map(k=>{const G=GODS[k],ok=post&&!S.prayed&&pl.res.ambrosia>=G.c;
         return `<button class="god" style="--gc:${G.col}" data-pray="${k}" ${ok?'':'disabled'}><div class="g-ic">${ico('god-'+k)}</div><b>${G.n}</b><i>${G.t}</i><span>${G.d}</span><em>${Array(G.c).fill(ico('ambrosia','ic sm')).join('')} ${G.c}</em></button>`}).join('')}</div>
       ${S.prayed?'<p class="note">You have prayed this turn.</p>':!post?'<p class="note">Prayers are made on your turn, after rolling.</p>':''}<button class="btn" id="x">Close</button>`;
+  }else if(kind==='looks'){                                     // same picture tiles as the profile, applied live
+    const p=prof(),sel=p.sel||{};
+    h=`<h2>Your looks</h2>${cosPreview(sel)}${['dice','board','frame','god','title'].map(k=>`<h4 style="margin:10px 0 4px">${KINDN[k]}</h4><div class="cosgrid">${cosTile(k,'',!sel[k],true,0)}${UNL.filter(u=>u[1]===k).map(u=>cosTile(k,u[2],sel[k]===u[2],u[0]<=p.lv||(p.unl||[]).includes(k+':'+u[2]),u[0],u[3])).join('')}</div>`).join('')}
+      <div class="row" style="margin-top:12px"><button class="btn" id="x">Close</button></div>`;
+    setTimeout(()=>document.querySelectorAll('.sheet [data-equip]').forEach(b=>b.onclick=e=>{e.stopPropagation();
+      const [k,id]=b.dataset.equip.split(':'),pp=prof();
+      if(b.classList.contains('lockd')){TAPS[k+':'+id]=(TAPS[k+':'+id]||0)+1;if(TAPS[k+':'+id]<3)return;TAPS[k+':'+id]=0;pp.unl=pp.unl||[];pp.unl.push(k+':'+id);saveProf(pp);sfx('win');toast('Unlocked!');return openSheet('looks')}
+      pp.sel=pp.sel||{};pp.sel[k]=id;saveProf(pp);applyCos();sfx('click');
+      const me=mySeat();if(me>=0&&['frame','god','title'].includes(k))act(me,'cos',myCos());     // others see my new frame/title/god
+      openSheet('looks')}),30);
   }else if(kind==='guide'){
     const ks=Object.keys(TIPS).filter(k=>!(k==='raiders'&&!S.ck)&&!(['hero','monster','ruins','agora'].includes(k)&&!(S.rpg&&S.rpg.k))&&!(k==='event'&&!S.rpg.ev)&&!(k==='missions'&&!S.tasks)&&!(k==='oracle'&&S.ck));
-    h=`<h2>${uico('help','ui')} Guide</h2><button class="btn pri" id="bTour" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-play></use></svg> Step-by-step walkthrough</button><div class="row" style="gap:8px;margin-bottom:8px"><button class="btn tgl" id="bSfx"><svg class=gi><use href=#g-speaker></use></svg> Sounds: ${SND.fx()?'ON':'OFF'}</button><button class="btn tgl" id="bMus"><svg class=gi><use href=#g-lyre></use></svg> Music: ${SND.mu()?'ON':'OFF'}</button></div><button class="btn" style="width:100%;margin-bottom:8px" onclick="reloadApp()">↻ Reload app</button><button class="btn" id="bCoach" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-owl></use></svg> Show me what to tap: ${coachOn()?'ON':'OFF'}</button><p class="note">Or tap any topic to read it.</p><div class="guide">${ks.map(k=>`<button class="gtopic" data-tip="${k}">${ico(TIPS[k].i)}<b>${TIPS[k].t}</b></button>`).join('')}</div>
+    h=`<h2>${uico('help','ui')} Guide</h2><button class="btn pri" id="bTour" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-play></use></svg> Step-by-step walkthrough</button><div class="row" style="gap:8px;margin-bottom:8px"><button class="btn tgl" id="bSfx"><svg class=gi><use href=#g-speaker></use></svg> Sounds: ${SND.fx()?'ON':'OFF'}</button><button class="btn tgl" id="bMus"><svg class=gi><use href=#g-lyre></use></svg> Music: ${SND.mu()?'ON':'OFF'}</button></div><button class="btn" style="width:100%;margin-bottom:8px" onclick="openSheet('looks')">🎨 Looks — dice, board, frame, title</button><button class="btn" style="width:100%;margin-bottom:8px" onclick="reloadApp()">↻ Reload app</button><button class="btn" id="bCoach" style="width:100%;margin-bottom:8px"><svg class=gi><use href=#g-owl></use></svg> Show me what to tap: ${coachOn()?'ON':'OFF'}</button><p class="note">Or tap any topic to read it.</p><div class="guide">${ks.map(k=>`<button class="gtopic" data-tip="${k}">${ico(TIPS[k].i)}<b>${TIPS[k].t}</b></button>`).join('')}</div>
       ${S.rpg&&S.rpg.k?'<button class="btn" id="bHow">Heroes mode — full rules</button>':''}<button class="btn" id="x">Close</button>`;
   }else if(kind==='emote'){
     h=`<h2>Say something</h2><div class="emogrid">${EMOTES.map((t,i)=>`<button class="emo-b ${t.length<=2?'big':''}" data-emo="${i}">${riz(esc(t))}</button>`).join('')}</div><button class="btn" id="x">Close</button>`;
@@ -5071,7 +5082,7 @@ function drawSheet(){
   }
   // explanation screens get resource pictures inline; pickers already show them
   if(!['discard','yop','mono','tradeui','mresp','market','gold','stats'].includes(kind))h=riz(h);
-  sc.innerHTML=`<div class="sheet ${oldSheet?'still':''}" role="dialog" aria-modal="true">${S&&S.phase!=='over'&&!['over','menu','help'].includes(kind)?invStrip():''}${h}</div>`;
+  sc.innerHTML=`<div class="sheet ${oldSheet?'still':''}" role="dialog" aria-modal="true">${S&&S.phase!=='over'&&!['over','menu','help','looks','guide'].includes(kind)?invStrip():''}${h}</div>`;
   if(oldSheet)sc.querySelector('.sheet').scrollTop=keepScroll;
   // wiring
   sc.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const [k,r]=b.dataset.add.split(':');const step=kind==='tradeui'&&ui.tt==='bank'&&k==='a'?rates(me)[r]:1;ui.pk[k][r]=(ui.pk[k][r]||0)+step;drawSheet()});
