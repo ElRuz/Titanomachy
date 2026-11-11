@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111143714'</script>
+<script>window.BUILD='20261111144025'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1490,6 +1490,32 @@ body.mgopen .stage *,body.mgopen .stage{animation-play-state:paused!important}
 .brc b{font:900 15px Cinzel,Georgia,serif;color:var(--cc)}.brc span{font-size:11px;color:#fffc;text-align:center}
 
 .sdrop circle{animation:sdg 1.4s ease-in-out infinite alternate}@keyframes sdg{to{r:26;fill:#ffd86a55}}
+
+/* ---- event feed: ticker under the events bar, bell with unread count, re-readable list ---- */
+.feedtick{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 58px);translate:-50% -6px;z-index:4;max-width:min(86vw,460px);padding:6px 12px;border-radius:12px;
+  background:#0b1626e6;border:1px solid #ffd86a66;color:#fff;font-size:13px;line-height:1.3;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,translate .3s;box-shadow:0 6px 16px #0008}
+.feedtick.on{opacity:1;translate:-50% 0;pointer-events:auto}
+.banner.open~.feedtick{display:none}                              /* the open feed already shows it */
+.feedtick.k-alert{border-color:#e0452f;background:#2a0d10ee}.feedtick.k-tip{border-color:#7fd1ff}.feedtick.k-god{border-color:var(--gc,#ffd86a)}
+.feedtick .tipx{margin-left:6px;border:0;background:#fff2;color:#fff;border-radius:6px;padding:0 6px}
+.banner .fcnt{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:3px;border-radius:9px;background:#e0452f;color:#fff;font:800 11px system-ui;padding:0 4px}
+.banner .fhide{padding:4px 9px!important}
+.banner .fcnt[hidden]{display:none}
+.banner .frow{flex-basis:100%;display:flex;justify-content:flex-end;gap:6px}
+.banner.mini{left:auto;right:10px;transform:none}
+.feedpanel{flex-basis:100%;max-height:min(46vh,380px);overflow:auto;padding:6px;border-radius:12px;background:#0b1626f2;border:1px solid #ffd86a55;text-align:left}
+.feedpanel h4{margin:2px 4px 6px;font:900 11px Cinzel,Georgia,serif;letter-spacing:.1em;color:#ffd86a}
+.fitem{display:flex;gap:8px;align-items:flex-start;width:100%;padding:6px 8px;border:0;border-bottom:1px solid #ffffff14;background:none;color:#fffd;font-size:12.5px;text-align:left}
+.fitem i{font-style:normal;width:16px;flex:none;text-align:center}.fitem span{flex:1;min-width:0}.fitem em{font-style:normal;font-size:10px;color:#fff7}
+.fitem.k-alert i{color:#ff7a5a}.fitem.k-tip{cursor:pointer}.fitem.k-tip span{text-decoration:underline dotted #fff6}
+/* ---- settings drop-down: one Menu button, the rest drops down with labels ---- */
+.railbtn{position:absolute;left:8px;top:calc(env(safe-area-inset-top,0px) + 54px);z-index:5;display:flex;gap:6px;align-items:center;height:38px;padding:0 12px 0 8px;border-radius:19px;
+  background:var(--glass,#0b1626cc);border:1.5px solid var(--hair,#ffd86a66);color:var(--gold-hi,#ffe7a3);font:800 12px system-ui;box-shadow:0 4px 10px #0007}
+.railbtn .ui{width:18px;height:18px}.railbtn.on{border-color:#ffd86a}
+.rail{display:none!important}
+.rail.open{display:grid!important;top:calc(env(safe-area-inset-top,0px) + 98px)!important;transform:none!important;left:8px!important;gap:4px!important;padding:6px;border-radius:14px;background:#0b1626f0;border:1px solid #ffd86a55;z-index:6;box-shadow:0 10px 24px #000a}
+.rail.open button{width:auto!important;height:38px!important;border-radius:10px!important;display:flex!important;align-items:center;gap:8px;padding:0 12px 0 6px;justify-content:flex-start}
+.rail .rl{font:700 12.5px system-ui;color:#fffd;white-space:nowrap}
 </style>
 </head><body>
 
@@ -3825,12 +3851,27 @@ const ico=(id,cls='ic')=>`<svg class="${cls}" viewBox="-12 -12 24 24"><use href=
 const RKEY=Object.fromEntries(Object.entries(RNAME).filter(([k])=>!BARREN.has(k)).map(([k,v])=>[v,k]));
 const RXRES=new RegExp('\\b('+Object.keys(RKEY).join('|')+')\\b','g');
 const riz=html=>String(html).split(/(<[^>]+>)/).map((part,i)=>i%2?part:part.replace(RXRES,m=>`<span class="ri">${ico(RKEY[m],'ic ri-ic')}${m}</span>`)).join('');
+let FEED=[],feedUnread=0;                                       // this game's notifications, newest first
+const inGame=()=>!!(S&&document.getElementById('feedtick'));
+function feedPush(kind,html,tip,extra){                         // kind: info | tip | alert | god | event · extra: ticker-only buttons
+  FEED.unshift({kind,html,tip,r:S&&S.round||0});if(FEED.length>100)FEED.length=100;if(!ui.banOpen)feedUnread++;
+  const tk=document.getElementById('feedtick');if(tk&&!ui.feedHide){tk.className='feedtick on k-'+kind;tk.innerHTML=html+(extra||'');clearTimeout(feedPush.t);
+    feedPush.t=setTimeout(()=>tk.classList.remove('on'),kind==='tip'?6500:kind==='alert'?4500:3200)}
+  feedPaint();return tk}
+const FEEDIC={info:'•',tip:'🦉',alert:'⚡',god:'✦',event:'☀'};
+function feedPaint(){                                           // bell counter + the open list
+  const c=document.getElementById('fcount');if(c){c.textContent=feedUnread||'';c.hidden=!feedUnread}
+  const L=document.getElementById('feedlist');if(!L)return;
+  L.innerHTML=FEED.length?FEED.map((f,i)=>`<button class="fitem k-${f.kind}" data-fi="${i}"><i>${FEEDIC[f.kind]||'•'}</i><span>${f.html}</span><em>R${f.r}</em></button>`).join(''):'<p class="note">Nothing yet — alerts, events and tips will collect here.</p>';
+  L.querySelectorAll('[data-fi]').forEach(b=>b.onclick=e=>{e.stopPropagation();const f=FEED[+b.dataset.fi];if(f&&f.tip&&TIPS[f.tip])showTip(f.tip,true)})}   // tips open again in full
 function note(html,ms,cls){                                   // short floating text, no images
+  if(inGame())return feedPush(/tipn/.test(cls||'')?'tip':/god/.test(cls||'')?'god':'info',html);   // in a game: into the event feed
   let box=document.getElementById('toasts');if(!box){box=document.createElement('div');box.id='toasts';document.body.appendChild(box)}
   while(box.children.length>=2)box.firstChild.remove();
   const t=document.createElement('div');t.className='toast fnote '+(cls||'');t.innerHTML=html;t.onclick=()=>t.remove();box.appendChild(t);setTimeout(()=>t.remove(),ms||4500);return t;
 }
 function toast(m){
+  if(inGame()){feedPush('info',esc(m));if(!document.querySelector('.scrim'))return}   // in a game: the feed (also float it over an open sheet)
   let box=document.getElementById('toasts');if(!box){box=document.createElement('div');box.id='toasts';document.body.appendChild(box)}
   while(box.children.length>=2)box.firstChild.remove();
   const t=document.createElement('div');t.className='toast';t.textContent=m;box.appendChild(t);setTimeout(()=>t.remove(),2600);
@@ -3848,7 +3889,7 @@ const SLAMQ=[];let slamBusy=false,slamPrev=null;
 function slam(kind,icon,title,sub){                             // kind: threat | swing | race | world
   if(SLAMQ.length>4)return;SLAMQ.push({kind,icon,title,sub});if(!slamBusy)slamNext()}
 function slamNext(){
-  const it=SLAMQ.shift();if(!it){slamBusy=false;return}slamBusy=true;
+  const it=SLAMQ.shift();if(!it){slamBusy=false;return}slamBusy=true;if(inGame())feedPush('alert',`<b>${it.title}</b>${it.sub?' — '+it.sub:''}`);
   const el=document.createElement('div');el.className='slam '+it.kind;
   el.innerHTML=`<div class="slam-band"><div class="slam-ic"><svg class=gi><use href=#g-${it.icon}></use></svg></div><div class="slam-tx"><b>${it.title}</b>${it.sub?`<span>${it.sub}</span>`:''}</div></div>`;
   document.body.appendChild(el);
@@ -4872,8 +4913,8 @@ function tipCheck(me){
 }
 function showTip(k,again){
   if(!again){const T=TIPS[k];tipsSeen[k]=1;LS.set('st-tips',tipsSeen);ui.lastTip=Date.now();   // in-game tip = one floating line
-    const t=note(`<svg class=gi><use href=#g-owl></use></svg> ${T.s}<button class="tipx" title="Turn tips off">✕</button>`,7000,'tipn');
-    t.querySelector('.tipx').onclick=e=>{e.stopPropagation();tipsSeen.off=1;LS.set('st-tips',tipsSeen);t.remove();toast('Tips off (Guide still has everything)')};return}
+    const t=inGame()?feedPush('tip',T.s,k,' <button class="tipx" title="Turn tips off">✕</button>'):note(`<svg class=gi><use href=#g-owl></use></svg> ${T.s}<button class="tipx" title="Turn tips off">✕</button>`,7000,'tipn');
+    const tx=t&&t.querySelector('.tipx');if(tx)tx.onclick=e=>{e.stopPropagation();tipsSeen.off=1;LS.set('st-tips',tipsSeen);t.classList.remove('on');toast('Tips off (Guide still has everything)')};return}
   const T=TIPS[k],el=document.createElement('div');el.id='tipcard';el.className='tipcard';
   el.innerHTML=`<div class="tip-ic">${ico(T.i)}</div><span class="tip-k">${again?'GUIDE':'NEW'}</span><h2>${T.t}</h2><ul>${T.l.map(x=>`<li>${riz(x)}</li>`).join('')}</ul>
     <div class="row"><button class="btn pri" id="tipOk">Got it</button>${again?'':'<button class="btn sm" id="tipOff">Hide tips</button>'}</div>`;
@@ -4969,13 +5010,15 @@ function renderGame(){
   if(!document.getElementById('gameRoot')){
     document.body.classList.add('ingame');
     seenSay=S.say?S.say.id:0;seenRoll=S.roll?S.roll.id:0;   // animate every roll from now on, incl. the first                                   // so the very first emote/taunt still shows
+    if(ui.feedGame!==S.id+S.created){ui.feedGame=S.id+S.created;FEED=[];feedUnread=0}   // fresh feed per game
     app.innerHTML=`<div class="table" id="gameRoot">
       <div class="pbar" id="players"></div>
       <div class="stage" id="stage">
         <div class="zoom" id="zoom"><div id="bh"></div></div>
         <div class="zctl"><button data-z="1.4" title="Zoom in">+</button><button data-z="0.7" title="Zoom out">−</button><button data-z="0" title="Fit board">⤢</button></div>
-        <div class="banner" id="banner"></div>
-        <div class="rail">
+        <div class="banner" id="banner"></div><div class="feedtick" id="feedtick"></div>
+        <button class="railbtn" id="railbtn" title="Menu">${uico('book')}<span>Menu</span></button>
+        <div class="rail" id="rail">
           <button title="Game log" data-rail="log">${uico('log')}</button><button title="Dice stats" data-rail="stats">${uico('chart')}</button>
           <button title="Cards & costs" data-rail="rules">${uico('book')}</button><button title="Secret missions" data-rail="contracts">${uico('task')}</button><button title="The gods" data-rail="gods">${ico('bolt','ui')}</button>
           <button title="Guide: how everything works" data-rail="howto">${uico('help')}</button>${S.online&&db?`<button id="vcbtn" title="Voice chat" data-rail="voice" class="${VC.on?'von':''}">${uico('mic')}<i class="vcnt">${VC.roster.length||''}</i></button>`:''}<button title="Zoom in" data-rail="zin">${uico('plus')}</button>
@@ -4987,6 +5030,10 @@ function renderGame(){
         <div class="tmbar" id="tbar" hidden><i></i><span></span></div><div class="hint" id="hint"></div><div class="confirm" id="confirm" hidden></div>
       </div>
       <div class="dock" id="dock"></div></div>`;
+    {const rb=document.getElementById('railbtn'),rl=document.getElementById('rail');   // settings drop-down
+      rl.querySelectorAll('button[title]').forEach(b=>{if(!b.querySelector('.rl'))b.insertAdjacentHTML('beforeend',`<span class="rl">${b.title}</span>`)});
+      rb.onclick=e=>{e.stopPropagation();rl.classList.toggle('open');rb.classList.toggle('on',rl.classList.contains('open'))};
+      rl.addEventListener('click',()=>{rl.classList.remove('open');rb.classList.remove('on')})}
     document.querySelectorAll('[data-rail]').forEach(b=>b.onclick=()=>{const k=b.dataset.rail;
       if(k==='lobby')return S.phase==='over'?leave():openSheet('exit');if(k==='zin')return ui.zoom(1.25);if(k==='zout')return ui.zoom(.8);if(k==='fit')return ui.zoom(0);
       if(k==='view')return toggle3d();
@@ -5075,11 +5122,15 @@ function renderGame(){
   if(S.warEv&&S.warEv.id!==ui.seenWar){if(ui.seenWar!==undefined)toast(S.warEv.p<0?'The Titan War begins! Every island is at war.':`${pname(S.warEv.p)} declares war on ${pname(S.warEv.q)}!`);ui.seenWar=S.warEv.id}
   if(S.story&&S.story.act&&me>=0){const a=S.story.act,d=S.story.done[me][a-1];ban.unshift(`<button class="bchip good" data-quests="1">${ico('map')}<span>Act ${['I','II','III'][a-1]} · <b>${actName(a)}</b> · quests ${d.filter(x=>x).length}/3</span></button>`)}
   if(S.rpg.k&&S.lair>=0)ban.push(`<button class="bchip" data-world="1">${ico('cave')}<span>Monster in ${S.lairT} · ${S.mons.length} roaming</span></button>`);
-  const bn=document.getElementById('banner');
-  if(ban.length>1){const open=!!ui.banOpen;bn.classList.toggle('open',open);    // one chip + a dropdown with everything else
-    bn.innerHTML=(open?ban.join(''):ban[0])+`<button class="bchip bmore" data-banmore="1">${open?'▴ Hide':'▾ '+(ban.length-1)+' more'}</button>`}
-  else{bn.classList.remove('open');bn.innerHTML=ban.join('')}
-  bn.querySelectorAll('[data-banmore]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.banOpen=!ui.banOpen;renderGame()});bn.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>openSheet('world'));bn.querySelectorAll('[data-evpop]').forEach(b=>b.onclick=()=>eventPop(S.event));
+  const bn=document.getElementById('banner'),open=!!ui.banOpen;          // events bar: first chip + bell; open = all chips + the feed
+  bn.classList.toggle('open',open);bn.classList.toggle('mini',!!ui.feedHide);
+  bn.innerHTML=ui.feedHide?`<button class="bchip bmore" data-feedshow="1">📜 Events${feedUnread?` <b class="fcnt">${feedUnread}</b>`:''}</button>`
+    :open?`<div class="frow"><button class="bchip bmore" data-banmore="1">▴ Close</button><button class="bchip bmore fhide" data-feedhide="1" title="Hide">–</button></div>${ban.join('')}<div class="feedpanel"><h4>Recent</h4><div id="feedlist"></div></div>`
+      :(ban[0]||'')+`<button class="bchip bmore" data-banmore="1">🔔<b class="fcnt" id="fcount" ${feedUnread?'':'hidden'}>${feedUnread||''}</b></button><button class="bchip bmore fhide" data-feedhide="1" title="Hide">–</button>`;
+  if(open)feedPaint();
+  bn.querySelectorAll('[data-feedhide]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.feedHide=1;ui.banOpen=0;renderGame()});
+  bn.querySelectorAll('[data-feedshow]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.feedHide=0;renderGame()});
+  bn.querySelectorAll('[data-banmore]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.banOpen=!ui.banOpen;if(ui.banOpen)feedUnread=0;renderGame()});bn.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>openSheet('world'));bn.querySelectorAll('[data-evpop]').forEach(b=>b.onclick=()=>eventPop(S.event));
   bn.querySelectorAll('[data-tutskip]').forEach(b=>b.onclick=()=>{const tr=S&&S.tut&&S.tut.kind==='trial';LS.set('st-tour-tw',true);LS.set('st-tour',true);LS.del('st-local');leave();
     if(tr&&!prof().trials)trialReward()});   /* skipping the Trials = finished: get the starter heroes, go to home */
   bn.querySelectorAll('[data-tut]').forEach(b=>b.onclick=()=>note(`<b>Hermes:</b> ${TG()[S.tut.step].d}`,6000));
@@ -5091,7 +5142,7 @@ function renderGame(){
   if(ui.seenUnl===undefined)ui.seenUnl=S.unlockEv?S.unlockEv.id:0;
   if(S.unlockEv&&S.unlockEv.id!==ui.seenUnl){ui.seenUnl=S.unlockEv.id;note({2:'<b>Trade</b> is open: swap cards with the bank or players.',3:'<b>Your hero</b> can now move, fight monsters and explore ruins.',4:'<b>The gods</b> answer now: spend Ambrosia for a blessing.'}[S.unlockEv.r],6000,'good')}
   if(ui.seenGod===undefined)ui.seenGod=S.godEv?S.godEv.id:0;      // first prayer of the game must also show
-  if(S.godEv&&S.godEv.id!==ui.seenGod){if(ui.seenGod!==undefined){const G=GODS[S.godEv.g],t=note(`${ico('god-'+G.k)}<b>${S.godEv.p===me?'You':esc(pname(S.godEv.p))}</b> ${S.godEv.p===me?'pray':'prays'} to <b>${G.n}</b> — ${G.d}`,5000,'god');t.style.setProperty('--gc',G.col||'#ffd86a')}ui.seenGod=S.godEv.id}
+  if(S.godEv&&S.godEv.id!==ui.seenGod){if(ui.seenGod!==undefined){const G=GODS[S.godEv.g],t=note(`${ico('god-'+G.k)}<b>${S.godEv.p===me?'You':esc(pname(S.godEv.p))}</b> ${S.godEv.p===me?'pray':'prays'} to <b>${G.n}</b> — ${G.d}`,5000,'god');if(t)t.style.setProperty('--gc',G.col||'#ffd86a')}ui.seenGod=S.godEv.id}
   if(S.actEv&&S.actEv.id!==ui.seenAct){if(ui.seenAct!==undefined||S.round<=1)actPop(S.actEv.a);ui.seenAct=S.actEv.id}
   if(S.taskEv&&S.taskEv.id!==ui.seenTask){if(ui.seenTask!==undefined&&S.taskEv.p===me)note(`${S.taskEv.ok?'✓':'✗'} <b>${esc(S.taskEv.n)}</b> ${S.taskEv.txt}`,4500,S.taskEv.ok?'good':'bad');ui.seenTask=S.taskEv.id}
   ui.vpSeen=ui.vpSeen||{};S.seats.forEach((_,i)=>{const v=vp(i,i===me);if(ui.vpSeen[i]!==undefined&&ui.vpSeen[i]!==v&&S.silentV!==S.v){const b=document.querySelector('#pc'+i+' .vpb');if(b){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}ui.vpSeen[i]=v});
