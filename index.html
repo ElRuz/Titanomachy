@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111190020'</script>
+<script>window.BUILD='20261111190036'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -4233,7 +4233,7 @@ function fitLobby(){                                          // menus fit the s
     const pad=parseFloat(getComputedStyle(el).paddingTop)||0,need=tall()-H;
     if(need>0)el.style.setProperty('padding-top',Math.max(120,pad-need)+'px','important')}
   const k=H/tall();if(k<1&&k>=.7)el.style.zoom=Math.max(.7,k-.004).toFixed(3)}    // more than 30% too tall → leave it scrollable
-addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(fitLobby,120)});
+if(typeof addEventListener!=='undefined')addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(fitLobby,120)});   // refit menus when the screen turns
 function renderLobby(){setTimeout(()=>{requestAnimationFrame(fitLobby);setTimeout(fitLobby,450);let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
     if(!b){b=document.createElement('button');b.id='rfbtn';b.setAttribute('aria-label','Reload');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.onclick=reloadApp;document.body.appendChild(b)}
     b.hidden=!!(S&&S.phase)},0);
