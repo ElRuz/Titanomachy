@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111202553'</script>
+<script>window.BUILD='20261111224152'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1587,6 +1587,15 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 .dhero-w{grid-column:2;grid-row:1/3;position:relative;display:grid;place-items:center}.dhero-w .dhero{grid-column:auto;grid-row:auto;position:relative;z-index:1}
 .dhero.armed{border-color:var(--ac);box-shadow:0 0 18px var(--ac),0 0 40px color-mix(in srgb,var(--ac) 50%,#0000)}
 .daura{position:absolute;inset:-22% -30%;width:160%;height:144%;z-index:0;animation:harm 2.4s ease-in-out infinite alternate;pointer-events:none}
+
+/* ---- no overlaps: turn timer is a small pill on the left, sound + emote stack, the event ticker sits under the banner ---- */
+#tbar.tmbar{position:absolute!important;left:8px!important;right:auto!important;margin:0!important;width:58px!important;height:30px!important;top:8px!important;bottom:auto!important;border-radius:15px!important;background:#0b1626e6!important;border:1px solid #ffd86a66;overflow:hidden;display:grid;place-items:center}
+#tbar.tmbar i{position:absolute;left:0;bottom:0;height:3px!important}
+#tbar.tmbar span{position:static!important;font:800 14px/1 Cinzel,Georgia,serif!important;color:#f6e7c1;text-shadow:0 1px 2px #000}
+#bSnd.fbtn{top:84px!important}@media (min-width:700px){#bSnd.fbtn{top:104px!important}}
+#supply.supply{left:72px!important}   /* clear of the timer pill */
+@media (max-width:420px){#supply.supply{gap:3px}#supply .sp-i svg{width:22px}}
+.lobby .backbtn{margin-left:52px}   /* clear of the language globe */
 </style>
 </head><body>
 
@@ -4059,7 +4068,9 @@ function feedPush(kind,html,tip,extra){                         // kind: info | 
     feedPush.t=setTimeout(()=>tk.classList.remove('on'),kind==='tip'?6500:kind==='alert'?4500:3200)}
   feedPaint();return tk}
 const FEEDIC={info:'•',tip:'🦉',alert:'⚡',god:'✦',event:'☀'};
-function feedPaint(){                                           // bell counter + the open list
+function placeTick(){if(typeof document==='undefined')return;const b=document.getElementById('banner'),t=document.getElementById('feedtick');if(!b||!t)return;   // keep the event ticker under the banner, never on top of it
+  const vis=getComputedStyle(b).display!=='none'&&b.offsetHeight>0;t.style.top=vis?(b.offsetTop+b.offsetHeight+6)+'px':''}
+function feedPaint(){setTimeout(placeTick,0);                                           // bell counter + the open list
   const c=document.getElementById('fcount');if(c){c.textContent=feedUnread||'';c.hidden=!feedUnread}
   const L=document.getElementById('feedlist');if(!L)return;
   L.innerHTML=FEED.length?FEED.map((f,i)=>`<button class="fitem k-${f.kind}" data-fi="${i}"><i>${FEEDIC[f.kind]||'•'}</i><span>${f.html}</span><em>R${f.r}</em></button>`).join(''):'<p class="note">Nothing yet — alerts, events and tips will collect here.</p>';
@@ -4139,7 +4150,7 @@ function slamCheck(){siegeSlams();                                           // 
   // world events
   if(cur.ev!==P.ev&&S.event&&S.event.t!=='calm'&&EVENTS[S.event.t])slam('world','globe',EVENTS[S.event.t].n,EVENTS[S.event.t].d);
 }
-function render(){setTimeout(slamCheck,0);
+function render(){setTimeout(slamCheck,0);setTimeout(placeTick,0);
   syncMode();
   if(!S)return renderLobby();
   if(S.phase==='wait')return renderWait();
