@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111190242'</script>
+<script>window.BUILD='20261111190943'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1546,7 +1546,7 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 .armc:not(.own){filter:saturate(.75)}.armc.on{border-color:var(--rc);box-shadow:0 0 14px color-mix(in srgb,var(--rc) 55%,#0000),inset 0 0 18px color-mix(in srgb,var(--rc) 35%,#0000)}
 .armc b{font:700 12.5px Cinzel,Georgia,serif;line-height:1.15}.armc small{font-size:10.5px}.armc i{font-style:normal;font-size:11px;color:#bfe7a5}
 .armi{width:76px;height:76px;filter:drop-shadow(0 4px 6px #000a)}
-.tabs{display:flex;gap:6px;margin:6px 0 10px;flex-wrap:wrap}.stab{flex:1;min-width:90px;padding:9px 6px;border-radius:12px;font:700 13px Cinzel,Georgia,serif;background:linear-gradient(#1c3150,#0f1d33);color:#f1e6c8;border:1.5px solid #ffd86a77;cursor:pointer}.stab.on{background:linear-gradient(#ffe6a0,#d7a43a);color:#2b1d0e;border-color:#fff1c2}
+.tabs{display:flex;gap:6px;margin:6px 0 10px;flex-wrap:wrap}.stab{flex:1;min-width:90px;padding:9px 6px;border-radius:12px;font:700 13px Cinzel,Georgia,serif;background:linear-gradient(#1c3150,#0f1d33);color:#f1e6c8;border:1.5px solid #ffd86a77;cursor:pointer}.stab.on{border-image-source:var(--b-gold)!important;color:#2e1c05!important;text-shadow:0 1px 0 #fff6!important}
 .doll{position:relative;display:grid;grid-template-columns:1fr 1.3fr 1fr;grid-template-rows:1fr 1fr;gap:8px;align-items:center;max-width:380px;margin:4px auto 6px}
 .dhero{grid-column:2;grid-row:1/3;width:100%;border-radius:50%;border:3px solid #ffd86a88;box-shadow:0 0 22px #ffd86a44}
 .dslot{aspect-ratio:1;border-radius:14px;background:#0008;border:1.5px dashed #ffd86a66;display:grid;place-items:center}.dslot i{font-size:11px;opacity:.6;font-style:normal}.dslot .armi{width:90%;height:90%}
@@ -1559,6 +1559,10 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 @media (max-width:520px){.hbtn{border-width:11px 13px!important}.hrow .hbtn{padding:4px 5px!important;gap:7px!important;min-height:0}.hmenu>.hbtn{padding:6px 8px!important}.hrow .hbtn .hic{width:30px!important;height:30px!important}
   .hrow .hbtn b{font-size:15px!important;line-height:1.12}.hrow .hbtn i{font-size:11.5px!important;line-height:1.15}
   .hbtn span,.hbtn i,.hbtn b{overflow-wrap:normal!important;word-break:normal!important;hyphens:auto}.hmenu>.hbtn b{font-size:19px}.hmenu>.hbtn i{font-size:12.5px}}
+
+/* PC monitors: list screens use the width (more cards per row) */
+@media (min-width:1100px){body[data-scr=shop] .lobby,body[data-scr=inv] .lobby,body[data-scr=profile] .lobby,body[data-scr=stats] .lobby,body[data-scr=howto] .lobby{max-width:1040px}
+  .armsets{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}.armset .armgrid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head><body>
 
@@ -4232,7 +4236,10 @@ function fitLobby(){                                          // menus fit the s
   if(el.classList.contains('haswp')){                          // home: the hero wallpaper gives up space so the menu fits
     const pad=parseFloat(getComputedStyle(el).paddingTop)||0,need=tall()-H;
     if(need>0)el.style.setProperty('padding-top',Math.max(120,pad-need)+'px','important')}
-  const k=H/tall();if(k<1&&k>=.7)el.style.zoom=Math.max(.7,k-.004).toFixed(3)}    // more than 30% too tall → leave it scrollable
+  document.body.dataset.scr=ui.screen||'home';
+  const up=innerWidth>=1100&&innerHeight>=860?Math.min(1.3,innerHeight/820):1;   // big PC monitors: menus grow so they don't look tiny
+  const k=H/tall();if(k<1&&k>=.7)el.style.zoom=Math.max(.7,k-.004).toFixed(3);    // more than 30% too tall → leave it scrollable
+  else if(up>1)el.style.zoom=(k>=1?Math.min(up,k-.004):up).toFixed(3)}
 if(typeof addEventListener!=='undefined')addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(fitLobby,120)});   // refit menus when the screen turns
 function renderLobby(){setTimeout(()=>{if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(fitLobby);setTimeout(fitLobby,450);let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
     if(!b){b=document.createElement('button');b.id='rfbtn';b.setAttribute('aria-label','Reload');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.onclick=reloadApp;document.body.appendChild(b)}
@@ -4270,13 +4277,13 @@ function renderLobby(){setTimeout(()=>{if(typeof requestAnimationFrame!=='undefi
         ${sc==='shop'?(own?'<span class="tag">Owned</span>':`<button class="btn sm pri" data-buy="${id}" ${drachma()>=R.pr?'':'disabled'}>${R.pr} ◉</button>`)
           :`<button class="btn sm ${on?'':'pri'}" data-wear="${id}">${on?'Take off':'Wear'}</button>`}</div>`};
     const sets=only=>Object.keys(ARM_SETS).map(set=>{const ids=Object.keys(ARM_SLOTS).map(sl=>armId(set,sl)).filter(only);if(!ids.length)return '';const S0=ARM_SETS[set];
-      return `<h3 class="rhead" style="color:${S0.c}">${S0.n}${S0.r>=3?' · <small>full set: +1 Ambrosia</small>':''}</h3><div class="armgrid">${ids.map(card).join('')}</div>`}).join('');
+      return `<div class="armset"><h3 class="rhead" style="color:${S0.c}">${S0.n}${S0.r>=3?' · <small>full set: +1 Ambrosia</small>':''}</h3><div class="armgrid">${ids.map(card).join('')}</div></div>`}).join('');
     const coin=`<div class="drbar"><b>${isAdmin()?'∞':drachma()}</b> drachma<small>Earn 20 per game, +40 for a win, +10 per trophy</small></div>`;
     let body='';
     if(sc==='shop'){
       const cos=UNL.filter(u=>['dice','board','frame','title'].includes(u[1])&&!unlocked(P,u[1],u[2]));
       body=`<h2>Shop</h2>${coin}<div class="tabs">${[['armour','Armour'],['packs','Hero packs'],['looks','Looks']].map(([k,n])=>`<button class="stab ${tab===k?'on':''}" data-stab="${k}">${n}</button>`).join('')}</div>
-        ${tab==='armour'?sets(()=>true):tab==='packs'?`<div class="armgrid"><div class="armc own" style="--rc:#ffd86a">${ico('chest','armi')}<b>Hero pack</b><small>1 hero card · 20% chance of a Forever card</small><button class="btn sm pri" data-pack="1" ${drachma()>=250?'':'disabled'}>250 ◉</button></div>
+        ${tab==='armour'?`<div class="armsets">${sets(()=>true)}</div>`:tab==='packs'?`<div class="armgrid"><div class="armc own" style="--rc:#ffd86a">${ico('chest','armi')}<b>Hero pack</b><small>1 hero card · 20% chance of a Forever card</small><button class="btn sm pri" data-pack="1" ${drachma()>=250?'':'disabled'}>250 ◉</button></div>
           <div class="armc own" style="--rc:#ffb02e">${ico('chest','armi')}<b>5 hero packs</b><small>Save 250</small><button class="btn sm pri" data-pack="5" ${drachma()>=1000?'':'disabled'}>1000 ◉</button></div></div>`
         :cos.length?`<div class="armgrid">${cos.map(u=>`<div class="armc own" style="--rc:#c3ccd6">${ico(u[1]==='dice'?'lucky':u[1]==='board'?'map':u[1]==='frame'?'gaegis':'crown','armi')}<b>${u[3]}</b><small>or reach level ${u[0]}</small><button class="btn sm pri" data-cos="${u[1]}:${u[2]}" ${drachma()>=300?'':'disabled'}>300 ◉</button></div>`).join('')}</div>`:'<p class="note">You own every look in the shop.</p>'}`}
     else{
@@ -4289,7 +4296,7 @@ function renderLobby(){setTimeout(()=>{if(typeof requestAnimationFrame!=='undefi
         ${tab==='treasures'?`<div class="armgrid"><div class="armc own" style="--rc:#ffd86a">${ico('chest','armi')}<b>Hero packs ×${isAdmin()?'∞':P.packs||0}</b><button class="btn sm pri" data-scr2="heroes">Open</button></div>
           ${ench.map(([id,n])=>`<div class="armc own" style="--rc:#b07aff"><svg class="armi"><use href="#g-${ENCH[id].i}"></use></svg><b>${ENCH[id].n} ×${n}</b><small>${ENCH[id].d}</small></div>`).join('')}
           <div class="armc own" style="--rc:#c3ccd6">${ico('lucky','armi')}<b>Dice, boards, frames, titles</b><button class="btn sm" data-scr2="profile">Profile</button></div></div>`
-        :(ARM_ALL.some(armOwned)?sets(armOwned):`<p class="note center">No armour yet. <button class="btn sm pri" data-scr2="shop">Visit the shop</button></p>`)}`}
+        :(ARM_ALL.some(armOwned)?`<div class="armsets">${sets(armOwned)}</div>`:`<p class="note center">No armour yet. <button class="btn sm pri" data-scr2="shop">Visit the shop</button></p>`)}`}
     app.innerHTML=`<div class="lobby">${back}<div class="box shopbox">${body}</div></div>`;
     document.getElementById('bBack').onclick=()=>{ui.screen='home';ui.shopTab=null;renderLobby()};
     const save=()=>{saveProf(P);sfx('click');renderLobby()};
