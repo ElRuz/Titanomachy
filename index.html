@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111183642'</script>
+<script>window.BUILD='20261111184801'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1534,7 +1534,7 @@ html:not(:lang(en)) .hc.mythic .hs{font-size:9px;letter-spacing:.02em}
 html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bchip{hyphens:auto;-webkit-hyphens:auto;overflow-wrap:anywhere}
 
 /* Battle Royale war works + fog */
-.works{display:grid;gap:6px;margin-top:6px}.works .wk-h{font:700 12px Cinzel,Georgia,serif;color:#ffd86a;letter-spacing:.04em}
+.works{display:grid;gap:6px;margin-top:6px}.works summary.wk-h{list-style:none;display:flex;gap:8px;align-items:center;justify-content:center;cursor:pointer}.works summary.wk-h::-webkit-details-marker{display:none}.works[open] summary{margin-bottom:6px}.works summary .ic{width:22px;height:22px}
 .btn.wk{display:flex;gap:8px;align-items:center;text-align:left;justify-content:flex-start}.btn.wk small{opacity:.8;font-size:11px;line-height:1.2}
 .fog{pointer-events:none}.wtrap{animation:wtp 1.2s ease-in-out infinite alternate}@keyframes wtp{to{opacity:.55}}
 
@@ -4135,7 +4135,7 @@ function statsHTML(){
 }
 // ======== Home screen + game setup ========
 const PRESETS={
-  br:{n:'Battle Royale',d:'3 god clans of 2 race to the Sanctum',i:'crown',set:{br:true,tw:true,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:true,ev:true,goals:false}}},
+  br:{n:'Battle Royale',d:'3 god clans of 2 race to the Sanctum',i:'crown',set:{timer:60,br:true,tw:true,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:true,ev:true,goals:false}}},
   quick:{n:'Quick',d:'Short game to 8 VP, no extras',i:'road',set:{br:false,tw:false,speed:true,ck:false,tasks:false,friendly:true,rpg:{k:false,ev:false,goals:false}}},
   classic:{n:'Classic',d:'The familiar island game to 10 VP',i:'house',set:{br:false,tw:false,speed:false,ck:false,tasks:false,friendly:true,rpg:{k:false,ev:false,goals:false}}},
   olympus:{n:'Olympus',d:'Gods, heroes, monsters, missions',i:'temple',set:{br:false,tw:false,speed:false,ck:false,tasks:true,friendly:true,rpg:{k:true,ev:true,goals:true}}},
@@ -4382,7 +4382,7 @@ function renderSetup(){
         <output id="vpo">${target()} VP</output>${cfg.vp?'<button class="linkbtn" id="vpauto">auto</button>':'<i>auto</i>'}</div></div>
       <div class="optrow"><b>Length</b><div class="pills">${pill('data-cv','speed:false',cfg.speed,'Normal')}${pill('data-cv','speed:true',cfg.speed,'Speed (−2 VP)')}</div></div>
       <div class="optrow"><b>Dice</b><div class="pills">${pill('data-cv','dice:random',cfg.dice,'True random')}${pill('data-cv','dice:deck',cfg.dice,'Balanced deck')}</div></div>
-      <div class="optrow"><b>Turn timer</b><div class="pills">${[0,60,90,120].map(t=>pill('data-cv','timer:'+t,cfg.timer,t?t+'s':'Off')).join('')}</div></div>
+      <div class="optrow"><b>Turn timer</b><div class="pills">${(cfg.br?[0,40,60,90]:[0,60,90,120]).map(t=>pill('data-cv','timer:'+t,cfg.timer,t?t+'s':'Off')).join('')}</div></div>
       <p class="note">${cfg.dice==='random'?'True random: two fair dice, exactly 1 in 6 per face.':'Balanced deck: all 36 dice results drawn like cards, so the odds even out.'}</p></details>
     <div class="startbar"><span>${cfg.br?'<b>6 players</b> · 3 clans · race to the Sanctum':`<b>${n} players</b> · first to <b>${target()} VP</b>`}</span>
       <button class="btn pri big" id="bStart" ${n<2?'disabled':''}>${online?'Create online game':'Start game'}</button></div>
@@ -5837,7 +5837,7 @@ function drawSheet(){
         ${!S.hmoved?`<button class="btn pri" data-bmode="hmove">Move hero (up to ${lv>=3?3:2} tiles)</button>`:'<span class="note">Moved this turn.</span>'}
         ${S.hacted?'<span class="note">Your hero has acted this turn.</span>':tileActions(me).map(a=>a.k==='battle'?`<button class="btn fightbtn" data-cact="battle">${ico(S.mons[a.mi].t)} Battle the ${MONS[S.mons[a.mi].t].n} (${S.mons[a.mi].hp}/${S.mons[a.mi].max} HP)</button>`
           :a.k==='explore'?`<button class="btn" data-cact="explore">${ico('ruin')} Explore the ruins</button>`
-          :a.k==='works'?`<div class="works"><b class="wk-h">War works — build here (uses your deed)</b>${Object.entries(WORKS).map(([t,W])=>`<button class="btn wk" data-cact="work" data-t="${t}" ${afford(me,W.c)?'':'disabled'}><svg class=gi style="width:26px;height:26px"><use href=#s-w${t}></use></svg><span><b>${W.n}</b> ${tradeTxt(W.c)}<br><small>${W.d}</small></span></button>`).join('')}</div>`
+          :a.k==='works'?`<details class="works"><summary class="btn wk-h">${ico('wtower')} War works — build here (uses your deed)</summary>${Object.entries(WORKS).map(([t,W])=>`<button class="btn wk" data-cact="work" data-t="${t}" ${afford(me,W.c)?'':'disabled'}><svg class=gi style="width:26px;height:26px"><use href=#s-w${t}></use></svg><span><b>${W.n}</b> ${tradeTxt(W.c)}<br><small>${W.d}</small></span></button>`).join('')}</details>`
           :a.k==='sdrop'?`<button class="btn pri" data-cact="sdrop"><svg class=gi style="width:22px;height:22px"><use href=#s-sdrop></use></svg> Open Zeus's supply chest</button>`
           :a.k==='duel'?`<button class="btn" data-cact="duel" data-q="${a.q}">${ico('sword')} Duel ${esc(pname(a.q))}'s hero</button>`
           :a.k==='sink'?`<button class="btn" data-cact="sink" data-q="${a.q}"><svg class=gi><use href=#g-anchor></use></svg> Attack ${esc(pname(a.q))}'s ship</button>`
