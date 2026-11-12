@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111230457'</script>
+<script>window.BUILD='20261111235447'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1583,7 +1583,8 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 .rail .emo{display:grid;place-items:center;font-size:24px;line-height:1}
 
 /* armour cosmetics on the hero */
-.harm{animation:harm 2.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes harm{from{opacity:.75}to{opacity:1;filter:brightness(1.25)}}
+.harm{animation:harm 2.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes harm{from{opacity:.75}to{opacity:1}}
+.bigb #board .harm,.bigb #board .ruinglow,.bigb #board .wtrap,.bigb #board .sdrop circle{animation:none}  /* big boards: no endless repaints */
 .dhero-w{grid-column:2;grid-row:1/3;position:relative;display:grid;place-items:center}.dhero-w .dhero{grid-column:auto;grid-row:auto;position:relative;z-index:1}
 .dhero.armed{border-color:var(--ac);box-shadow:0 0 18px var(--ac),0 0 40px color-mix(in srgb,var(--ac) 50%,#0000)}
 .daura{position:absolute;inset:-22% -30%;width:160%;height:144%;z-index:0;animation:harm 2.4s ease-in-out infinite alternate;pointer-events:none}
@@ -4680,11 +4681,12 @@ function boardSVG(){
       <path d="M-4 6 V0 Q-4 -6 1 -6 L5 -2 L1 -1 L2 6 Z" fill="${k.act?(k.p===2?'#333':'#fff'):c}"/>${[...Array(k.lv)].map((_,j)=>`<circle cx="${(j-(k.lv-1)/2)*5.5}" cy="14" r="2.3" fill="#ffd86a" stroke="#000" stroke-width=".6"/>`).join('')}</g>`}
   // fog of war (Battle Royale): tiles my clan can't see are clouded; enemy heroes there are hidden
   if(SEEN){const hid=HEX.map((h,i)=>i).filter(i=>!SEEN.has(i));if(hid.length){        // undiscovered tiles: deep base, drifting painted mist, gold frame + compass star
-    s+=`<defs><filter id="mistf" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".011 .016" numOctaves="3" seed="7"/><feColorMatrix values="0 0 0 0 .78  0 0 0 0 .85  0 0 0 0 .95  0 0 0 1.6 -.45"/><feComposite in2="SourceGraphic" operator="in"/></filter>
-      <radialGradient id="fogbase"><stop offset="0" stop-color="#2b4566"/><stop offset="1" stop-color="#0c1a2e"/></radialGradient></defs>`;
-    s+=`<g class="fog">${hid.map(i=>`<polygon points="${hexPts(HEX[i].x,HEX[i].y,R+.5)}" fill="url(#fogbase)"/>`).join('')}</g>`;
-    s+=`<g class="fog fogmist" filter="url(#mistf)">${hid.map(i=>`<polygon points="${hexPts(HEX[i].x,HEX[i].y,R)}" fill="#fff"/>`).join('')}</g>`;
-    s+=`<g class="fog">${hid.map(i=>`<use href="#s-fogframe" x="${HEX[i].x-R*S3/2}" y="${HEX[i].y-R}" width="${R*S3}" height="${2*R}" opacity=".9"/>`).join('')}</g>`}}
+    // every hidden tile is drawn identically from one cached symbol: no SVG filters (feTurbulence made phones lag/overheat)
+    s+=`<defs><radialGradient id="fogbase"><stop offset="0" stop-color="#2b4566"/><stop offset="1" stop-color="#0c1a2e"/></radialGradient>
+      <radialGradient id="fogpuff"><stop offset="0" stop-color="#dfe8f5" stop-opacity=".55"/><stop offset="1" stop-color="#dfe8f5" stop-opacity="0"/></radialGradient>
+      <symbol id="fogtile" viewBox="${-R*S3/2} ${-R} ${R*S3} ${2*R}" overflow="visible"><polygon points="${hexPts(0,0,R+.5)}" fill="url(#fogbase)"/>
+        <ellipse cx="${-R*.28}" cy="${-R*.22}" rx="${R*.55}" ry="${R*.3}" fill="url(#fogpuff)"/><ellipse cx="${R*.3}" cy="${R*.25}" rx="${R*.5}" ry="${R*.28}" fill="url(#fogpuff)"/></symbol></defs>`;
+    s+=`<g class="fog">${hid.map(i=>`<use href="#fogtile" x="${HEX[i].x-R*S3/2}" y="${HEX[i].y-R}" width="${R*S3}" height="${2*R}"/><use href="#s-fogframe" x="${HEX[i].x-R*S3/2}" y="${HEX[i].y-R}" width="${R*S3}" height="${2*R}" opacity=".9"/>`).join('')}</g>`}}
   // champions: shield in the owner's colour, numbered by level, red ring when hurt
   if(S.rpg&&S.rpg.k)S.seats.forEach((_,p)=>{const pl=S.pl[p];if(pl.hx<0)return;if(SEEN&&pl.hx<1000&&!SEEN.has(pl.hx)&&!sameClan(p,me)&&p!==me)return;const h=cellOf(pl.hx);if(!h)return;
     if(pl.hx>=1000)s+=`<use href="#s-ship" x="${h.x-26}" y="${h.y-12}" width="52" height="52"/>`;   // sailing: hero rides a ship
@@ -4719,6 +4721,9 @@ function boardSVG(){
   if(ui.d3){                                                    // tilt the whole table inside the SVG (2D math: exact taps on every phone)
     const b=VBOX.split(' ').map(Number),cy=b[1]+b[3]*.6,k=.8,i=s.indexOf('>')+1;
     s=s.slice(0,i)+`<g transform="translate(0 ${(cy*(1-k)).toFixed(1)}) scale(1 ${k})">`+s.slice(i).replace(/<g transform="translate\(([^)]*)\)" filter="url\(#f-shadow\)"/g,`<g transform="translate($1) scale(1 ${(1/k).toFixed(3)})" filter="url(#f-shadow)"`)+`</g>`}
+  // big boards (Battle Royale / Titan War): drop blurred drop-shadow filters on tokens; phones repaint far faster and stay cool
+  const big=HEX.length>40;if(big)s=s.replace(/ filter="url\(#f-shadow\)"/g,'');
+  if(typeof document!=='undefined')document.body.classList.toggle('bigb',big);
   return s+`</svg>`;
 }
 
