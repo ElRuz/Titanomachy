@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261111184801'</script>
+<script>window.BUILD='20261111190020'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1551,6 +1551,14 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 .dhero{grid-column:2;grid-row:1/3;width:100%;border-radius:50%;border:3px solid #ffd86a88;box-shadow:0 0 22px #ffd86a44}
 .dslot{aspect-ratio:1;border-radius:14px;background:#0008;border:1.5px dashed #ffd86a66;display:grid;place-items:center}.dslot i{font-size:11px;opacity:.6;font-style:normal}.dslot .armi{width:90%;height:90%}
 .s-helm{grid-column:1;grid-row:1}.s-body{grid-column:1;grid-row:2}.s-shield{grid-column:3;grid-row:1}.s-weapon{grid-column:3;grid-row:2}
+
+/* short phones: tighter home menu so it fits without scrolling */
+@media (max-height:760px){.hmenu{gap:7px}.hrow{gap:7px}.hbtn{padding:9px 12px;gap:10px}.home{gap:10px;padding-block:14px 16px}.hbtn .hic{width:30px;height:30px}}
+
+/* phones: compact two-column home buttons, whole words on one line (no "Inventor-y") */
+@media (max-width:520px){.hbtn{border-width:11px 13px!important}.hrow .hbtn{padding:4px 5px!important;gap:7px!important;min-height:0}.hmenu>.hbtn{padding:6px 8px!important}.hrow .hbtn .hic{width:30px!important;height:30px!important}
+  .hrow .hbtn b{font-size:15px!important;line-height:1.12}.hrow .hbtn i{font-size:11.5px!important;line-height:1.15}
+  .hbtn span,.hbtn i,.hbtn b{overflow-wrap:normal!important;word-break:normal!important;hyphens:auto}.hmenu>.hbtn b{font-size:19px}.hmenu>.hbtn i{font-size:12.5px}}
 </style>
 </head><body>
 
@@ -4218,7 +4226,15 @@ function heroesHTML(){                                         // the collection
 const isApp=()=>{try{return navigator.standalone||matchMedia('(display-mode: standalone)').matches}catch(e){return false}};   // opened from the home screen
 function reloadApp(){toast('Reloading…');setTimeout(()=>location.reload(),250)}
 const FIGHT_URL=typeof location!=='undefined'&&/github\.io$/.test(location.hostname)?'fight/':'https://claude.ai/artifact/Vjaz9u5XCR8umuSDQJzVX7';   // TEMP fight test link
-function renderLobby(){setTimeout(()=>{let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
+function fitLobby(){                                          // menus fit the screen: shrink a little instead of scrolling; long lists still scroll
+  const el=document.querySelector('#app>div');if(!el||(S&&S.phase))return;el.style.zoom='';el.style.paddingTop='';
+  const H=innerHeight-2,tall=()=>Math.max(...[...el.children].map(c=>c.getBoundingClientRect().bottom))+scrollY+(parseFloat(getComputedStyle(el).paddingBottom)||0);   // where the content really ends
+  if(el.classList.contains('haswp')){                          // home: the hero wallpaper gives up space so the menu fits
+    const pad=parseFloat(getComputedStyle(el).paddingTop)||0,need=tall()-H;
+    if(need>0)el.style.setProperty('padding-top',Math.max(120,pad-need)+'px','important')}
+  const k=H/tall();if(k<1&&k>=.7)el.style.zoom=Math.max(.7,k-.004).toFixed(3)}    // more than 30% too tall → leave it scrollable
+addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(fitLobby,120)});
+function renderLobby(){setTimeout(()=>{requestAnimationFrame(fitLobby);setTimeout(fitLobby,450);let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
     if(!b){b=document.createElement('button');b.id='rfbtn';b.setAttribute('aria-label','Reload');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.onclick=reloadApp;document.body.appendChild(b)}
     b.hidden=!!(S&&S.phase)},0);
   document.querySelectorAll('.evcard,.godpop,.bigroll,.taskpop,#tipcard,#coachring,#coachtip,#toasts>*').forEach(e=>e.remove());   // no game pop-ups over the menus
