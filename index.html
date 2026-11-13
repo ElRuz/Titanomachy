@@ -5,12 +5,14 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261113122532'</script>
+<script>window.BUILD='20261113125611'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Alegreya+Sans:wght@500;700;800;900&display=swap">
 <style>
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}   /* iPhone: no text zoom when the phone turns */
+
 /* Layout: wooden game table — board is the hero, player rail on top, hand + actions below (side panel on wide screens) */
 :root{
   --table:#1d1611; --panel:#2b2119; --panel2:#3a2d22; --line:#5a4632;
@@ -1503,6 +1505,10 @@ body.mgopen .stage *,body.mgopen .stage{animation-play-state:paused!important}
 .feedtick.on{opacity:1;translate:-50% 0;pointer-events:auto}
 .banner.open~.feedtick{display:none}                              /* the open feed already shows it */
 .feedtick.k-alert{border-color:#e0452f;background:#2a0d10ee}.feedtick.k-tip{border-color:#7fd1ff}.feedtick.k-god{border-color:var(--gc,#ffd86a)}
+@media (orientation:landscape) and (max-height:520px){                   /* phone turned sideways: top row (timer · supply · 3D) stays clear, story pill and tips sit below it, smaller */
+  .stage .banner{top:52px!important;bottom:auto!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;max-width:62%!important;gap:4px!important}
+  .stage .banner .bchip{font-size:11px!important;padding:2px 7px 2px 4px!important}
+  .feedtick{max-width:56%!important;font-size:11.5px!important;line-height:1.25!important;padding:4px 8px!important}}
 .feedtick .tipx{margin-left:6px;border:0;background:#fff2;color:#fff;border-radius:6px;padding:0 6px}
 .banner .fcnt{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:3px;border-radius:9px;background:#e0452f;color:#fff;font:800 11px system-ui;padding:0 4px}
 .banner .fhide{padding:4px 9px!important}
@@ -4385,7 +4391,10 @@ function fitLobby(){                                          // menus fit the s
   const up=innerWidth>=1100&&innerHeight>=860?Math.min(1.3,innerHeight/820):1;   // big PC monitors: menus grow so they don't look tiny
   const k=H/tall();if(k<1&&k>=.7)el.style.zoom=Math.max(.7,k-.004).toFixed(3);    // more than 30% too tall → leave it scrollable
   else if(up>1)el.style.zoom=(k>=1?Math.min(up,k-.004):up).toFixed(3)}
-if(typeof addEventListener!=='undefined')addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(fitLobby,120)});   // refit menus when the screen turns
+/* phone turned: iPhones report the new size late, so refit menus, board and hints a few times while it settles */
+function refitAll(){[0,150,400,800].forEach(t=>setTimeout(()=>{fitLobby();if(ui.zapply&&document.getElementById('board'))ui.zapply();if(typeof placeCoach==='function')placeCoach()},t))}
+if(typeof addEventListener!=='undefined'){addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(refitAll,60)});addEventListener('orientationchange',refitAll);
+  if(typeof visualViewport!=='undefined'&&visualViewport)visualViewport.addEventListener('resize',()=>{clearTimeout(fitLobby.t);fitLobby.t=setTimeout(refitAll,60)})}
 function renderLobby(){setTimeout(()=>{if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(fitLobby);setTimeout(fitLobby,450);let b=document.getElementById('rfbtn');                                 // ↻ button on every menu screen
     if(!b){b=document.createElement('button');b.id='rfbtn';b.setAttribute('aria-label','Reload');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';b.onclick=reloadApp;document.body.appendChild(b)}
     b.hidden=!!(S&&S.phase)},0);
