@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261113125611'</script>
+<script>window.BUILD='20261113173448'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1811,7 +1811,7 @@ function syncMode(){
 }
 const RNAME={brick:'Clay',lumber:'Timber',wool:'Fleece',grain:'Wheat',ore:'Marble',ambrosia:'Ambrosia',desert:'Tartarus',shrine:'Olympus Shrine',forge:'Forge of Hephaestus',vault:'Treasure Vault',capital:'Capital',paper:'Papyrus',cloth:'Linen',coin:'Silver'};
 const RCOL={brick:'#e0602f',lumber:'#1f9a4b',wool:'#86c932',grain:'#f2b01c',ore:'#7f93ad',ambrosia:'#a24fe0',paper:'#b08a4e',cloth:'#4d8fd6',coin:'#9aa6b2'};
-const COST={road:{brick:1,lumber:1},settle:{brick:1,lumber:1,wool:1,grain:1},city:{grain:2,ore:2,brick:1},dev:{wool:1,ore:1,lumber:1},
+const COST={road:{brick:1,lumber:1},ship:{lumber:1,wool:1},settle:{brick:1,lumber:1,wool:1,grain:1},city:{grain:2,ore:2,brick:1},dev:{wool:1,ore:1,lumber:1},
   knight:{wool:1,ore:1},kup:{wool:1,ore:1},kact:{grain:1}};
 // ---------- Polis & Phalanx ----------
 const TRK={trade:{n:'Trade',com:'cloth',col:'#d9a92e',ab:'Trading House: trade commodities 2:1 with the bank'},
@@ -2019,7 +2019,7 @@ const ACH=[
   ['hoard','Midas Touch','Hold 15+ cards at once',x=>x.maxCards>=15],
   ['blitz','Marathon','Win in 12 rounds or fewer',(x,r)=>x.won&&Math.ceil(r.turns/r.players.length)<=12],
   ['lucky','Darling of Tyche','Collect 60+ cards from dice in one game',x=>x.got>=60],
-  ['bridge','Bridge of the Gods','Build 2 bridge roads in one game',x=>x.bridges>=2],
+  ['bridge','Admiral of the Aegean','Launch 3 ships in one game',x=>(x.ships||0)>=3||x.bridges>=2],
   ['favour','Blessed','Earn Divine Favour 4 times in one game',x=>x.favour>=4],
   ['slayer','Labours of Heracles','Defeat 3 monsters in one game',x=>x.kills>=3],
   ['quester','Argonaut','Explore 3 ruins in one game',x=>x.quests>=3],
@@ -2035,7 +2035,8 @@ const d6=()=>rnd(6)+1;
 
 // ---------- Board geometry (pointy-top hexes, radius-2 island) ----------
 const R=56,S3=Math.sqrt(3);
-// ---------- Board geometry: 'arch' = three islands joined by stone bridges; 'classic' = games saved earlier ----------
+// ---------- Board geometry: 'arch' = three islands (ships cross the straits); 'classic' = games saved earlier ----------
+const SEAX=[];                                               // classic: sea hexes next to land (ship lanes)
 const HEX=[],V=[],E=[],HN=[],HADJ0=[],HADJ=[],COAST=[],PORTS=[],TWC=[],ROUTES=[],RSET=new Set(),XADJ=[],WH=[],NB={};/* WH: sea hexes (cell id 1000+j); NB: hero travel graph */let vmap={},emap={},GEO='',SEA='',VBOX='';
 const SHIPC={lumber:1,wool:1};                                 // a ship: Timber + Fleece
 const BARREN=new Set(['desert','shrine','forge','vault','capital']);   // tiles that never produce
@@ -2045,7 +2046,7 @@ const TWLAY={'12x':[[-6,1],[6,-6],[1,6],[-6,4],[3,-6],[4,3],[-3,1],[3,-3],[1,3],
 const HDIR=[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
 function buildGeo(shape){
   if(GEO===shape)return;GEO=shape;
-  [HEX,V,E,HN,HADJ0,HADJ,COAST,PORTS,TWC,ROUTES,XADJ,WH].forEach(a=>a.length=0);RSET.clear();for(const k in NB)delete NB[k];vmap={};emap={};
+  [HEX,V,E,HN,HADJ0,HADJ,COAST,PORTS,TWC,ROUTES,XADJ,WH,SEAX].forEach(a=>a.length=0);RSET.clear();for(const k in NB)delete NB[k];vmap={};emap={};
   const ax=[],tw=shape.startsWith('tw'),tn=tw?parseInt(shape.slice(2)):0;
   if(tw){TWLAY[shape.slice(2)in TWLAY?shape.slice(2):tn].forEach(([q,r],k)=>{TWC.push(ax.length);ax.push([q,r,k]);HDIR.forEach(([a,b])=>ax.push([q+a,r+b,k]))});   // island k belongs to seat k
     [[0,0],[1,0],[0,1]].forEach(([q,r])=>ax.push([q,r,tn]));
@@ -2067,9 +2068,17 @@ function buildGeo(shape){
       E[emap[k]].h.push(hi);h.e.push(emap[k]);
     }
   });
+  if(shape==='arch'||shape==='arch5'){                         // the sea around and between the islands: its corners and edges join the board (no land hexes on them)
+    const land=new Set(HEX.map(h=>h.q+','+h.r));HEX.forEach(h=>HDIR.forEach(([a,b])=>{const q=h.q+a,r=h.r+b,k=q+','+r;if(land.has(k)||SEAX.some(w=>w.q===q&&w.r===r))return;SEAX.push({q,r,x:R*S3*(q+r/2),y:R*1.5*r})}));
+    SEAX.forEach(w=>{const ids=[];
+      for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30),x=w.x+R*Math.cos(a),y=w.y+R*Math.sin(a),k=Math.round(x)+','+Math.round(y);
+        if(vmap[k]==null){vmap[k]=V.length;V.push({x,y,h:[],adj:[],e:[]})}ids.push(vmap[k])}
+      for(let i=0;i<6;i++){const a=Math.min(ids[i],ids[(i+1)%6]),b=Math.max(ids[i],ids[(i+1)%6]),k=a+'-'+b;
+        if(emap[k]==null){emap[k]=E.length;E.push({a,b,h:[]});V[a].adj.push(b);V[b].adj.push(a);V[a].e.push(emap[k]);V[b].e.push(emap[k])}
+        E[emap[k]].sea=1}})}                                      // sea:1 = a ship may sail here (coast edges have one land hex, open-sea edges none)
   let cx=HEX.reduce((t,h)=>t+h.x,0)/HEX.length,cy=HEX.reduce((t,h)=>t+h.y,0)/HEX.length;   // centre the land
   if(shape==='tw12x'){const O=HEX.filter(h=>h.isl===12);if(O.length){cx=O.reduce((t,h)=>t+h.x,0)/O.length;cy=O.reduce((t,h)=>t+h.y,0)/O.length}}   // Royale: the Sanctum island sits in the exact middle
-  HEX.concat(V).forEach(o=>{o.x-=cx;o.y-=cy});
+  HEX.concat(V,SEAX).forEach(o=>{o.x-=cx;o.y-=cy});
   E.forEach(e=>{if(e.h.length===2)HN.push(e.h)});
   HEX.forEach(()=>{HADJ0.push([]);HADJ.push([])});
   HN.forEach(([a,b])=>{HADJ0[a].push(b);HADJ0[b].push(a);HADJ[a].push(b);HADJ[b].push(a)});
@@ -2091,14 +2100,12 @@ function buildGeo(shape){
   }
   if(shape==='classic'){[0,3,6,10,13,16,20,23,26].forEach(k=>PORTS.push(COAST[k]));SEA=[0,1,2,3,4,5].map(i=>{const a=Math.PI/3*i;return (318*Math.cos(a)).toFixed(1)+','+(318*Math.sin(a)).toFixed(1)}).join(' ');VBOX='-335 -300 670 600';return}
   if(shape==='arch'||shape==='arch5'){
-  // stone bridges: 2 per pair of islands, across the narrow strait, as far apart as possible
-  const isl=v=>HEX[V[v].h[0]].isl,cand={},bv=new Set();
-  V.forEach((a,i)=>{if(a.h.length>2)return;V.forEach((b,j)=>{if(j<=i||b.h.length>2||isl(i)===isl(j))return;
-    if(Math.abs(Math.hypot(a.x-b.x,a.y-b.y)-R*S3)<2){const k=isl(i)+'-'+isl(j);(cand[k]=cand[k]||[]).push([i,j])}})});
-  Object.keys(cand).sort().forEach(k=>{const c=cand[k],m=([i,j])=>[(V[i].x+V[j].x)/2,(V[i].y+V[j].y)/2];let best=null,bd=-1;
-    c.forEach(x=>c.forEach(y=>{const [a,b]=m(x),[d,e]=m(y),dd=Math.hypot(a-d,b-e);if(dd>bd){bd=dd;best=[x,y]}}));
-    best.forEach(([a,b])=>{const n=E.length;E.push({a,b,h:[],br:1});V[a].e.push(n);V[b].e.push(n);bv.add(a);bv.add(b);
-      const ha=V[a].h[0],hb=V[b].h[0];HADJ[ha].push(hb);HADJ[hb].push(ha)})});
+  // no bridges: ships cross the straits. Heroes sail one sea route per pair of neighbouring islands
+  const bv=new Set(),hd=(a,b)=>(Math.abs(a.q-b.q)+Math.abs(a.r-b.r)+Math.abs(a.q+a.r-b.q-b.r))/2,best={};
+  HEX.forEach((a,i)=>HEX.forEach((b,j)=>{if(j<=i||a.isl===b.isl||hd(a,b)!==2)return;const key=Math.min(a.isl,b.isl)+'-'+Math.max(a.isl,b.isl);
+    const ca=HEX.filter(h=>h.isl===a.isl),cb=HEX.filter(h=>h.isl===b.isl),mx=(ca.reduce((t,h)=>t+h.x,0)/ca.length+cb.reduce((t,h)=>t+h.x,0)/cb.length)/2,my=(ca.reduce((t,h)=>t+h.y,0)/ca.length+cb.reduce((t,h)=>t+h.y,0)/cb.length)/2;
+    const sc=Math.hypot((a.x+b.x)/2-mx,(a.y+b.y)/2-my);if(!best[key]||sc<best[key][2])best[key]=[i,j,sc]}));
+  Object.values(best).forEach(([i,j])=>{ROUTES.push([i,j]);RSET.add(i+'-'+j);RSET.add(j+'-'+i);HADJ[i].push(j);HADJ[j].push(i)});
   // harbours on the outer shore of each island: 3 each (3 islands) / 2 each (5 islands)
   const NI=shape==='arch5'?5:3,OFF=NI===5?[-.8,.8]:[-1.4,0,1.4];
   [...Array(NI).keys()].forEach(k=>{const hs=HEX.filter(h=>h.isl===k),ix=hs.reduce((t,h)=>t+h.x,0)/hs.length,iy=hs.reduce((t,h)=>t+h.y,0)/hs.length,out=Math.atan2(iy,ix);
@@ -2111,7 +2118,7 @@ function buildGeo(shape){
   if(shape==='tw12x')d.fill(Math.max(...d));                  // Royale: a regular sea frame centred on the Sanctum
   const Pt=N.map((n,i)=>{const m=N[(i+1)%6],dt=n[0]*m[1]-n[1]*m[0],d2=d[(i+1)%6];return [(d[i]*m[1]-n[1]*d2)/dt,(n[0]*d2-d[i]*m[0])/dt]});
   SEA=Pt.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
-  const vx=V.map(v=>v.x),vy=V.map(v=>v.y),pad=40;   // tight: the islands fill the basin              // view = land + harbour badges (the sea frame may run off the edge)
+  const LV=V.filter(v=>v.h.length),vx=LV.map(v=>v.x),vy=LV.map(v=>v.y),pad=SEAX.length?56:40;   // frame the land (sea lanes peek in at the edges)   // tight: the islands fill the basin              // view = land + harbour badges (the sea frame may run off the edge)
   VBOX=[Math.min(...vx)-pad,Math.min(...vy)-pad,Math.max(...vx)-Math.min(...vx)+2*pad,Math.max(...vy)-Math.min(...vy)+2*pad].map(x=>x.toFixed(0)).join(' ');
   if(shape==='tw12x'){const hw=Math.max(...vx.map(Math.abs))+pad,hh=Math.max(...vy.map(Math.abs))+pad;VBOX=[-hw,-hh,2*hw,2*hh].map(x=>x.toFixed(0)).join(' ')}   // symmetric view around the Sanctum
   if(tw&&shape.endsWith('x')){                                // sea hexes fill the frame; heroes count their steps on them
@@ -2546,7 +2553,7 @@ function newState(cfg){
     ck:!!cfg.ck,rpg,
     hexes:b.tl.map((r,i)=>({r,n:b.n[i]})),robber:b.rob??b.tl.indexOf('desert'),ports:b.ports,
     tasks:!!cfg.tasks,tdrawn:false,
-    vb:{},er:{},pl:cfg.seats.map((s,i)=>({tasks:[],offers:[],res:z(),dev:[],kn:0,rd:15,st:5,ct:4,bonus:0,xp:0,cloak:0,
+    vb:{},er:{},es:{},sea:GEO==='arch'||GEO==='arch5',pl:cfg.seats.map((s,i)=>({tasks:[],offers:[],res:z(),dev:[],kn:0,rd:15,sh:15,st:5,ct:4,bonus:0,xp:0,cloak:0,
       hero:s.hero&&HEROES[s.hero]?s.hero:hk[rnd(hk.length)],imp:{trade:0,politics:0,science:0},prog:[],relics:[],hx:-1,cap:-1,hp:HPMAX,gold:0,ren:0,court:null,goal:rpg.goals?{t:gk[i%gk.length],done:false}:null})),
     bank:Object.fromEntries(RES.map(r=>[r,r==='ambrosia'?(n>4?14:10):COMS.includes(r)?(n>4?16:12):(n>4?24:19)])),deck:shuffle(deck),   // 5–6 players: 24 of each card
     temples:pickTemples(b),prayed:false,ares:-1,
@@ -2555,7 +2562,7 @@ function newState(cfg){
     rolled:false,roll:null,rollN:0,dq:[],free:0,devDone:false,trade:null,victims:[],
     log:[],fx:[],fxN:0,stats:Array(13).fill(0),ddeck:[],lr:-1,la:-1,turn:1,winner:-1,botActs:0,
     timer:cfg.timer||0,friendly:!!cfg.friendly,speed:!!cfg.speed,tStart:Date.now(),mk:null,say:null,botOffers:0,recorded:false,
-    tr:cfg.seats.map(()=>({bridges:0,favour:0,robbed:0,stole:0,trades:0,mono:0,maxCards:0,cities:0,got:0,roads:0,builds:0,kills:0,kbuilt:0,quests:0,defend:0}))   // per-player stats for history & achievements
+    tr:cfg.seats.map(()=>({bridges:0,ships:0,favour:0,robbed:0,stole:0,trades:0,mono:0,maxCards:0,cities:0,got:0,roads:0,builds:0,kills:0,kbuilt:0,quests:0,defend:0}))   // per-player stats for history & achievements
   };
 }
 
@@ -2570,18 +2577,25 @@ function rollDice(){
 
 // ---------- Placement rules ----------
 function canSettle(p,v,setup){
+  if(!V[v].h.length)return false;                               // open-sea corner: nothing to build on
   if(S.vb[v]||S.kn[v]||V[v].adj.some(u=>S.vb[u]))return false;   // distance rule; hoplites also occupy corners
   if(S.tw&&!twCanBuild(p,V[v].h))return false;                 // Titan War: build only on islands you hold
   if(!setup&&sieged(p,[v]))return false;                        // siege camp blocks home-island building
-  return setup||V[v].e.some(e=>S.er[e]===p);
+  return setup||V[v].e.some(e=>S.er[e]===p||(S.es&&S.es[e]===p));   // reached by your road or your ship
 }
 function canRoad(p,e,setup){
-  if(S.er[e]!=null)return false;
+  if(S.er[e]!=null||!E[e].h.length||(S.es&&S.es[e]!=null))return false;   // roads need land on one side, and no ship there
   if(S.tw&&!twCanBuild(p,E[e].h))return false;
   const {a,b}=E[e];
   if(!setup&&sieged(p,[a,b]))return false;                      // siege camp blocks home-island roads
   if(setup)return a===S.last||b===S.last;
   return [a,b].some(v=>{const bd=S.vb[v]||S.kn[v];if(bd)return bd.p===p;return V[v].e.some(x=>x!==e&&S.er[x]===p)});
+}
+// ships (classic): on any edge that touches the sea; they grow from your own village/city or from your last ship (roads and ships meet only at a village)
+function shipOK(p,e){
+  if(!S.sea||!S.es||S.es[e]!=null||S.er[e]!=null||!E[e].sea||E[e].h.length>1)return false;
+  const {a,b}=E[e];
+  return [a,b].some(v=>{const bd=S.vb[v]||S.kn[v];if(bd)return !!S.vb[v]&&bd.p===p;return V[v].e.some(x=>x!==e&&S.es[x]===p)});
 }
 // Friendly robber: cannot block a tile touching an opponent with 2 points or fewer
 const robOK=(p,h)=>h!==S.robber&&!(S.friendly&&HEX[h].v.some(v=>S.vb[v]&&S.vb[v].p!==p&&vp(S.vb[v].p)<=2));
@@ -2598,12 +2612,14 @@ const freeSpot=v=>!S.vb[v]&&!S.kn[v]&&!V[v].adj.some(u=>S.vb[u]);
 // ---------- Longest road / largest army ----------
 function roadLen(p){
   let best=0;
-  const dfs=(v,used,len)=>{
+  const ES=S.es||{},kind=e=>S.er[e]===p?'r':ES[e]===p?'s':null;   // trade route: roads and ships
+  const dfs=(v,used,len,ty)=>{
     best=Math.max(best,len);
-    const b=S.vb[v]||S.kn[v];if(len>0&&b&&b.p!==p)return;          // opponent building breaks the road
-    for(const e of V[v].e){if(S.er[e]!==p||used.has(e))continue;used.add(e);dfs(E[e].a===v?E[e].b:E[e].a,used,len+1);used.delete(e)}
+    const b=S.vb[v]||S.kn[v];if(len>0&&b&&b.p!==p)return;          // opponent building breaks the route
+    const port=!!(S.vb[v]&&S.vb[v].p===p);                         // road ↔ ship only through your own village/city
+    for(const e of V[v].e){const t=kind(e);if(!t||used.has(e)||(ty&&t!==ty&&!port))continue;used.add(e);dfs(E[e].a===v?E[e].b:E[e].a,used,len+1,t);used.delete(e)}
   };
-  for(const e in S.er)if(S.er[e]===p){dfs(E[e].a,new Set(),0);dfs(E[e].b,new Set(),0)}
+  for(const e of [...Object.keys(S.er),...Object.keys(ES)])if(kind(e)){dfs(E[e].a,new Set(),0,null);dfs(E[e].b,new Set(),0,null)}
   return best;
 }
 function updLR(){
@@ -3122,8 +3138,9 @@ const RULES={
       S.er[id]=p;if(E[id].br)S.tr[p].bridges=(S.tr[p].bridges||0)+1;pl.rd--;S.free--;S.tr[p].roads++;xp(p,1);if(S.free<=0||pl.rd<1)S.sub=null;updLR();checkWin(p);return;
     }
     if(!S.rolled||S.sub)return bad('Roll the dice first');
-    if(besieger(p)>=0&&onHome(p,k==='road'?[E[id].a,E[id].b]:[+id]))return bad(`Your island is under siege by ${pname(besieger(p))} — break the siege first`);
+    if(besieger(p)>=0&&onHome(p,k==='road'||k==='ship'?[E[id].a,E[id].b]:[+id]))return bad(`Your island is under siege by ${pname(besieger(p))} — break the siege first`);
     if(k==='road'){const c=costFor(p,'road');if(pl.rd<1||!canRoad(p,id)||!afford(p,c))return bad("Can't build a road there");pay(p,c);S.er[id]=p;if(E[id].br)S.tr[p].bridges=(S.tr[p].bridges||0)+1;pl.rd--;S.tr[p].roads++;xp(p,1);log(`<b>${pname(p)}</b> built a ${E[id].br?'bridge road':'road'}`)}
+    else if(k==='ship'){const c=COST.ship;if(!S.sea||(pl.sh??15)<1||!shipOK(p,id)||!afford(p,c))return bad("Can't launch a ship there");pay(p,c);S.es[id]=p;pl.sh=(pl.sh??15)-1;S.tr[p].ships=(S.tr[p].ships||0)+1;xp(p,1);log(`<b>${pname(p)}</b> launched a ship`)}
     else if(k==='settle'){const c=costFor(p,'settle');if(pl.st<1||!canSettle(p,id)||!afford(p,c))return bad("Can't settle there");pay(p,c);S.tr[p].builds++;xp(p,3);S.vb[id]={p,c:0};pl.st--;twClaim(p,id);log(`<b>${pname(p)}</b> built a village`)}
     else if(k==='city'){const b=S.vb[id],free=S.freeCity===p;if(!b||b.p!==p||b.c||pl.ct<1||(!free&&!afford(p,COST.city)))return bad("Can't upgrade that");if(free)S.freeCity=-1;else pay(p,COST.city);S.tr[p].builds++;xp(p,4);b.c=1;pl.ct--;pl.st++;S.tr[p].cities++;say(p,'city');log(`<b>${pname(p)}</b> built a city`)}
     S.built=(S.built||0)+1;                                   // Divine Favour: 2 builds in one turn = +1 Ambrosia
@@ -3650,6 +3667,13 @@ function botTarget(p){
   return S.ck?(Object.values(S.kn).filter(k=>k.p===p).length<6?'knight':'city'):'dev';
 }
 function needs(p){const c=costFor(p,botTarget(p)),m=z();RES.forEach(r=>m[r]=Math.max(0,(c[r]||0)-S.pl[p].res[r]));return m}
+/* ships: the best edge toward a valuable free corner across the water (its value fades ×0.7 per sea step) */
+function shipPlan(p,lvl){
+  if(!S.sea||(S.pl[p].sh??15)<1)return null;const c=E.map((_,e)=>e).filter(e=>shipOK(p,e));if(!c.length)return null;
+  let f=V.map((_,u)=>V[u].h.length&&freeSpot(u)?vScore(p,u,lvl):0);
+  for(let k=0;k<5;k++){const g=f.slice();E.forEach(e=>{if(!e.sea)return;g[e.a]=Math.max(g[e.a],f[e.b]*.7);g[e.b]=Math.max(g[e.b],f[e.a]*.7)});f=g}
+  const sc=e=>Math.max(f[E[e].a],f[E[e].b]),e=pickBest(c,e=>sc(e)+rnd(10)/40,lvl);return e!=null&&sc(e)>0?{e,v:sc(e)}:null}
+function roadValue(p,lvl,e){const sv=u=>freeSpot(u)&&V[u].h.length?vScore(p,u,lvl):0,end=w=>Math.max(sv(w),.75*Math.max(0,...V[w].adj.map(sv)));return e==null?0:Math.max(end(E[e].a),end(E[e].b))}
 function bestRoad(p,lvl,setup){
   const sv=u=>freeSpot(u)?vScore(p,u,lvl):0;
   const end=w=>Math.max(sv(w),.75*Math.max(0,...V[w].adj.map(sv)));
@@ -3875,6 +3899,8 @@ function botStep(p){
   }
   const tgt=botTarget(p);
   const ex=botExtras(p,lvl,spots,myS);if(ex)return ex();
+  if(!spots.length&&tgt!=='city'&&afford(p,COST.ship)){const sp=shipPlan(p,lvl);   // no land left to reach by road: sail for the next island
+    if(sp&&(pl.rd<1||!afford(p,costFor(p,'road'))||sp.v>roadValue(p,lvl,bestRoad(p,lvl))*1.05))return A('place',{k:'ship',id:sp.e})}
   if(pl.rd>0&&(!spots.length||(per(p).road>1&&rnd(2)===0))&&tgt!=='city'&&afford(p,costFor(p,'road'))){const e=bestRoad(p,lvl);if(e!=null)return A('place',{k:'road',id:e})}
   // --- post an offer to the table (traders do this a lot) ---
   if(lvl>0&&S.botOffers<per(p).offers){
@@ -4649,13 +4675,27 @@ function morphBoard(html){
   pool.forEach(arr=>arr.forEach(o=>{if(o.parentNode===old)o.remove()}));                               // drop pieces that are gone
   old.__html=html;
 }
+/* trireme seen from the side: wooden hull with a band in the player's colour, painted eye, bronze ram, oars, square sail in the player's colour */
+function shipSVG(e,c){const {a,b}=E[e],A=V[a],B=V[b],x=(A.x+B.x)/2,y=(A.y+B.y)/2;let an=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;
+  if(an>90)an-=180;if(an<=-90)an+=180;const tilt=Math.max(-22,Math.min(22,an*.4)),fl=(e%2)?-1:1,dk=`color-mix(in srgb,${c} 55%,#000)`,lt=`color-mix(in srgb,${c} 55%,#fff)`;
+  return `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${c}" stroke-opacity=".55" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round"/>
+  <g transform="translate(${x.toFixed(1)},${(y+2).toFixed(1)}) rotate(${tilt.toFixed(1)}) scale(${fl},1)">
+    <ellipse cx="0" cy="9" rx="24" ry="4.5" fill="#fff" opacity=".35"/><ellipse cx="2" cy="10" rx="17" ry="2.6" fill="#0a2a44" opacity=".45"/>
+    <path d="M-15 4 l-4 7 M-9 5 l-4 7 M-3 5 l-4 7 M3 5 l-4 7 M9 5 l-4 7" stroke="#3a2412" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M-21 -2 C-24 -9 -20 -12 -16 -9 C-17 -6 -17 -3 -14 0 L15 0 C18 0 21 -1 23 -4 L22 2 L26 3.5 L21 4.5 C14 8 -12 8 -17 5 Z" fill="#6b4524" stroke="#24150a" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M-16 1.2 L19 1.2" stroke="${c}" stroke-width="3"/><path d="M-16 2.6 L19 2.6" stroke="${dk}" stroke-width=".8"/>
+    <circle cx="16" cy="2" r="1.6" fill="#fff"/><circle cx="16.4" cy="2" r=".8" fill="#111"/><path d="M22 2 L26 3.5 L21 4.5 Z" fill="#c9a24a"/>
+    <path d="M1 0 V-24" stroke="#3a2412" stroke-width="1.6"/><path d="M-10 -21 H12" stroke="#3a2412" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M-9.5 -20.5 H11.5 C12.5 -14 12 -7 10.5 -3 C4 -1.5 -2 -1.5 -8.5 -3 C-10 -8 -10.5 -14 -9.5 -20.5 Z" fill="${c}" stroke="${dk}" stroke-width=".9"/>
+    <path d="M1 -20.5 V-2.3" stroke="${lt}" stroke-width="3" opacity=".75"/><path d="M1 -24 l6 1.6 -6 1.6 z" fill="${c}" stroke="${dk}" stroke-width=".5"/></g>`}
 function boardSVG(){
-  const me=mySeat(),mine=myMove(),hot={v:[],e:[],h:[],c:[],k:[]};
+  const me=mySeat(),mine=myMove(),hot={v:[],e:[],h:[],c:[],k:[],s:[]};
   if(mine){                                                   // which spots are tappable right now
     if(S.phase==='setup'){if(S.sub==='s')hot.v=V.map((_,v)=>v).filter(v=>canSettle(me,v,true));else hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e,true))}
     else if(S.sub==='roadbuild')hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e));
     else if(S.sub==='robber')hot.h=HEX.map((_,i)=>i).filter(i=>robOK(me,i));
     else if(S.rolled&&!S.sub&&ui.build==='road')hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e));
+    else if(S.rolled&&!S.sub&&ui.build==='ship')hot.s=E.map((_,e)=>e).filter(e=>shipOK(me,e));
     else if(S.rolled&&!S.sub&&ui.build==='settle')hot.v=V.map((_,v)=>v).filter(v=>canSettle(me,v));
     else if(S.rolled&&!S.sub&&ui.build==='city')hot.c=Object.keys(S.vb).map(Number).filter(v=>S.vb[v].p===me&&!S.vb[v].c);
     else if(S.rolled&&!S.sub&&ui.build==='knight')hot.k=V.map((_,v)=>v).filter(v=>!S.vb[v]&&!S.kn[v]&&V[v].e.some(e=>S.er[e]===me));
@@ -4667,6 +4707,7 @@ function boardSVG(){
       if(st===2)hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e));if(st===3){hot.v=V.map((_,v)=>v).filter(v=>canSettle(me,v));if(!hot.v.length)hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e))}if(st===6)hot.c=Object.keys(S.vb).map(Number).filter(v=>S.vb[v].p===me&&!S.vb[v].c)}
     else if(S.phase==='main'&&S.rolled&&!S.sub&&!ui.build&&!ui.pick){const pl=S.pl[me];hot.quiet=1;
       if(pl.rd>0&&afford(me,costFor(me,'road')))hot.e=E.map((_,e)=>e).filter(e=>canRoad(me,e));
+      if(S.sea&&(pl.sh??15)>0&&afford(me,COST.ship))hot.s=E.map((_,e)=>e).filter(e=>shipOK(me,e)&&!hot.e.includes(e));   // idle tap on open water launches a ship
       if(pl.st>0&&afford(me,costFor(me,'settle')))hot.v=V.map((_,v)=>v).filter(v=>canSettle(me,v));
       if(pl.ct>0&&(afford(me,COST.city)||S.freeCity===me))hot.c=Object.keys(S.vb).map(Number).filter(v=>S.vb[v].p===me&&!S.vb[v].c)}
   }
@@ -4730,12 +4771,8 @@ function boardSVG(){
     HEX[a].v.forEach(i=>HEX[b].v.forEach(j=>{const d=Math.hypot(V[i].x-V[j].x,V[i].y-V[j].y);if(!best||d<best[2])best=[V[i],V[j],d]}));
     const A=best[0],B=best[1];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#f3e9d6" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round" opacity=".85"/>
     <g transform="translate(${(A.x+B.x)/2},${(A.y+B.y)/2})"><circle r="11" fill="#0d2742cc" stroke="#f3e9d6" stroke-width="1.2"/><use href="#s-ship" x="-8" y="-8" width="16" height="16"/></g>`});
-  // stone bridges between islands (roads can be built on them)
-  E.forEach(e=>{if(!e.br)return;const A=V[e.a],B=V[e.b],L=Math.hypot(B.x-A.x,B.y-A.y),an=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI;
-    s+=`<g transform="translate(${((A.x+B.x)/2).toFixed(1)},${((A.y+B.y)/2).toFixed(1)}) rotate(${an.toFixed(1)})"><rect x="${-L/2}" y="-7" width="${L}" height="16" rx="3" fill="#0006" transform="translate(2,5)"/>
-      <rect x="${-L/2-3}" y="-9" width="${L+6}" height="18" rx="3" fill="#d8cdb0" stroke="#5a4a2e" stroke-width="1.4"/>
-      ${[...Array(Math.floor(L/9))].map((_,k)=>`<path d="M${-L/2+6+k*9} -6 V6" stroke="#a8997a" stroke-width=".9"/>`).join('')}
-      <path d="M${-L/2-3} -7 H${L/2+3} M${-L/2-3} 7 H${L/2+3}" stroke="#8a7a58" stroke-width="2.4"/></g>`});
+  // ship lanes: the sea hexes next to land, faint (brighter while choosing where a ship goes)
+  if(SEAX.length&&S.sea)s+=`<g class="seagrid" opacity="${mine&&ui.build==='ship'?.45:.1}">${SEAX.map(w=>`<polygon points="${hexPts(w.x,w.y,R-3)}" fill="none" stroke="#e8f6ff" stroke-width="1.2"/>`).join('')}</g>`;
   // roads
   for(const e in S.er){const {a,b}=E[e],c=PCOL[S.er[e]].c,f=.17,x1=V[a].x+(V[b].x-V[a].x)*f,y1=V[a].y+(V[b].y-V[a].y)*f,x2=V[b].x-(V[b].x-V[a].x)*f,y2=V[b].y-(V[b].y-V[a].y)*f;
     const L=Math.hypot(x2-x1,y2-y1),ang=Math.atan2(y2-y1,x2-x1)*180/Math.PI,dk=`color-mix(in srgb,${c} 58%,#000)`,hi=`color-mix(in srgb,${c} 70%,#fff)`;
@@ -4743,6 +4780,8 @@ function boardSVG(){
     s+=`<g transform="translate(${(x1+x2)/2},${(y1+y2)/2}) rotate(${ang})"><rect x="${-L/2}" y="-3" width="${L}" height="11" rx="3" fill="#0006" transform="translate(1.5,4)"/>
       <rect x="${-L/2}" y="-1" width="${L}" height="9" rx="2.5" fill="${dk}"/><rect x="${-L/2}" y="-5.5" width="${L}" height="9" rx="2.5" fill="${c}" stroke="#1b130c" stroke-opacity=".6" stroke-width=".8"/>
       <path d="M${-L/2+3} -3 H${L/2-3}" stroke="${hi}" stroke-width="1.6" stroke-linecap="round"/><path d="M${-L/2+6} 0 H${L/4}" stroke="#0003" stroke-width=".8"/></g>`}
+  // ships: a Greek trireme in the owner's colour on each sea edge, with a faint wake along the lane
+  if(S.es)for(const e in S.es)s+=shipSVG(+e,PCOL[S.es[e]].c);
   // monsters: red outline, beast, HP badge (tap to fight when allowed)
   // the Tartarus (monsters are born here) and ruins (explore with your hero)
   if(S.lair>=0){const h=HEX[S.lair];s+=`<g transform="translate(${h.x},${h.y-38})" filter="url(#f-shadow)"><rect x="-40" y="-9" width="80" height="18" rx="4" fill="#1c0d10" stroke="url(#g-goldrim)" stroke-width="1.6"/><text y="4" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="9" font-weight="900" fill="#f6e3a1" letter-spacing=".5">${S.tw?'VAULT':'TARTARUS'} · ${S.lairT}</text></g>`}
@@ -4811,6 +4850,8 @@ function boardSVG(){
   // wide invisible hit areas so thin spots are easy to tap on a phone
   hot.e.forEach(e=>{const {a,b}=E[e];s+=`<line data-k="road" data-id="${e}" x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="#fff" stroke-opacity="0" stroke-width="30" stroke-linecap="round" style="cursor:pointer"/>`});
   hot.v.forEach(v=>s+=`<circle data-k="settle" data-id="${v}" cx="${V[v].x}" cy="${V[v].y}" r="20" fill="#fff" fill-opacity="0" style="cursor:pointer"/>`);
+  hot.s.forEach(e=>{const {a,b}=E[e];s+=`<line data-k="ship" data-id="${e}" x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="#fff" stroke-opacity="0" stroke-width="30" stroke-linecap="round" style="cursor:pointer"/>`});
+  if(!hot.quiet)hot.s.forEach(e=>{const {a,b}=E[e];s+=`<line class="hot" data-k="ship" data-id="${e}" x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="#9fe0ff" stroke-opacity=".95" stroke-width="5" stroke-dasharray="3 5" stroke-linecap="round"/>`});
   if(!hot.quiet)hot.e.forEach(e=>{const {a,b}=E[e];s+=`<line class="hot ${hot.soft?'soft':''}" data-k="road" data-id="${e}" x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="#fffaf0" stroke-opacity=".9" stroke-width="${hot.soft?3.5:5.5}" stroke-dasharray="${hot.soft?'4 5':'7 4'}" stroke-linecap="round"/>`});
   if(!hot.quiet)hot.v.forEach(v=>s+=`<circle class="hot ${hot.soft?'soft':''}" data-k="settle" data-id="${v}" cx="${V[v].x}" cy="${V[v].y}" r="${hot.soft?5.5:7}" fill="#fffaf0" fill-opacity=".92" stroke="#a8761f" stroke-width="2"/>`);
   if(mine&&S.tw&&(ui.build==='ferry'||ui.build==='gtravel')&&S.rolled&&!S.sub&&!S.hmoved)(ui.build==='ferry'?harbourHexes():HEX.map((_,i)=>i)).filter(i=>i!==S.pl[me].hx).forEach(i=>s+=`<polygon class="hexhit" data-k="${ui.build}" data-id="${i}" points="${hexPts(HEX[i].x,HEX[i].y,R-6)}" fill="#7fd3ff22" stroke="#7fd3ff" stroke-width="3" stroke-dasharray="6 5"/>`);
@@ -4823,6 +4864,7 @@ function boardSVG(){
   // ghost preview of the spot waiting for ✓
   if(ui.pick&&me>=0){const c=PCOL[me].c,P=ui.pick;
     if(P.k==='robber'){const h=HEX[P.id];s+=`<polygon points="${hexPts(h.x,h.y,R-6)}" fill="#ff5a4a22" stroke="#ff8a7a" stroke-width="3"/><g class="ghost" transform="translate(${h.x-28},${h.y+2})"><use href="#s-cyclops" x="-24" y="-28" width="48" height="48" opacity=".8"/></g>`}
+    else if(P.k==='ship')s+=`<g class="ghost" opacity=".85">${shipSVG(P.id,c)}</g>`;
     else if(P.k==='road'){const {a,b}=E[P.id];s+=`<line class="ghost" x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="${c}" stroke-width="11" stroke-linecap="round"/><line x1="${V[a].x}" y1="${V[a].y}" x2="${V[b].x}" y2="${V[b].y}" stroke="#fff" stroke-width="3" stroke-dasharray="4 4" stroke-linecap="round"/>`}
     else{const v=V[P.id],w=P.k==='city'?40:31,hh=P.k==='city'?37:29;s+=`<g class="ghost" transform="translate(${v.x},${v.y})"><use href="#p-${P.k==='city'?'temple':'house'}" x="${-w/2}" y="${-hh*.72}" width="${w}" height="${hh}" filter="url(#tint${me})" opacity=".85"/></g>`}}
   if(ui.d3){                                                    // tilt the whole table inside the SVG (2D math: exact taps on every phone)
@@ -5235,7 +5277,7 @@ const TOUR={
     {i:'road',t:'What you can build',l:['<b>Road</b> — Clay + Timber. Roads let you reach new corners.','<b>Village</b> — Clay + Timber + Fleece + Wheat = <b>1 VP</b>. Must touch your road, with one empty corner between villages.','<b>City</b> — upgrade a village: 2 Wheat + 2 Marble + Clay = <b>2 VP</b>, and it collects double.','<b>Oracle card</b> — Fleece + Timber + Marble: a surprise card.'],tip:'Build 2 things in one turn and the gods give you +1 Ambrosia.'},
     {i:'anchor',t:'Trading',l:['<b>Bank</b>: give 4 of one resource for 1 of any other.','<b>Harbours</b> on the coast: 3:1 or 2:1 if you have a village on them.','<b>Players</b>: post an offer; others accept, decline or counter.'],tip:'Unlucky? After 3 rolls with nothing, Hermes gives you a free card.'},
     {i:'cyclops',t:'Rolling a 7: the Cyclops',l:['Nobody collects on a 7.','Anyone holding more than 9 cards gives back half.','The roller moves the Cyclops onto a tile: that tile makes nothing until he leaves.','The roller steals 1 card from someone next to it.'],tip:'Ambrosia is never stolen or discarded.'},
-    {i:'bolt',t:'Cards, gods and bonuses',l:['<b>Oracle cards</b>: Hoplite (move the Cyclops), Laurel (+1 VP), free roads, free resources and more. Play one per turn.','<b>Gods</b> (<svg class=gi><use href=#g-bolt></use></svg> button): spend Ambrosia for a blessing, once per turn.','<b>Royal Highway</b>: the longest road of 6+ = +2 VP.','<b>Favour of Ares</b>: most hoplites played + monsters slain (3+) = +2 VP.'],tip:'Tap any card or icon in the game to read what it does.'},
+    {i:'bolt',t:'Cards, gods and bonuses',l:['<b>Oracle cards</b>: Hoplite (move the Cyclops), Laurel (+1 VP), free roads, free resources and more. Play one per turn.','<b>Gods</b> (<svg class=gi><use href=#g-bolt></use></svg> button): spend Ambrosia for a blessing, once per turn.','<b>Royal Highway</b>: the longest road of 6+ = +2 VP (ships count too, joined at your village).','<b>Ships</b> (Classic): Timber + Fleece. Launch from a coastal village, sail along the sea edges to reach other islands.','<b>Favour of Ares</b>: most hoplites played + monsters slain (3+) = +2 VP.'],tip:'Tap any card or icon in the game to read what it does.'},
     {i:'ambrosia',t:'Between your turns',l:['<b>Mini-games</b> while others play: catch Ambrosia, the Sirens\' song, the chariot race — one try each per round.','<b>Ambrosia</b> buys blessings from the gods; <b>5 Ambrosia</b> can be offered to Olympus for <b>+1 VP</b>.','Rolls pay you on every turn, so watch the dice even when it is not your move.'],tip:'Everything that happens goes into the 🔔 event feed at the top — tap it to read it again.'},
     {i:'vp',t:'How to win',l:['Village 1 VP · City 2 VP · Laurel card 1 VP · each bonus 2 VP.','Reach the goal on your turn and you win at once.','Easy plan: villages first, then cities on your best tiles.'],tip:'Stuck? Open the book icon for rules and the Guide.'}
   ],
@@ -5279,7 +5321,7 @@ function openTour(track,pg){                                 // full-screen walk
 }
 // ---------- First-time explainers: shown once per device, the first time each thing appears ----------
 const TIPS={
-  welcome:{s:'Tap a glowing corner for a village, then a road next to it.',i:'temple',t:'Welcome to the Isles',l:['Build roads, villages and cities to earn victory points (VP).','First to the target VP wins — see the number on each player’s badge.','On your turn: Roll → collect resources → build or trade → End.','Three islands, joined by stone bridges. Build roads across them.','Unlucky? After 3 rolls with nothing, Hermes gives you a free card.']},
+  welcome:{s:'Tap a glowing corner for a village, then a road next to it.',i:'temple',t:'Welcome to the Isles',l:['Build roads, villages and cities to earn victory points (VP).','First to the target VP wins — see the number on each player’s badge.','On your turn: Roll → collect resources → build or trade → End.','Islands, divided by the sea. Build ships (Timber + Fleece) from a coastal village to reach the next island.','Unlucky? After 3 rolls with nothing, Hermes gives you a free card.']},
   conquest:{s:'War: send your hero to a rival Capital while their hero is away, then Siege.',i:'rebel',t:'Conquest',l:['At war, put your hero on an enemy Capital while their hero is away. Siege once to set up camp, then attack from the next turn.','At 0 HP the Capital falls: you take half their cards, +2 VP and their best city. They become your vassal.','A vassal who beats the conqueror in a duel rebels and gets everything back.','Fallen heroes spend 1 round in the Underworld (or pay 2 Ambrosia to Hades).','Win by VP, by conquering every Capital, or by leading when time runs out.']},
   titan:{s:'Your first village claims an island. Grow it before the war.',i:'sword',t:'Titan War',l:['Place your first village on any island: that island becomes yours. One extra island stays free to claim later.','The Capital in your island centre: when its number rolls, you pick the resource.','Olympus in the middle holds the Shrine, the Forge and the Vault.','Heroes cross the sea by routes, ferry, ship or divine travel.','Watch the Titan clock: at round 10 the war begins.','Hero → Train & equip: raise stats, buy gear at the Forge, collect battle cards for duels.','Stand alone on the Olympus Shrine at the start of a round: Ambrosia, a card and gold.','Hero → War: declare war early (1 Ambrosia + 2 gold) to duel anywhere and raid harder.']},
   build:{s:'Tap Build to turn cards into roads, villages and cities.',i:'house',t:'Building',l:['After rolling, every spot you can afford glows.','Tap a spot, check the preview, then press ✓ to build.','<b>Road</b> — Clay + Timber','<b>Village</b> — Clay + Timber + Fleece + Wheat','<b>City</b> — 2 Wheat + 2 Marble + 1 Clay','Build 2+ things in one turn → <b>Divine Favour</b>: +1 Ambrosia.']},
@@ -5356,6 +5398,7 @@ function quickMoves(me){                                       // your 2-3 most 
   if(pl.st>0&&can('settle')&&V.some((_,v)=>canSettle(me,v)))out.push({t:'Village',ic:uico('build'),go:go('settle')});
   if(S.rpg.k&&opened(3)&&!S.hacted&&pl.hx>=0){const m=S.mons.find(m=>m.h===pl.hx||reach(me).has(m.h));if(m&&!S.hmoved||m&&m.h===pl.hx)out.push({t:'Fight',ic:ico(m.t,'ui'),go:()=>{if(m.h===pl.hx)openSheet('battle');else{ui.build='hmove';renderGame()}}})}
   if(pl.rd>0&&can('road')&&E.some((_,e)=>canRoad(me,e)))out.push({t:'Road',ic:uico('build'),go:go('road')});
+  if(S.sea&&(pl.sh??15)>0&&can('ship',COST.ship)&&E.some((_,e)=>shipOK(me,e))&&!V.some((_,v)=>canSettle(me,v)))out.push({t:'Ship',ic:uico('build'),go:go('ship')});
   out.splice(3);                                               // End stays on its own big button
   return out}
 function hintText(){
@@ -5369,7 +5412,7 @@ function hintText(){
   if(S.sub==='duel'&&S.duel)return `Duel: ${pname(S.duel.a)} vs ${pname(S.duel.b)} — round ${S.duel.r}`;
   if(S.sub==='mfight'&&S.mf)return `${pname(S.mf.p)} fights the ${MONS[S.mf.t].n} — round ${S.mf.r}`;
   return {court:'The Agora awaits your decision',alch:S.alchOne?'Oracle: choose one die':'Alchemist: choose your dice',robber:S.bishop?'Bishop: tap a tile — rob everyone there':'Tap a tile to move the Cyclops',steal:'Choose who to steal from',discard:'Discard half your cards',roadbuild:`Place ${S.free} free road${S.free>1?'s':''}`,yop:'Choose 2 resources',mono:'Choose a resource to monopolize',market:'Waiting for answers to your offer'}[S.sub]
-    ||(!S.rolled?'Roll the dice (or play a Hoplite first)':ui.build?`Tap a highlighted spot: ${{road:'build a road',settle:'build a village',city:'build a city',knight:'train a hoplite',hmove:'move your hero',ferry:'pick a harbour to sail to',gtravel:'pick any tile — Hermes takes you there',kup:'promote a hoplite',kact:'activate a hoplite',chase:'pick the hoplite to chase the Cyclops'}[ui.build]}`:'Build, trade, or end your turn');
+    ||(!S.rolled?'Roll the dice (or play a Hoplite first)':ui.build?`Tap a highlighted spot: ${{road:'build a road',ship:'launch a ship (from your coastal village or your last ship)',settle:'build a village',city:'build a city',knight:'train a hoplite',hmove:'move your hero',ferry:'pick a harbour to sail to',gtravel:'pick any tile — Hermes takes you there',kup:'promote a hoplite',kact:'activate a hoplite',chase:'pick the hoplite to chase the Cyclops'}[ui.build]}`:'Build, trade, or end your turn');
 }
 function toggle3d(){ui.d3=!ui.d3;LS.set('st-3d',ui.d3);renderGame()}
 function zoomButtons(){document.querySelectorAll('.zctl [data-z]').forEach(b=>b.onclick=e=>{e.stopPropagation();ui.zoom(+b.dataset.z)})}
@@ -6001,6 +6044,7 @@ function drawSheet(){
     const opt=(k,n,c,ok,extra='')=>`<button class="bopt" data-bmode="${k}" ${ok?'':(c&&typeof c==='object'&&lacks(me,c).length?needAttr(c)+' style="opacity:.45"':'disabled style="opacity:.45"')}><b>${n}${extra}</b><span class="cost">${costIcons(c)}</span></button>`;
     h=`<h2>Build</h2><p class="note">Pick one → tap a glowing spot → ✓</p><div class="build">
       ${opt('road','Road',costFor(me,'road'),afford(me,costFor(me,'road'))&&pl.rd>0,` <span class="tag">${pl.rd} left</span>`)}
+      ${S.sea?opt('ship','Ship',COST.ship,afford(me,COST.ship)&&(pl.sh??15)>0,` <span class="tag">${pl.sh??15} left</span>`):''}
       ${opt('settle','Village',costFor(me,'settle'),afford(me,costFor(me,'settle'))&&pl.st>0,` <span class="tag">${pl.st} left</span>`)}
       ${opt('city','City',COST.city,(afford(me,COST.city)||S.freeCity===me)&&pl.ct>0,S.freeCity===me?' <span class="tag">free</span>':` <span class="tag">${pl.ct} left</span>`)}
       ${S.ck?opt('knight','Train hoplite',COST.knight,afford(me,COST.knight))+opt('kup','Promote hoplite',COST.kup,afford(me,COST.kup))+opt('kact','Activate hoplite',COST.kact,afford(me,COST.kact))
@@ -6133,7 +6177,7 @@ function drawSheet(){
       <b>Pacts</b> — 3 rounds of peace and shared hands; breaking one costs 1 VP. <b>Private deals</b>: in Trade, pick one player.<br>
       <b>Win</b> — ${S.goal} VP, or every other Capital conquered${S.tw.end==='r15'?', or the most VP after round 15':''}.</p>`:'')+`<h2>Oracle cards</h2><p class="note">Deck of 24: 10 Hoplites, 4 Laurel Wreaths, 2 Road Builders, 2 Cornucopia, 2 Tribute, 2 Trojan Horses, 2 Oracles. Cost: Fleece + Timber + Marble. One card per turn, not on the turn you bought it.</p>
       ${Object.keys(DEV).map(t=>`<div class="bigcard" style="grid-template-columns:64px 1fr"><div class="dcard art ${artc(t)}" style="width:58px;height:80px">${ico(t)}</div><p><b>${DEV[t].n}</b><br>${DEV[t].d}</p></div>`).join('')}
-      <p class="note"><b>Building costs</b><br><b>Road</b> — Clay + Timber<br><b>Village</b> — Clay + Timber + Fleece + Wheat<br><b>City</b> — 2 Wheat + 2 Marble + 1 Clay<br><b>Royal Highway</b> — 6+ connected roads, the longest: +2 VP<br><b>Favour of Ares</b> — hoplites played + monsters slain, 3+ and the most: +2 VP<br><b>Divine Favour</b> — build 2+ things in one turn: +1 Ambrosia<br><b>Hermes</b> — 3 rolls in a row with nothing: +1 free card<br><b>Cyclops</b> — on a 7, more than 9 cards = discard half<br><b>Ambrosia</b> comes from the 3 temple tiles and pays for prayers and secret missions. First to ${S.goal} VP on their turn wins.</p><button class="btn" id="x">Close</button>`;
+      <p class="note"><b>Building costs</b><br><b>Road</b> — Clay + Timber<br><b>Village</b> — Clay + Timber + Fleece + Wheat<br><b>City</b> — 2 Wheat + 2 Marble + 1 Clay<br><b>Ship</b> — Timber + Fleece (Classic): sails on sea edges from your coastal village or your last ship<br><b>Royal Highway</b> — 6+ connected roads and ships (they join only at your village), the longest: +2 VP<br><b>Favour of Ares</b> — hoplites played + monsters slain, 3+ and the most: +2 VP<br><b>Divine Favour</b> — build 2+ things in one turn: +1 Ambrosia<br><b>Hermes</b> — 3 rolls in a row with nothing: +1 free card<br><b>Cyclops</b> — on a 7, more than 9 cards = discard half<br><b>Ambrosia</b> comes from the 3 temple tiles and pays for prayers and secret missions. First to ${S.goal} VP on their turn wins.</p><button class="btn" id="x">Close</button>`;
   }else if(kind==='stats'){
     const n=S.stats.reduce((a,b)=>a+b,0),mx=Math.max(1,...S.stats,n*6/36);
     const W=320,H=150,bw=24;
