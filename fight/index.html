@@ -152,7 +152,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 /* ================= setup: renderer, camera, lights ================= */
 const view=document.getElementById('view');
 const R=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-R.setPixelRatio(Math.min(2,devicePixelRatio));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+R.setPixelRatio(Math.min(/[?&]embed/.test(location.search)&&matchMedia('(pointer:coarse)').matches?1.5:2,devicePixelRatio));   // in-game on phones: a touch lighter, stays coolR.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
 R.outputColorSpace=THREE.SRGBColorSpace;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.05;
 view.prepend(R.domElement);
 const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xc9a57a,8,13);
@@ -256,9 +256,10 @@ const A=new Fighter(0,{...ROSTER.heracles});A.key='heracles';
 if(ARM){const ring=new THREE.Mesh(new THREE.RingGeometry(.55,.75,48),new THREE.MeshBasicMaterial({color:ARM.c,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
   ring.rotation.x=-Math.PI/2;ring.position.y=.02;A.root.add(ring);const glow=new THREE.PointLight(ARM.c,.6+ARM.n*.25,3.2);glow.position.set(0,1.2,.4);A.root.add(glow);
   (function pulse(){const t=performance.now()/600;ring.material.opacity=.35+.25*Math.sin(t)+ARM.n*.05;ring.scale.setScalar(1+.06*Math.sin(t*1.3));requestAnimationFrame(pulse)})()}
-function setFighter(f,k){const H=ROSTER[k];if(!H)return;f.stun=0;f.look={...H};f.mv=STYLES[H.style];f.mixer=null;f.acts={};f.cur=null;
-  if(f.body)f.root.remove(f.body);f.buildDummy(f.look);$('n'+f.side).textContent=H.name;f.key=k;
-  loader.load(H.file,g=>{if(f.key===k){f.useGLB(g);f.set(f.st)}},undefined,()=>{})}   // no file yet → keeps the stand-in   // no file yet → keeps the stand-in
+function setFighter(f,k,ov){const H=ROSTER[k];if(!H)return;f.stun=0;f.look={...H,...(ov||{})};   // ov: the game's overrides (monster name / size)f.mv=STYLES[H.style];f.mixer=null;f.acts={};f.cur=null;
+  if(f.body)f.root.remove(f.body);f.buildDummy(f.look);$('n'+f.side).textContent=f.look.name;f.key=k;
+  f.ready=false;loader.load(H.file,g=>{if(f.key===k){f.useGLB(g);f.set(f.st);f.ready=true;tint(f)}},undefined,()=>{f.ready=true})}
+function tint(f){if(!f.tint||!f.body)return;const c=new THREE.Color(f.tint);f.body.traverse(o=>{if(!o.isMesh)return;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.color)m.color.multiply(c)})})}   // monsters share a model, each in its own colour   // no file yet → keeps the stand-in   // no file yet → keeps the stand-in
 const B=new Fighter(1,{name:'Minotaur',skin:0x6b3a22,armor:0x8a6a3a,legs:0x4a2a18,horns:1,scale:1.15});
 
 /* ================= hit sparks (additive points) ================= */
@@ -308,6 +309,9 @@ const MAGIC={
 
 /* ================= the fight ================= */
 const G={time:30,state:'intro',slow:1,shake:0,zoom:0,stop:0};
+/* embedded mode: the board game opens this arena in a frame, sends the matchup, gets the result back */
+const EMB=new URLSearchParams(location.search).has('embed');
+const MUL=[1,1],STAT={pf:0,best:0};let EM=null,PAUSE=EMB;
 function resolve(at,df){const m=at.mv[at.move],dist=Math.abs(at.x-df.x);if(dist>m.reach*(at.look.scale>1?1.08:1))return;
   at.hitDone=true;const blocked=(df.st==='block'&&at.move!=='special')||df.guard>0;let d=df.guard>0?0:blocked?Math.round(m.dmg*.15):m.dmg;if(df.guard>0)df.guard=0;
   const hx=(at.x+df.x)/2,hy=1.35*df.look.scale;
@@ -316,10 +320,15 @@ function resolve(at,df){const m=at.mv[at.move],dist=Math.abs(at.x-df.x);if(dist>
     df.move=null;df.set('hit');df.vx+=at.dir*m.push*6;G.stop=at.move==='light'?.05:.09;G.shake=at.move==='light'?.08:.22;if(at.move!=='light'){$('flash').classList.remove('on');void $('flash').offsetWidth;$('flash').classList.add('on')}
     at.meter=Math.min(100,at.meter+(at.move==='light'?12:18));df.meter=Math.min(100,df.meter+6)}
   if(at.move==='special'&&MAGIC[at.look.magic])MAGIC[at.look.magic](at,df,blocked);
+  if(blocked&&df.st==='block'&&df.t<.22&&at.move!=='special'){d=0;df.meter=Math.min(100,df.meter+25);at.vx-=at.dir*4;big('PERFECT BLOCK',650);if(df===A)STAT.pf++}   // a block raised just in time: no damage, power surge
+  if(!blocked&&d){const c=at.combo=(performance.now()-(at.lastHit||0)<1100)?(at.combo||1)+1:1;at.lastHit=performance.now();   // chained hits grow stronger
+    if(c>=3){d=Math.round(d*(1+.1*(c-2)));big(c+' HIT COMBO',500)}if(at===A)STAT.best=Math.max(STAT.best,c)}
+  d=Math.round(d*MUL[at.side]);                                   // stats from the board (attack vs armour / HP)
   df.hp-=d;if(df.hp<=0)finish(at,df)}
 function finish(w,l){if(G.state!=='fight')return;G.state='ko';l.hp=0;l.move=null;l.set('ko');sfx('ko');G.slow=.22;G.zoom=1;big('K.O.',1600);
   setTimeout(()=>{G.slow=1;w.move=null;w.set('win')},1300);
   setTimeout(()=>{const won=w===A,s=$('stamp');s.className='stamp '+(won?'':'lose');s.textContent=won?'VICTORY':'DEFEATED';void s.offsetWidth;s.classList.add('on')},1500);
+  if(EMB)return setTimeout(report,2700);
   setTimeout(()=>{$('endt').textContent=w===A?'Victory!':'Defeated';$('ends').textContent=`${A.look.name} ${Math.max(0,Math.round(A.hp))} HP · ${B.look.name} ${Math.max(0,Math.round(B.hp))} HP`;$('end').classList.add('on')},3000)}
 function reset(){[A,B].forEach(f=>{if(f.stun){f.stun=0;setStone(f,false);if(f.mixer)f.mixer.timeScale=1}});[A,B].forEach((f,i)=>{f.hp=100;f.meter=0;f.x=i?1.3:-1.3;f.vx=f.wv=0;f.move=null;f.set('idle')});G.time=30;G.state='intro';G.zoom=0;
   $('end').classList.remove('on');$('stamp').classList.remove('on');hud();big('ROUND 1',900);setTimeout(()=>{big('FIGHT!',700);G.state='fight'},1100)}
@@ -372,8 +381,9 @@ function openSel(step=0,mine){G.state='select';$('end').classList.remove('on');$
 const GAME_URL=/github\.io$/.test(location.hostname)?'../':'https://claude.ai/artifact/Gif7uibiwVhMSnpJ5NQQng';
 $('selback').onclick=()=>{if($('sel').dataset.step==='1')return openSel(0);try{window.close()}catch(e){}setTimeout(()=>{location.href=GAME_URL},250)};   // tab opened from the game: close it
 $('exit').onclick=()=>{G.state='select';G.slow=1;openSel(0)};                                  // leave the fight at any time$('gear').onclick=()=>$('load').classList.toggle('on');
+THREE.Cache.enabled=true;                                         // models load once, every later fight starts instantly
 const loader=new GLTFLoader();
-setFighter(A,'heracles');setFighter(B,'minotaur');   // real Meshy fighters   // real Meshy fighters
+if(!EMB){setFighter(A,'heracles');setFighter(B,'minotaur')}   // real Meshy fighters   // real Meshy fighters
 [0,1].forEach(i=>$('f'+i).onchange=e=>{const f=e.target.files[0];if(!f)return;const u=URL.createObjectURL(f);
   loader.load(u,g=>{const names=(i?B:A).useGLB(g);$('clips').textContent=(i?'Enemy':'Hero')+' clips: '+(names.join(', ')||'none');URL.revokeObjectURL(u)},undefined,err=>$('clips').textContent='Could not load: '+err.message)});
 
@@ -405,9 +415,10 @@ function step(f,o,dt){f.t+=dt;
   f.x=THREE.MathUtils.clamp(f.x,-4.2,4.2);if(f.side===0)f.x=Math.min(f.x,o.x-gap);else f.x=Math.max(f.x,o.x+gap);
   f.root.position.x=f.x;f.root.rotation.y=f.mixer?(f.dir>0?0:Math.PI):(f.dir>0?Math.PI/2:-Math.PI/2);
   if(f.mixer)f.mixer.update(dt);else f.pose(dt,time)}
-function loop(){requestAnimationFrame(loop);for(let i=fx.length-1;i>=0;i--){const e=fx[i];e.life-=1/60;e.tick(e.obj,Math.max(0,e.life/e.max));if(e.life<=0){scene.remove(e.obj);fx.splice(i,1)}}const raw=Math.min(.05,clock.getDelta());let dt=raw*G.slow;
+function loop(){requestAnimationFrame(loop);if(PAUSE)return;                 // idle between fights: no GPU work
+  for(let i=fx.length-1;i>=0;i--){const e=fx[i];e.life-=1/60;e.tick(e.obj,Math.max(0,e.life/e.max));if(e.life<=0){scene.remove(e.obj);fx.splice(i,1)}}const raw=Math.min(.05,clock.getDelta());let dt=raw*G.slow;
   if(G.stop>0){G.stop-=raw;dt*=.08}                                                   // hit-stop: impacts feel heavy, not jerkytime+=dt;
-  if(G.state==='fight'){G.time-=dt;bot(dt);if(G.time<=0)finish(A.hp>=B.hp?A:B,A.hp>=B.hp?B:A)}
+  if(G.state==='fight'){G.time-=dt;bot(dt);if(G.time<=0){if(EMB){G.state='ko';[A,B].forEach(f=>{f.move=null;f.set('idle')});big('TIME!',1200);setTimeout(report,1500)}else finish(A.hp>=B.hp?A:B,A.hp>=B.hp?B:A)}}
   step(A,B,dt);step(B,A,dt);
   torches.forEach((l,i)=>l.intensity=5.5+Math.sin(time*9+i*2)*1.2+Math.random()*.6);
   sparks.forEach(s=>{s.life-=raw;const p=s.pts.geometry.attributes.position;for(let i=0;i<s.v.length;i++){s.v[i].y-=9*raw;p.setXYZ(i,p.getX(i)+s.v[i].x*raw,p.getY(i)+s.v[i].y*raw,p.getZ(i)+s.v[i].z*raw)}p.needsUpdate=true;s.pts.material.opacity=Math.max(0,s.life*2)});
@@ -418,6 +429,19 @@ function loop(){requestAnimationFrame(loop);for(let i=fx.length-1;i>=0;i--){cons
   const sx=(Math.random()-.5)*G.shake,sy=(Math.random()-.5)*G.shake;G.shake*=Math.exp(-raw*9);
   wall.position.x=cam.position.x*.6;cam.position.lerp(new THREE.Vector3(mid+sx,1.55+sy+(G.zoom?-.2:0),z),1-Math.exp(-raw*7));cam.lookAt(mid,1.15,0);scene.fog.near=cam.position.z+3;scene.fog.far=cam.position.z+8;
   hud();R.render(scene,cam)}
-openSel();loop();window.FT={A,B,G,IN};   // handle for automated tests
+function report(){if(!EM)return;const r={type:'tm-fight',id:EM.id,a:Math.max(0,Math.round(A.hp)),b:Math.max(0,Math.round(B.hp)),pf:STAT.pf,best:STAT.best,fled:EM.fled?1:0};
+  EM=null;PAUSE=true;G.state='idle';try{parent.postMessage(r,'*')}catch(e){}}
+function startEmb(c){EM=c;STAT.pf=0;STAT.best=0;PAUSE=false;MUL[0]=+c.am||1;MUL[1]=+c.bm||1;$('end').classList.remove('on');$('sel').classList.remove('on');
+  if(A.key!==c.a)setFighter(A,c.a);const sig=[c.b,c.bc,c.bs,c.bn].join();B.tint=c.bc||0;if(B.sig!==sig){B.key=null;setFighter(B,c.b,{name:c.bn||ROSTER[c.b].name,scale:+c.bs||ROSTER[c.b].scale});B.sig=sig}
+  const wait=performance.now();G.state='load';big('…',400);
+  (function go(){if(!(A.ready&&B.ready)&&performance.now()-wait<9000)return setTimeout(go,120);
+    reset();A.hp=Math.max(1,Math.min(100,+c.ah||100));B.hp=Math.max(1,Math.min(100,+c.bh||100));G.time=+c.t||40;
+    hud()})()}
+if(EMB){document.body.classList.add('emb');$('gear').style.display='none';$('exit').title='Retreat';
+  $('exit').onclick=()=>{if(!EM||G.state==='ko')return;EM.fled=1;G.state='ko';big('RETREAT',800);setTimeout(report,700)};   // wounds stay, the fight ends
+  addEventListener('message',e=>{const d=e.data;if(d&&d.type==='tm-start')startEmb(d);if(d&&d.type==='tm-pre'){if(A.key!==d.a)setFighter(A,d.a);if(B.key!==d.b)setFighter(B,d.b)}});
+  try{parent.postMessage({type:'tm-ready'},'*')}catch(e){}}
+else openSel();
+loop();window.FT={A,B,G,IN,STAT};   // handle for automated tests
 </script>
 

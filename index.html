@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261112203441'</script>
+<script>window.BUILD='20261112204242'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1584,7 +1584,11 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 
 /* armour cosmetics on the hero */
 .harm{animation:harm 2.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes harm{from{opacity:.75}to{opacity:1}}
-.bigb #board .hot{animation:none}.bigb #board .harm,.bigb #board .ruinglow,.bigb #board .wtrap,.bigb #board .sdrop circle{animation:none}  /* big boards: no endless repaints */
+.bigb #board .hot{animation:none}
+#f3d{position:fixed;inset:0;z-index:9000;background:#05080f;display:none}#f3d.on{display:block}
+#f3d p{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#ffe7a3;font:900 18px Cinzel,Georgia,serif;letter-spacing:.06em}
+#f3d iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+body.f3dopen{overflow:hidden}.bigb #board .harm,.bigb #board .ruinglow,.bigb #board .wtrap,.bigb #board .sdrop circle{animation:none}  /* big boards: no endless repaints */
 .dhero-w{grid-column:2;grid-row:1/3;position:relative;display:grid;place-items:center}.dhero-w .dhero{grid-column:auto;grid-row:auto;position:relative;z-index:1}
 .dhero.armed{border-color:var(--ac);box-shadow:0 0 18px var(--ac),0 0 40px color-mix(in srgb,var(--ac) 50%,#0000)}
 .daura{position:absolute;inset:-22% -30%;width:160%;height:144%;z-index:0;animation:harm 2.4s ease-in-out infinite alternate;pointer-events:none}
@@ -2744,6 +2748,13 @@ function rebel(w,l){                                          // a vassal beats 
 }
 // ---------- Titan War duel engine ----------
 const DBEAT={atk:'fnt',def:'atk',fnt:'def'},DSTN={atk:'Attack',def:'Defend',fnt:'Feint'};   // Attack > Feint > Defend > Attack
+function monWin(p,F,m){                                      // the monster is slain: loot, XP, rare laurel / Forever card, ally's share
+  const pl=S.pl[p],M=MONS[F.t];
+  S.mons=S.mons.filter(x=>x!==m);S.tr[p].kills++;if(dg(p).labour)pl.gold++;updLA(p);xp(p,5);loot(p,F.t);if(dg(p).loot)loot(p,F.t);if(dg(p).rest)pl.tired=1;
+  if(Math.random()<.05){pl.bonus=(pl.bonus||0)+1;S.laurel={p,why:'slaying the '+M.n,id:(S.laurel?S.laurel.id:0)+1};log(`<b>${pname(p)}</b> earns the <b>Laurel of the Gods</b>: +1 VP!`);checkWin(p)}
+  if(Math.random()<.08){S.drops=S.drops||[];S.drops.push({p,id:(S.dropN=(S.dropN||0)+1),e:EKEYS[rnd(EKEYS.length)]});log(`The ${M.n} dropped a <b>Forever card</b>!`)}
+  if(F.help&&F.help.st==='yes'){const q=F.help.q,g=Math.min(pl.gold,Math.floor(M.gold/2));pl.gold-=g;S.pl[q].gold=(S.pl[q].gold||0)+g;xp(q,2);log(`<b>${pname(q)}</b> shares the spoils: +${g} gold`)}
+}
 function duelRound(){
   const D=S.duel,P=[D.a,D.b],pk=D.pk,card=[pk[0].c,pk[1].c],tim=[pk[0].t||0,pk[1].t||0];
   if(card[0]==='feintc'&&card[1]&&card[1]!=='feintc')card[1]=null;   // Feint cancels the other card
@@ -3226,12 +3237,35 @@ const RULES={
     S.pl[p].hx=h;S.hmoved=true;log(h>=1000?`<b>${pname(p)}</b>'s hero sails the open sea`:`<b>${pname(p)}</b>'s hero travels to a ${RNAME[S.hexes[h].r]} tile`);
     if(S.works&&S.works.length)stepOnWork(p);
   },
-  battle(p){                                                  // start a fight with the monster on the hero's tile
+  battle(p,o){                                                // start a fight with the monster on the hero's tile (o.f3d: fought in the 3D arena)
     const pl=S.pl[p],mi=S.mons.findIndex(m=>m.h===pl.hx);
     if(!S.rpg.k||!S.rolled||S.sub||S.hacted||mi<0)return bad('No monster on your hero\'s tile');
     S.hacted=true;const m=S.mons[mi];
     S.mf={p,id:m.id,t:m.t,max:m.max,r:1,sta:Math.min(5,stamina(p)),intent:monIntent(m.t,false),charged:false,last:null,done:false,win:false,ko:false,n:(S.mf?S.mf.n:0)+1};
+    if(o&&o.f3d){S.mf.f3d=1;if(S.timer)S.tStart=(S.tStart||Date.now())+75000}   // the arena fight gets its own time
     S.sub='mfight';log(`<b>${pname(p)}</b>'s hero attacks the <b>${MONS[m.t].n}</b>!`);
+  },
+  mfight3d(p,o){                                              // the 3D arena reports back: remaining HP % of hero and monster
+    const F=S.mf;if(S.sub!=='mfight'||!F||F.p!==p||F.done||!o)return bad('No fight now');
+    const pl=S.pl[p],m=S.mons.find(x=>x.id===F.id),M=MONS[F.t];if(!m)return bad('No fight now');
+    const a=Math.max(0,Math.min(100,+o.a||0)),b=Math.max(0,Math.min(100,+o.b||0)),pf=Math.max(0,Math.min(5,+o.pf||0));
+    const nh=a<=0?0:Math.max(1,Math.round(hpMax(p)*a/100)),nm=b<=0?0:Math.max(1,Math.round(m.max*b/100)),dmg=Math.max(0,m.hp-nm),mdmg=Math.max(0,pl.hp-nh);
+    m.hp=nm;pl.hp=nh;if(dmg)xp(p,1);if(pf)xp(p,pf);                         // perfect blocks earn XP
+    let txt;
+    if(m.hp<=0){F.win=true;monWin(p,F,m);txt=`You slay the ${M.n} in the arena! +${M.gold} gold`;log(`<b>${pname(p)}</b>'s hero slays the <b>${M.n}</b> in the arena! +${M.gold} gold`)}
+    else if(pl.hp<=0){F.ko=true;txt=`The ${M.n} knocks your hero out.`;log(`<b>${pname(p)}</b>'s hero falls to the <b>${M.n}</b>`);knockout(p)}
+    else{txt=`${o.fled?'You retreat':'Time runs out'} — you dealt ${dmg}, took ${mdmg}. Its wounds stay.`;log(`Arena vs ${M.n}: <b>${pname(p)}</b> deals ${dmg}, takes ${mdmg}`)}
+    F.last={a:'3d',d:0,dmg,mdmg,q:pf?1:0,txt,mk:'atk'};F.done=true;S.sub=null;
+    S.lastFight={p,t:F.t,d:0,dmg,md:0,taken:mdmg,hp:Math.max(0,m.hp),max:m.max,win:F.win,ko:F.ko,id:(S.lastFight?S.lastFight.id:0)+1};
+  },
+  duel3d(p,o){                                                // arena duel against the rival hero (AI-run for now): remaining HP %
+    const D=S.duel;if(S.sub!=='duel'||!D||D.done||D.a!==p||!D.f3d||!o)return bad('No duel now');
+    const P=[D.a,D.b],v=[o.a,o.b].map(x=>Math.max(0,Math.min(100,+x||0))),old=P.map(q=>S.pl[q].hp);
+    P.forEach((q,i)=>{S.pl[q].hp=v[i]<=0?0:Math.max(1,Math.round(hpMax(q)*v[i]/100))});
+    const pf=Math.max(0,Math.min(5,+o.pf||0));if(pf)xp(p,pf);
+    const w=o.fled?-1:v[1]<=0?0:v[0]<=0?1:v[0]===v[1]?-1:v[0]>v[1]?0:1;
+    D.last={r:D.r,a3d:1,txt:`Arena duel: ${pname(P[0])} dealt ${Math.max(0,old[1]-S.pl[P[1]].hp)}, ${pname(P[1])} dealt ${Math.max(0,old[0]-S.pl[P[0]].hp)}${o.fled?' — '+pname(P[0])+' retreats':''}`};
+    log(D.last.txt);duelEnd(w);
   },
   mfight(p,o){                                                // one round: your move, then the monster's
     const F=S.mf;if(S.sub!=='mfight'||!F||F.p!==p||F.done)return bad('No fight now');
@@ -3250,10 +3284,7 @@ const RULES={
     else F.ready=true;
     m.hp-=dmg;if(dmg)xp(p,1);
     let mdmg=0,txt='';
-    if(m.hp<=0){F.win=true;S.mons=S.mons.filter(x=>x!==m);S.tr[p].kills++;if(dg(p).labour)pl.gold++;updLA(p);xp(p,5);loot(p,F.t);if(dg(p).loot)loot(p,F.t);if(dg(p).rest)pl.tired=1;
-      if(Math.random()<.05){pl.bonus=(pl.bonus||0)+1;S.laurel={p,why:'slaying the '+M.n,id:(S.laurel?S.laurel.id:0)+1};log(`<b>${pname(p)}</b> earns the <b>Laurel of the Gods</b>: +1 VP!`);checkWin(p)}
-      if(Math.random()<.08){S.drops=S.drops||[];S.drops.push({p,id:(S.dropN=(S.dropN||0)+1),e:EKEYS[rnd(EKEYS.length)]});log(`The ${M.n} dropped a <b>Forever card</b>!`)}
-      if(F.help&&F.help.st==='yes'){const q=F.help.q,g=Math.min(pl.gold,Math.floor(M.gold/2));pl.gold-=g;S.pl[q].gold=(S.pl[q].gold||0)+g;xp(q,2);log(`<b>${pname(q)}</b> shares the spoils: +${g} gold`)}
+    if(m.hp<=0){F.win=true;monWin(p,F,m);
       txt=`Your ${pw?'charged strike':'strike'} deals ${dmg} — the ${M.n} is slain! +${M.gold} gold`;log(`<b>${pname(p)}</b>'s hero slays the <b>${M.n}</b>! +${M.gold} gold`)}
     else{
       if(I.k==='atk'&&!dg(p).lull)mdmg=Math.max(0,I.v*(F.charged?2:1)-armor(p)-(a==='guard'?4:0));
@@ -3303,10 +3334,12 @@ const RULES={
     S.tr[p].raids=(S.tr[p].raids||0)+1;xp(p,1);log(`<b>${pname(p)}</b>'s hero raids <b>${pname(q)}</b>'s village`);steal(p,q,(war?2:1)+(dg(p).raid?1:0));
   },
   duel(p,q){
+    let f3d=0;if(q&&typeof q==='object'){f3d=q.f3d?1:0;q=+q.q}      // {q, f3d}: fought in the 3D arena
     if(!S.rpg.k||!S.rolled||S.sub||S.hacted||S.pl[q].hx!==S.pl[p].hx)return bad('No rival hero here');
     if(S.tw&&!tileActions(p).some(a=>a.k==='duel'&&a.q===q))return bad('At peace you can only duel on Olympus or your own island');
-    if(S.tw){                                                 // Titan War: a real 3-round duel
-      S.hacted=true;S.duel={a:p,b:q,r:1,pk:[null,null],sta:[stamina(p),stamina(q)],last:null,done:false,w:-1,id:(S.duel?S.duel.id:0)+1};
+    if(S.tw||f3d){                                            // Titan War (or any arena duel): a real duel
+      S.hacted=true;S.duel={a:p,b:q,r:1,pk:[null,null],sta:[stamina(p),stamina(q)],last:null,done:false,w:-1,f3d,id:(S.duel?S.duel.id:0)+1};
+      if(f3d&&S.timer)S.tStart=(S.tStart||Date.now())+75000;
       S.sub='duel';markGr(q,p);log(`<b>${pname(p)}</b> challenges <b>${pname(q)}</b> to a duel!`);return;
     }
     S.hacted=true;const a=d6()+atk(p),b=d6()+atk(q),w=a>b?p:q,l=w===p?q:p,g=Math.min(2,S.pl[l].gold);
@@ -4277,6 +4310,34 @@ function heroesHTML(){                                         // the collection
 const isApp=()=>{try{return navigator.standalone||matchMedia('(display-mode: standalone)').matches}catch(e){return false}};   // opened from the home screen
 function reloadApp(){toast('Reloading…');setTimeout(()=>location.reload(),250)}
 const fightURL=()=>{const a=typeof prof==='function'?armDom():null;return FIGHT_URL+(a?(FIGHT_URL.includes('?')?'&':'?')+'arm='+a.set+'&n='+a.n:'')};   // the arena dresses your fighter in your armour glow
+/* ---------- 3D arena inside the game: monster fights and duels open the fighting game in a full-screen frame ----------
+   the frame is created once and kept (models stay loaded); it sleeps between fights. No answer within 15 s → classic dice fight. */
+const F3D={fr:null,ok:null,cb:null,id:0,pend:null,to:0};
+const ARENA_MON={goblin:{bn:'Harpies',bc:0x9fb5a8,bs:.95},troll:{bn:'Minotaur'},dragon:{bn:'Hydra',bc:0x6fd0a8,bs:1.25},
+  kronos:{bn:'Kronos',bc:0xc8b48a,bs:1.45},atlas:{bn:'Atlas',bc:0x9aaed0,bs:1.5},hyperion:{bn:'Hyperion',bc:0xffd27a,bs:1.4},typhon:{bn:'Typhon',bc:0x9a6ad0,bs:1.5}};   // one beast model, each in its own colour and size (own models later)
+const ARENA_HERO=k=>['heracles','perseus','theseus','achilles','penthesilea','orion','meleager','aeneas','autolycus','asclepius','aristaeus','orpheus'].includes(k)?k:'heracles';
+const arenaOK=()=>typeof document!=='undefined'&&F3D.ok!==false&&!!S&&!S.tut&&mySeat()>=0;
+function arenaFrame(){if(F3D.fr)return F3D.fr;
+  const w=document.createElement('div');w.id='f3d';w.innerHTML='<p>Entering the arena…</p>';document.body.appendChild(w);
+  const a=typeof prof==='function'?armDom():null,u=FIGHT_URL+(FIGHT_URL.includes('?')?'&':'?')+'embed=1'+(a?'&arm='+a.set+'&n='+a.n:'');
+  const f=document.createElement('iframe');f.src=u;f.allow='autoplay; fullscreen';f.title='Arena';w.appendChild(f);F3D.fr=w;return w}
+if(typeof addEventListener==='function')addEventListener('message',e=>{const d=e.data;if(!F3D.fr||!d||e.source!==F3D.fr.querySelector('iframe').contentWindow)return;
+  if(d.type==='tm-ready'){F3D.ok=true;if(F3D.pend){e.source.postMessage(F3D.pend,'*');F3D.pend=null}}
+  if(d.type==='tm-fight'&&d.id===F3D.id){clearTimeout(F3D.to);F3D.fr.classList.remove('on');document.body.classList.remove('f3dopen');const cb=F3D.cb;F3D.cb=null;if(cb)cb(d)}});
+function arenaFight(cfg,cb){const w=arenaFrame();w.classList.add('on');document.body.classList.add('f3dopen');F3D.cb=cb;cfg.type='tm-start';cfg.id=++F3D.id;
+  if(F3D.ok)w.querySelector('iframe').contentWindow.postMessage(cfg,'*');else F3D.pend=cfg;
+  clearTimeout(F3D.to);F3D.to=setTimeout(()=>{if(F3D.ok)return;F3D.ok=false;w.classList.remove('on');document.body.classList.remove('f3dopen');F3D.cb=null;F3D.pend=null;
+    toast('The arena could not load — fight with the dice');if(cb)cb(null)},15000)}
+const applied=()=>!S.online||S.host===ME.uid;            // this device applied the move itself (else it went to the host)
+const clampN=(v,a,b)=>Math.max(a,Math.min(b,v));
+function arenaMon(){const me=mySeat(),pl=S.pl[me],m=S.mons.find(x=>x.h===pl.hx);if(!m)return;const M=MONS[m.t],X=ARENA_MON[m.t]||{};
+  arenaFight({a:ARENA_HERO(pl.hero),b:'minotaur',bn:X.bn||M.n,bc:X.bc||0,bs:X.bs||0,ah:pl.hp/hpMax(me)*100,bh:m.hp/m.max*100,
+    am:clampN((3.5+atk(me)+(dg(me).mon||0))*3/m.max,.45,2.4),bm:clampN((M.atk+2-armor(me))*3/hpMax(me),.3,2.2),t:M.titan?60:45},
+    r=>{if(!r){openSheet('battle');return}act(me,'mfight3d',{a:r.a,b:r.b,pf:r.pf,fled:r.fled});ui.mfSeen=-1;openSheet('battle')})}
+function arenaDuel(q){const me=mySeat();
+  arenaFight({a:ARENA_HERO(S.pl[me].hero),b:ARENA_HERO(S.pl[q].hero),ah:S.pl[me].hp/hpMax(me)*100,bh:S.pl[q].hp/hpMax(q)*100,
+    am:clampN((3.5+atk(me)-armor(q))*3/hpMax(q),.4,2.2),bm:clampN((3.5+atk(q)-armor(me))*3/hpMax(me),.4,2.2),t:45},
+    r=>{if(!r){openSheet('duel');return}act(me,'duel3d',{a:r.a,b:r.b,pf:r.pf,fled:r.fled});openSheet('duel')})}
 const FIGHT_URL=typeof location!=='undefined'&&/github\.io$/.test(location.hostname)?'fight/':'https://claude.ai/artifact/Vjaz9u5XCR8umuSDQJzVX7';   // TEMP fight test link
 function fitLobby(){                                          // menus fit the screen: shrink a little instead of scrolling; long lists still scroll
   if(typeof document==='undefined'||!document.querySelector)return;const el=document.querySelector('#app>div');if(!el||!el.style||(S&&S.phase))return;el.style.zoom='';el.style.paddingTop='';
@@ -5967,7 +6028,8 @@ function drawSheet(){
     const bc=mi>=0?(S.pl[me].bc||[]):[];if(ui.dc>=bc.length)ui.dc=-1;
     h=`<h2>${ico('attack')} ${D.done?'Duel over':`Duel · round ${D.r} of 3`}</h2>
       <div class="darena">${fighter(0)}<b class="vs">VS</b>${fighter(1)}</div>
-      ${L?`<div class="panel"><h3>ROUND ${L.r}</h3><p class="note">${[0,1].map(i=>`<b>${esc(pname(P[i]))}</b>: ${ico(stI[L.st[i]])} ${DSTN[L.st[i]]}${L.c[i]?` + ${BCARD[L.c[i]].n}${L.live[i]?'':' (cancelled)'}`:''}${L.roll[i]?` · rolled ${L.roll[i]} · dealt <b>${L.dmg[i]}</b>`:''}${L.heal[i]?` · healed ${L.heal[i]}`:''}`).join('<br>')}${L.txt?'<br>'+esc(L.txt):''}</p></div>`:''}
+      ${D.f3d&&!D.done&&me!==D.a?`<div class="panel"><b>⚔ ${esc(pname(D.a))} is fighting your hero in the arena…</b><p class="note">Your hero fights on its own (AI) for now.</p></div>`:''}
+      ${L&&L.a3d?`<div class="panel"><p class="note">${esc(L.txt)}</p></div>`:L?`<div class="panel"><h3>ROUND ${L.r}</h3><p class="note">${[0,1].map(i=>`<b>${esc(pname(P[i]))}</b>: ${ico(stI[L.st[i]])} ${DSTN[L.st[i]]}${L.c[i]?` + ${BCARD[L.c[i]].n}${L.live[i]?'':' (cancelled)'}`:''}${L.roll[i]?` · rolled ${L.roll[i]} · dealt <b>${L.dmg[i]}</b>`:''}${L.heal[i]?` · healed ${L.heal[i]}`:''}`).join('<br>')}${L.txt?'<br>'+esc(L.txt):''}</p></div>`:''}
       ${D.done?`<div class="panel"><b>${D.w<0?'No winner this time.':esc(pname(D.w))+' wins the duel! Up to 2 gold.'}</b></div><button class="btn" id="x">Close</button>`
       :mine2?`<h3 class="lbl">YOUR STANCE — secret until both lock in</h3><p class="note">Attack beats Feint · Defend beats Attack · Feint beats Defend. Win the stance: +3 damage. Lose it: half damage. The faster hero strikes first.</p>
         <div class="tabs">${['atk','def','fnt'].map(k=>`<button data-dst="${k}" aria-pressed="${ui.dst===k}">${ico(stI[k])} ${DSTN[k]}</button>`).join('')}</div>
@@ -6094,7 +6156,7 @@ function drawSheet(){
   sc.querySelectorAll('[data-bc]').forEach(b=>b.onclick=()=>{const c=pl.bc[+b.dataset.bc];if(c==='potion'&&myMove()){act(me,'bcuse',+b.dataset.bc);drawSheet()}else toast(`${BCARD[c].n}: ${BCARD[c].d}`)});
   sc.querySelectorAll('[data-hydra]').forEach(b=>b.onclick=()=>hydraGame(n=>act(me,'hydra',{n})));
   sc.querySelectorAll('[data-wt]').forEach(b=>b.onclick=()=>{if(!b.disabled){act(me,'roar',{t:b.dataset.wt});sfx(b.dataset.wt==='cheer'?'shimmer':'click')}});
-  sc.querySelectorAll('[data-cact]').forEach(b=>b.onclick=()=>{const k=b.dataset.cact;if(k==='battle')openSheet('battle');else if(k==='explore'&&!S.tut)labGame(ok=>act(me,'explore',{lab:ok?1:0}));else if(k==='work')act(me,'work',{t:b.dataset.t});else act(me,k,b.dataset.q!=null?+b.dataset.q:undefined)});
+  sc.querySelectorAll('[data-cact]').forEach(b=>b.onclick=()=>{const k=b.dataset.cact;if(k==='battle')openSheet('battle');else if(k==='explore'&&!S.tut)labGame(ok=>act(me,'explore',{lab:ok?1:0}));else if(k==='work')act(me,'work',{t:b.dataset.t});else if(k==='duel'&&arenaOK()){const q=+b.dataset.q;act(me,'duel',{q,f3d:1});if(applied()&&!(S.sub==='duel'&&S.duel&&S.duel.a===me&&!S.duel.done))return;closeSheet();arenaDuel(q)}else act(me,k,b.dataset.q!=null?+b.dataset.q:undefined)});
   sc.querySelectorAll('[data-tip]').forEach(b=>b.onclick=()=>{closeSheet();showTip(b.dataset.tip,true)});on('bHow',()=>openSheet('howto'));on('bSfx',()=>{LS.set('st-sfx',!SND.fx());sfx('click');drawSheet()});on('bMus',()=>{LS.set('st-mus',!SND.mu());actx();syncMusic();drawSheet()});on('bCoach',()=>{LS.set('st-coach',!coachOn());drawSheet();placeCoach()});on('bTour',()=>{closeSheet();openTour(S&&S.tw?'titan':'basics',0)});
   sc.querySelectorAll('[data-emo]').forEach(b=>b.onclick=()=>{if(Date.now()-(ui.lastEmo||0)<1500)return;ui.lastEmo=Date.now();act(me,'emote',EMOTES[+b.dataset.emo]);closeSheet()});
   sc.querySelectorAll('[data-dev]').forEach(b=>b.onclick=()=>{act(me,'dev',JSON.parse(b.dataset.dev));drawSheet()});
@@ -6112,7 +6174,7 @@ function drawSheet(){
   {const vt=sc.querySelector('#vpTitle');if(vt&&!LS.get('st-nodev',0))vt.onclick=()=>{const t=Date.now();ui.taps=(ui.taps||[]).filter(x=>t-x<4000);ui.taps.push(t);   // secret dev menu
     if(ui.taps.length>=7){ui.taps=[];ui.dev?openSheet('dev'):openSheet('devcode')}}}
   sc.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{act(me,'buy',b.dataset.buy);if(ui.sheet)drawSheet()});
-  on('strike',()=>{act(me,'battle');drawSheet()});
+  on('strike',()=>{if(arenaOK()){act(me,'battle',{f3d:1});if(applied()&&!(S.sub==='mfight'&&S.mf&&S.mf.p===me))return drawSheet();closeSheet();arenaMon()}else{act(me,'battle');drawSheet()}});
   ui.tb0=performance.now();                                    // timing bar: marker runs 0→1→0 every 1.2 s (matches the CSS animation)
   const tq=()=>{const t=((performance.now()-ui.tb0)%1200)/1200,x=t<.5?t*2:2-t*2,d=Math.abs(x-.5);return d<.07?1:d<.2?.5:0};
   sc.querySelectorAll('[data-help]').forEach(b=>b.onclick=()=>act(mySeat(),'help',{q:+b.dataset.help}));
