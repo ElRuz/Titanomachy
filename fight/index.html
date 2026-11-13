@@ -430,7 +430,8 @@ function loop(){requestAnimationFrame(loop);if(PAUSE)return;                 // 
   for(let i=sparks.length-1;i>=0;i--)if(sparks[i].life<=0){scene.remove(sparks[i].pts);sparks.splice(i,1)}
   // camera: keep both fighters framed, push in on the K.O., shake on big hits
   const mid=(A.x+B.x)/2,span=Math.abs(A.x-B.x)+2.6,hf=Math.tan(THREE.MathUtils.degToRad(cam.fov/2));
-  let z=Math.max(4.2,(span/2)/(hf*cam.aspect)+.6);if(G.zoom)z=THREE.MathUtils.lerp(z,3.2,.6);
+  const tall=1.85*Math.max(A.look.scale,B.look.scale);                       // tallest fighter (Titans): keep the head clear of the HP bars
+  let z=Math.max(4.2,(span/2)/(hf*cam.aspect)+.6,(tall-1.15+.3)/(hf*.62));if(G.zoom)z=THREE.MathUtils.lerp(z,3.2,.6);
   const sx=(Math.random()-.5)*G.shake,sy=(Math.random()-.5)*G.shake;G.shake*=Math.exp(-raw*9);
   wall.position.x=cam.position.x*.6;cam.position.lerp(new THREE.Vector3(mid+sx,1.55+sy+(G.zoom?-.2:0),z),1-Math.exp(-raw*7));cam.lookAt(mid,1.15,0);scene.fog.near=cam.position.z+3;scene.fog.far=cam.position.z+8;
   hud();R.render(scene,cam)}
