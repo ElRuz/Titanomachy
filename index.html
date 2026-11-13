@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261112204242'</script>
+<script>window.BUILD='20261113122532'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1483,6 +1483,12 @@ body.mgopen .stage *,body.mgopen .stage{animation-play-state:paused!important}
 .pbar.br .avw{width:34px;height:38px;border-width:2px}
 .pbar.br .pmore,.pbar.br .ribbon i,.pbar.br .ribbon b{display:none}
 .pbar.br .ribbon span{font-size:10px}
+.pbar.many{gap:4px!important}                                             /* 5–6 players: every banner fits on a phone */
+.pbar.many .pban{min-width:0!important;max-width:none!important;flex:1 1 0!important}
+.pbar.many .avw{width:34px!important;height:38px!important;border-width:2px!important}.pbar.many .pban{gap:3px!important;padding-right:3px}
+.pbar.many .pmore,.pbar.many .ribbon{display:none}                     /* name lives on the avatar tap; cards + HP stay */
+.pbar.many .pban{flex-direction:column!important;align-items:center!important;padding:3px 2px!important}   /* avatar on top, cards + HP underneath */
+.pbar.many .pinfo{min-width:0;width:100%;justify-content:center}.pbar.many .pstats{flex-direction:row;justify-content:center;gap:4px;font-size:10.5px;flex-wrap:nowrap}.pbar.many .pstats .ic,.pbar.many .pstats .gi{width:11px;height:11px}
 .poff{position:absolute;right:2px;bottom:1px;font-size:12px;color:#fff6;z-index:2}.poff.on{color:var(--cc,#ffd86a);text-shadow:0 0 6px currentColor}
 
 .brclans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -2028,6 +2034,7 @@ const HEX=[],V=[],E=[],HN=[],HADJ0=[],HADJ=[],COAST=[],PORTS=[],TWC=[],ROUTES=[]
 const SHIPC={lumber:1,wool:1};                                 // a ship: Timber + Fleece
 const BARREN=new Set(['desert','shrine','forge','vault','capital']);   // tiles that never produce
 const TWLAY={'12x':[[-6,1],[6,-6],[1,6],[-6,4],[3,-6],[4,3],[-3,1],[3,-3],[1,3],[-2,4],[-1,-2],[4,-1]],   // Battle Royale: 6 clan homes (Zeus, Poseidon, Hades ×2) + 6 wild/highland islands
+  '6x':[[4,0],[0,4],[-4,4],[-4,0],[0,-4],[4,-4]],'7x':[[4,0],[0,4],[-4,4],[-4,0],[0,-4],[4,-4],[4,4]],   // 5 / 6 players: homes on the six corners (+ free island)
   '3x':[[-3,2],[2,-3],[2,2]],'4x':[[-2,-1],[-2,4],[3,-3],[3,1]],'5x':[[-3,1],[-2,4],[1,-3],[2,2],[4,-2]],'2v':[[-2,4],[2,-3]],2:[[-2,-1],[2,2]],3:[[-3,2],[2,-3],[2,2]],4:[[-2,-1],[-2,4],[3,-3],[3,1]]};   // Titan War home-island centres around Olympus
 const HDIR=[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
 function buildGeo(shape){
@@ -2037,7 +2044,7 @@ function buildGeo(shape){
   if(tw){TWLAY[shape.slice(2)in TWLAY?shape.slice(2):tn].forEach(([q,r],k)=>{TWC.push(ax.length);ax.push([q,r,k]);HDIR.forEach(([a,b])=>ax.push([q+a,r+b,k]))});   // island k belongs to seat k
     [[0,0],[1,0],[0,1]].forEach(([q,r])=>ax.push([q,r,tn]));
     if(shape==='tw12x')[[[-1,0],[2,-1],[0,2]],[[-1,1],[1,-1],[1,1]],[[-1,2],[0,-1],[2,0]]].forEach((o,k)=>o.forEach(([q,r])=>ax.push([q,r,tn,k])))}   // Royale: 9 highland tiles ring the Sanctum (3 turn-symmetric trios)                                                           // Olympus = island tn
-  else if(shape==='arch')[[0,0],[4,0],[0,4]].forEach(([q,r],k)=>{ax.push([q,r,k]);HDIR.forEach(([a,b])=>ax.push([q+a,r+b,k]))});  // 3 islands of 7 tiles
+  else if(shape==='arch'||shape==='arch5')(shape==='arch5'?[[0,0],[4,0],[0,4],[-4,4],[4,-4]]:[[0,0],[4,0],[0,4]]).forEach(([q,r],k)=>{ax.push([q,r,k]);HDIR.forEach(([a,b])=>ax.push([q+a,r+b,k]))});  // 3 islands of 7 tiles
   else for(let r=-2;r<=2;r++)for(let q=-2;q<=2;q++)if(Math.abs(q+r)<=2)ax.push([q,r,0]);
   ax.forEach(([q,r,isl,hl])=>HEX.push({q,r,isl,hl,x:R*S3*(q+r/2),y:R*1.5*r,v:[],e:[]}));   // hl: highland trio (Royale core ring)
   HEX.forEach((h,hi)=>{
@@ -2077,7 +2084,7 @@ function buildGeo(shape){
       [-.9,.9].forEach(off=>{let best=-1,bd=9;ce.forEach(e=>{if(PORTS.includes(e))return;const t=Math.atan2((V[E[e].a].y+V[E[e].b].y)/2-c.y,(V[E[e].a].x+V[E[e].b].x)/2-c.x)-out-off,d=Math.abs(Math.atan2(Math.sin(t),Math.cos(t)));if(d<bd){bd=d;best=e}});if(best>=0)PORTS.push(best)})}   // inner islands may have no shore
   }
   if(shape==='classic'){[0,3,6,10,13,16,20,23,26].forEach(k=>PORTS.push(COAST[k]));SEA=[0,1,2,3,4,5].map(i=>{const a=Math.PI/3*i;return (318*Math.cos(a)).toFixed(1)+','+(318*Math.sin(a)).toFixed(1)}).join(' ');VBOX='-335 -300 670 600';return}
-  if(shape==='arch'){
+  if(shape==='arch'||shape==='arch5'){
   // stone bridges: 2 per pair of islands, across the narrow strait, as far apart as possible
   const isl=v=>HEX[V[v].h[0]].isl,cand={},bv=new Set();
   V.forEach((a,i)=>{if(a.h.length>2)return;V.forEach((b,j)=>{if(j<=i||b.h.length>2||isl(i)===isl(j))return;
@@ -2086,10 +2093,11 @@ function buildGeo(shape){
     c.forEach(x=>c.forEach(y=>{const [a,b]=m(x),[d,e]=m(y),dd=Math.hypot(a-d,b-e);if(dd>bd){bd=dd;best=[x,y]}}));
     best.forEach(([a,b])=>{const n=E.length;E.push({a,b,h:[],br:1});V[a].e.push(n);V[b].e.push(n);bv.add(a);bv.add(b);
       const ha=V[a].h[0],hb=V[b].h[0];HADJ[ha].push(hb);HADJ[hb].push(ha)})});
-  // 9 harbours: 3 on the outer shore of each island
-  [0,1,2].forEach(k=>{const hs=HEX.filter(h=>h.isl===k),ix=hs.reduce((t,h)=>t+h.x,0)/hs.length,iy=hs.reduce((t,h)=>t+h.y,0)/hs.length,out=Math.atan2(iy,ix);
+  // harbours on the outer shore of each island: 3 each (3 islands) / 2 each (5 islands)
+  const NI=shape==='arch5'?5:3,OFF=NI===5?[-.8,.8]:[-1.4,0,1.4];
+  [...Array(NI).keys()].forEach(k=>{const hs=HEX.filter(h=>h.isl===k),ix=hs.reduce((t,h)=>t+h.x,0)/hs.length,iy=hs.reduce((t,h)=>t+h.y,0)/hs.length,out=Math.atan2(iy,ix);
     const ce=COAST.filter(e=>HEX[E[e].h[0]].isl===k&&!bv.has(E[e].a)&&!bv.has(E[e].b));
-    [-1.4,0,1.4].forEach(off=>{let best=-1,bd=9;ce.forEach(e=>{if(PORTS.includes(e))return;
+    OFF.forEach(off=>{let best=-1,bd=9;ce.forEach(e=>{if(PORTS.includes(e))return;
       const t=Math.atan2((V[E[e].a].y+V[E[e].b].y)/2-iy,(V[E[e].a].x+V[E[e].b].x)/2-ix)-out-off,d=Math.abs(Math.atan2(Math.sin(t),Math.cos(t)));if(d<bd){bd=d;best=e}});PORTS.push(best)})});
   }
   // sea frame: a hexagon hugging the land (6 half-planes), viewBox from its bounds
@@ -2126,20 +2134,43 @@ function genBoard(){
       tl[i]=['shrine','forge','vault'][HEX.filter(x=>x.isl===tn).indexOf(h)];n[i]=0}});
     return {tl,n,rob:tl.indexOf('vault'),ports:PORTS.map((e,i)=>({e,t:i%2?BASE[rnd(5)]:'any'}))};
   }
-  const ar=GEO==='arch';                                        // archipelago: 21 tiles, 20 numbers
-  const tiles=[...Array(ar?4:3).fill('brick'),...Array(4).fill('lumber'),...Array(ar?5:4).fill('wool'),...Array(4).fill('grain'),...Array(3).fill('ore'),'desert'];
-  const nums=ar?[2,3,3,4,4,5,5,5,6,6,8,8,9,9,9,10,10,11,11,12]:[2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
+  const ar=GEO==='arch',a5=GEO==='arch5';                       // archipelago: 21 tiles, 20 numbers · 5–6 players: 35 tiles, 33 numbers
+  const tiles=a5?[...Array(7).fill('brick'),...Array(7).fill('lumber'),...Array(7).fill('wool'),...Array(7).fill('grain'),...Array(6).fill('ore'),'desert']
+    :[...Array(ar?4:3).fill('brick'),...Array(4).fill('lumber'),...Array(ar?5:4).fill('wool'),...Array(4).fill('grain'),...Array(3).fill('ore'),'desert'];
+  const nums=a5?[2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,8,8,8,9,9,9,9,10,10,10,10,11,11,11,11,12,12]
+    :ar?[2,3,3,4,4,5,5,5,6,6,8,8,9,9,9,10,10,11,11,12]:[2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12];
+  if(a5)return genA5(tiles,nums);
   for(let t=0;t<200000;t++){
     const tl=shuffle(tiles.slice());
     if(HN.some(([a,b])=>tl[a]===tl[b]))continue;                 // no clumped terrain
     for(let u=0;u<4000;u++){                                     // then find fair numbers for it
       const ns=shuffle(nums.slice());let k=0;const n=tl.map(r=>r==='desert'?0:ns[k++]);
       if(!fairNums(tl,n,u>3000))continue;
-      const types=shuffle(['any','any','any','any','brick','lumber','wool','grain','ore']);
+      const types=shuffle(a5?['any','any','any','any','any','brick','lumber','wool','grain','ore']:['any','any','any','any','brick','lumber','wool','grain','ore']);
       return {tl,n,ports:PORTS.map((e,i)=>({e,t:types[i]}))};
     }
   }
 }
+/* 5–6 player board (35 tiles): built tile by tile instead of by blind shuffles (fast on phones) */
+function genA5(tiles,nums){
+  const adj=HEX.map(()=>[]);HN.forEach(([a,b])=>{adj[a].push(b);adj[b].push(a)});
+  for(let t=0;t<3000;t++){
+    const left={};tiles.forEach(r=>left[r]=(left[r]||0)+1);const tl=[];let ok=true;
+    for(const h of shuffle(HEX.map((_,i)=>i))){                   // each tile: a type none of its placed neighbours has
+      const opts=Object.keys(left).filter(r=>left[r]>0&&!adj[h].some(o=>tl[o]===r));
+      if(!opts.length){ok=false;break}const w=opts.flatMap(r=>Array(left[r]).fill(r)),r=w[rnd(w.length)];tl[h]=r;left[r]--}
+    if(!ok)continue;
+    for(let u=0;u<400;u++){                                       // numbers: reds apart first, then the rest with no twins side by side
+      const land=HEX.map((_,i)=>i).filter(i=>tl[i]!=='desert'),n=HEX.map(()=>0),reds=nums.filter(x=>x===6||x===8),rest=shuffle(nums.filter(x=>x!==6&&x!==8));
+      let fail=false;for(const x of reds){const c=shuffle(land.filter(i=>!n[i]&&!adj[i].some(o=>n[o]===6||n[o]===8)));if(!c.length){fail=true;break}n[c[0]]=x}
+      if(fail)continue;
+      for(const x of rest){const c=land.filter(i=>!n[i]&&!adj[i].some(o=>n[o]===x)),c2=c.length?c:land.filter(i=>!n[i]);n[c2[rnd(c2.length)]]=x}
+      if(!fairNums(tl,n,true))continue;
+      const types=shuffle(['any','any','any','any','any','brick','lumber','wool','grain','ore']);
+      return {tl,n,ports:PORTS.map((e,i)=>({e,t:types[i]}))}}
+  }
+  const tl=shuffle(tiles.slice());let k=0;const ns=shuffle(nums.slice()),n=tl.map(r=>r==='desert'?0:ns[k++]);   // never fails: plain shuffle as a last resort
+  return {tl,n,ports:PORTS.map((e,i)=>({e,t:['any','brick','lumber','wool','grain','ore'][i%6]}))}}
 function fairNums(tl,n,relax){
   for(const [a,b] of HN){
     if(!n[a]||!n[b])continue;
@@ -2205,7 +2236,7 @@ const evMult=r=>{const e=S.event&&S.event.t;return (e==='goldrush'&&r==='ore')||
 function actor(){
   if(!S||(S.phase!=='setup'&&S.phase!=='main'))return -1;
   if(S.sub==='discard')return S.dq[0];
-  if(S.sub==='duel'&&S.duel)return S.duel.pk[0]?S.duel.b:S.duel.a;
+  if(S.sub==='duel'&&S.duel)return S.duel.f3d===2?S.duel.b:S.duel.pk[0]?S.duel.b:S.duel.a;   // f3d 2: the challenged player fights it out in the arena
   return S.cur;
 }
 function vp(p,hidden){
@@ -2223,7 +2254,7 @@ function vp(p,hidden){
 // Two sacred temple tiles: buildings there also receive Ambrosia when the tile produces
 function pickTemples(b){
   const ok=HEX.map((_,i)=>i).filter(i=>!BARREN.has(b.tl[i])&&PIPS[b.n[i]]>=2&&PIPS[b.n[i]]<=4);
-  if(GEO==='arch'||GEO.startsWith('tw'))return [...Array(GEO==='arch'?3:parseInt(GEO.slice(2))).keys()].map(k=>{const o=ok.filter(i=>HEX[i].isl===k);return o.length?o[rnd(o.length)]:-1}).filter(x=>x>=0);   // one temple per island
+  if(GEO==='arch'||GEO==='arch5'||GEO.startsWith('tw'))return [...Array(GEO==='arch'?3:GEO==='arch5'?5:parseInt(GEO.slice(2))).keys()].map(k=>{const o=ok.filter(i=>HEX[i].isl===k);return o.length?o[rnd(o.length)]:-1}).filter(x=>x>=0);   // one temple per island
   for(let t=0;t<200;t++){const a=ok[rnd(ok.length)],c=ok[rnd(ok.length)];if(a!==c&&!HADJ0[a].includes(c))return [a,c]}
   return ok.slice(0,2);
 }
@@ -2497,11 +2528,11 @@ function rematch(){
   ui={d3:ui.d3,screen:ui.screen,user:ui.user,amode:ui.amode};closeSheet();log('Rematch! New game — place your first village and road');save();
   if(S.online)openGame(S.id);render()}
 function newState(cfg){
-  const twn=cfg.tw?cfg.seats.length:0;buildGeo(cfg.br?'tw12x':twn?'tw'+(twn+1)+'x':'arch');   // one island per player + one free island (Battle Royale: the big 12-island map)
+  const twn=cfg.tw?cfg.seats.length:0;buildGeo(cfg.br?'tw12x':twn?'tw'+(twn+1)+'x':cfg.seats.length>4?'arch5':'arch');   // one island per player + one free island (Battle Royale: the big 12-island map)
   RES=BASE.concat(SPEC,cfg.ck?COMS:[]);
   const b=genBoard(),n=cfg.seats.length,deck=[];
   const r0=cfg.rpg||{},rpg={k:!!r0.k,ev:!!r0.ev,goals:!!r0.goals&&!r0.k&&!cfg.tw,hero:!!r0.k,mon:!!r0.k,relic:!!r0.k},gk=shuffle(Object.keys(GOALS).filter(k=>!(GOALS[k].ck&&!cfg.ck)&&!(GOALS[k].classic&&cfg.ck)&&!(GOALS[k].mon&&!rpg.mon))),hk=Object.keys(HEROES);
-  [['knight',10],['vp',4],['road',2],['yop',2],['mono',2],['trojan',2],['oracle',2]].forEach(([t,k])=>{for(let i=0;i<k;i++)deck.push(t)});
+  const big=n>4;[['knight',big?14:10],['vp',big?5:4],['road',big?3:2],['yop',big?3:2],['mono',big?3:2],['trojan',2],['oracle',2]].forEach(([t,k])=>{for(let i=0;i<k;i++)deck.push(t)});   // 5–6 players: a larger deck
   return {
     v:1,shape:GEO,tw:cfg.br?{br:1,end:'sanctum',war:3,on:false,claim:true,ni:12,own:Object.fromEntries(cfg.seats.map((_,i)=>[i,i])),cap:cfg.seats.map((_,i)=>TWC[i]),cy:{},clan:cfg.seats.map((_,i)=>i%3),off:{}}   // clans: seats 0,3 Zeus · 1,4 Poseidon · 2,5 Hades
       :twn?{end:cfg.twEnd||'r15',war:10,on:false,claim:true,ni:twn+1,own:{},cap:[],cy:{}}:null,id:cfg.id,online:!!cfg.online,phase:cfg.online?'wait':'setup',host:ME.uid,created:Date.now(),
@@ -2511,7 +2542,7 @@ function newState(cfg){
     tasks:!!cfg.tasks,tdrawn:false,
     vb:{},er:{},pl:cfg.seats.map((s,i)=>({tasks:[],offers:[],res:z(),dev:[],kn:0,rd:15,st:5,ct:4,bonus:0,xp:0,cloak:0,
       hero:s.hero&&HEROES[s.hero]?s.hero:hk[rnd(hk.length)],imp:{trade:0,politics:0,science:0},prog:[],relics:[],hx:-1,cap:-1,hp:HPMAX,gold:0,ren:0,court:null,goal:rpg.goals?{t:gk[i%gk.length],done:false}:null})),
-    bank:Object.fromEntries(RES.map(r=>[r,r==='ambrosia'?10:COMS.includes(r)?12:19])),deck:shuffle(deck),
+    bank:Object.fromEntries(RES.map(r=>[r,r==='ambrosia'?(n>4?14:10):COMS.includes(r)?(n>4?16:12):(n>4?24:19)])),deck:shuffle(deck),   // 5–6 players: 24 of each card
     temples:pickTemples(b),prayed:false,ares:-1,
     kn:{},barb:0,barbHit:false,metro:{},mons:[],lair:-1,lairT:2,ruins:[],hmoved:false,hacted:false,quest:null,event:null,round:0,fought:false,fleet:-1,alch:null,lucky:-1,freeCity:-1,pickN:0,monoMode:null,bishop:false,lvup:null,
     order:[...Array(n).keys(),...[...Array(n).keys()].reverse()],step:0,cur:0,sub:'s',last:null,
@@ -2763,7 +2794,7 @@ function duelRound(){
   D.pk=[null,null];D.last=res;
   if(card[0]==='retreat'||card[1]==='retreat'){const w=card[0]==='retreat'?0:1;res.txt=`${pname(P[w])} retreats.`;log(`Duel: <b>${pname(P[w])}</b> retreats`);return duelEnd(-1)}
   card.forEach((c,i)=>{if(c==='potion'){const pl=S.pl[P[i]],hl=Math.min(4,hpMax(P[i])-pl.hp);pl.hp+=hl;res.heal[i]=hl}});
-  const home=i=>S.pl[P[i]].hx>=0&&S.pl[P[i]].hx<1000&&HEX[S.pl[P[i]].hx].isl===P[i]?1:0;   // fighting on your own island: +1 armour
+  const home=i=>!!S.tw&&S.pl[P[i]].hx>=0&&S.pl[P[i]].hx<1000&&HEX[S.pl[P[i]].hx].isl===P[i]?1:0;   // fighting on your own island: +1 armour
   const hit=i=>{const j=1-i;let d=d6();res.roll[i]=d;d+=atk(P[i])+(card[i]==='spear'?3:0)+(isLeader(P[j])?1:0);   // +1 against the VP leader
     if(DBEAT[res.st[i]]===res.st[j])d+=3;else if(DBEAT[res.st[j]]===res.st[i])d=Math.floor(d/2);   // stance won / lost
     if(card[i]==='fury')d*=2;
@@ -2788,7 +2819,7 @@ function duelEnd(w){                                          // w = 0 attacker,
       if(gs.length){const x=gs[rnd(gs.length)];delete S.pl[L].gear[x];(S.pl[W].gear=S.pl[W].gear||{})[x]=1;log(`<b>${pname(W)}</b> takes the ${GEAR[x].n} as spoils`)}
       else{const k=Math.min(3,S.pl[L].gold);S.pl[L].gold-=k;S.pl[W].gold+=k}
       knockout(L)}
-    if(cs(W).fallen&&cs(W).by===L)rebel(W,L);
+    if(S.tw&&cs(W).fallen&&cs(W).by===L)rebel(W,L);              // rebellion only exists in Titan War
     if(S.tut&&W===0){S.tut.duel=true;if(S.pl[L].hp>0)knockout(L)}}   // tutorial: the beaten hero always leaves
   S.lastFight={duel:1,p:P[0],q:P[1],a:S.pl[P[0]].hp,b:S.pl[P[1]].hp,w:D.w,id:(S.lastFight?S.lastFight.id:0)+1};
 }
@@ -3259,12 +3290,12 @@ const RULES={
     S.lastFight={p,t:F.t,d:0,dmg,md:0,taken:mdmg,hp:Math.max(0,m.hp),max:m.max,win:F.win,ko:F.ko,id:(S.lastFight?S.lastFight.id:0)+1};
   },
   duel3d(p,o){                                                // arena duel against the rival hero (AI-run for now): remaining HP %
-    const D=S.duel;if(S.sub!=='duel'||!D||D.done||D.a!==p||!D.f3d||!o)return bad('No duel now');
-    const P=[D.a,D.b],v=[o.a,o.b].map(x=>Math.max(0,Math.min(100,+x||0))),old=P.map(q=>S.pl[q].hp);
+    const D=S.duel;if(S.sub!=='duel'||!D||D.done||!o||!(D.f3d===1&&D.a===p||D.f3d===2&&D.b===p))return bad('No duel now');
+    const P=[D.a,D.b],v=(D.f3d===2?[o.b,o.a]:[o.a,o.b]).map(x=>Math.max(0,Math.min(100,+x||0))),old=P.map(q=>S.pl[q].hp);
     P.forEach((q,i)=>{S.pl[q].hp=v[i]<=0?0:Math.max(1,Math.round(hpMax(q)*v[i]/100))});
     const pf=Math.max(0,Math.min(5,+o.pf||0));if(pf)xp(p,pf);
     const w=o.fled?-1:v[1]<=0?0:v[0]<=0?1:v[0]===v[1]?-1:v[0]>v[1]?0:1;
-    D.last={r:D.r,a3d:1,txt:`Arena duel: ${pname(P[0])} dealt ${Math.max(0,old[1]-S.pl[P[1]].hp)}, ${pname(P[1])} dealt ${Math.max(0,old[0]-S.pl[P[0]].hp)}${o.fled?' — '+pname(P[0])+' retreats':''}`};
+    D.last={r:D.r,a3d:1,txt:`Arena duel: ${pname(P[0])} dealt ${Math.max(0,old[1]-S.pl[P[1]].hp)}, ${pname(P[1])} dealt ${Math.max(0,old[0]-S.pl[P[0]].hp)}${o.fled?' — '+pname(p)+' retreats':''}`};
     log(D.last.txt);duelEnd(w);
   },
   mfight(p,o){                                                // one round: your move, then the monster's
@@ -3335,6 +3366,7 @@ const RULES={
   },
   duel(p,q){
     let f3d=0;if(q&&typeof q==='object'){f3d=q.f3d?1:0;q=+q.q}      // {q, f3d}: fought in the 3D arena
+    if(!f3d&&!S.tut&&S.seats[p]&&S.seats[p].kind!=='human'&&S.seats[q]&&S.seats[q].kind==='human')f3d=2;   // a bot challenges a person: the person fights it in the arena
     if(!S.rpg.k||!S.rolled||S.sub||S.hacted||S.pl[q].hx!==S.pl[p].hx)return bad('No rival hero here');
     if(S.tw&&!tileActions(p).some(a=>a.k==='duel'&&a.q===q))return bad('At peace you can only duel on Olympus or your own island');
     if(S.tw||f3d){                                            // Titan War (or any arena duel): a real duel
@@ -3442,6 +3474,7 @@ const RULES={
   dpick(p,o){                                                 // lock in a stance (+ optional battle card) for this duel round
     const D=S.duel;if(S.sub!=='duel'||!D)return bad('No duel now');const i=p===D.a?0:p===D.b?1:-1;
     if(i<0||D.pk[i])return bad('Already chosen');if(!o||!['atk','def','fnt'].includes(o.st))return bad('Pick a stance');
+    D.f3d=0;                                                   // a classic pick (arena unavailable / time up): the duel goes on with stances
     const bc=S.pl[p].bc||[],c=o.c==null||o.c<0?-1:+o.c;
     const cst=c>=0&&bc[c]?BCARD[bc[c]].sta+(dg(p).heavy||0):0;if(c>=0&&(!bc[c]||cst>D.sta[i]))return bad('Not enough stamina for that card');
     D.pk[i]={st:o.st,c:c>=0?bc[c]:null,t:o.st==='atk'&&[.5,1].includes(o.t)?o.t:0};if(c>=0){D.sta[i]-=cst;bc.splice(c,1)}
@@ -4187,7 +4220,7 @@ function slamCheck(){siegeSlams();                                           // 
   // world events
   if(cur.ev!==P.ev&&S.event&&S.event.t!=='calm'&&EVENTS[S.event.t])slam('world','globe',EVENTS[S.event.t].n,EVENTS[S.event.t].d);
 }
-function render(){setTimeout(slamCheck,0);setTimeout(placeTick,0);
+function render(){setTimeout(slamCheck,0);if(typeof document!=='undefined')setTimeout(duelDefCheck,0);setTimeout(placeTick,0);
   syncMode();
   if(!S)return renderLobby();
   if(S.phase==='wait')return renderWait();
@@ -4196,7 +4229,7 @@ function render(){setTimeout(slamCheck,0);setTimeout(placeTick,0);
 }
 
 // ---------- Lobby ----------
-let cfg={seats:[{kind:'me'},{kind:'open'},{kind:'bot',level:1,persona:'random'},{kind:'none'}],dice:'random',timer:0,speed:false,friendly:true,tasks:true,ck:false,rpg:{k:true,ev:true,goals:true},hero:LS.get('st-hero','heracles')};
+let cfg={seats:[{kind:'me'},{kind:'open'},{kind:'bot',level:1,persona:'random'},{kind:'none'},{kind:'none'},{kind:'none'}],dice:'random',timer:0,speed:false,friendly:true,tasks:true,ck:false,rpg:{k:true,ev:true,goals:true},hero:LS.get('st-hero','heracles')};
 const heroChips=(sel,attr)=>{const pv=ui.hprev&&HEROES[ui.hprev]?ui.hprev:sel;return `<div class="tabs">${Object.entries(HEROES).map(([k,h])=>{const lk=!owns(k);return `<button ${attr}="${k}" class="${pv===k&&pv!==sel?'hprev':''}" aria-pressed="${sel===k}" ${lk?'disabled title="Find this hero in a hero pack"':''}>${ico(h.i)} ${h.n}${lk?' <svg class=gi><use href=#g-lock></use></svg>':''}</button>`}).join('')}</div><div class="dgpick">${ico(HEROES[pv].i,'dgbig')}<p class="note"><b>${HEROES[pv].n}</b>, ${HEROES[pv].par}<br><svg class=gi><use href=#g-star></use></svg> ${HEROES[pv].pw}<br><svg class=gi><use href=#g-cross></use></svg> ${HEROES[pv].wk}<br>${pv===sel?'<span class="tag">✓ Chosen</span>':`<button class="btn sm pri" ${attr}="${pv}">Choose ${HEROES[pv].n}</button> <i>or tap it again</i>`}</p></div>`};
 const seg=(key,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button data-cfg="${key}" data-v="${v}" aria-pressed="${String(cfg[key])===String(v)}">${l}</button>`).join('')}</div>`;
 async function loadHist(){                                   // local games + shared online history
@@ -4313,8 +4346,8 @@ const fightURL=()=>{const a=typeof prof==='function'?armDom():null;return FIGHT_
 /* ---------- 3D arena inside the game: monster fights and duels open the fighting game in a full-screen frame ----------
    the frame is created once and kept (models stay loaded); it sleeps between fights. No answer within 15 s → classic dice fight. */
 const F3D={fr:null,ok:null,cb:null,id:0,pend:null,to:0};
-const ARENA_MON={goblin:{bn:'Harpies',bc:0x9fb5a8,bs:.95},troll:{bn:'Minotaur'},dragon:{bn:'Hydra',bc:0x6fd0a8,bs:1.25},
-  kronos:{bn:'Kronos',bc:0xc8b48a,bs:1.45},atlas:{bn:'Atlas',bc:0x9aaed0,bs:1.5},hyperion:{bn:'Hyperion',bc:0xffd27a,bs:1.4},typhon:{bn:'Typhon',bc:0x9a6ad0,bs:1.5}};   // one beast model, each in its own colour and size (own models later)
+const ARENA_MON={goblin:{k:'harpy',bn:'Harpies'},kronos:{k:'kronos',bn:'Kronos'},troll:{bn:'Minotaur'},dragon:{bn:'Hydra',bc:0x6fd0a8,bs:1.25},
+  atlas:{bn:'Atlas',bc:0x9aaed0,bs:1.5},hyperion:{bn:'Hyperion',bc:0xffd27a,bs:1.4},typhon:{bn:'Typhon',bc:0x9a6ad0,bs:1.5}};   // one beast model, each in its own colour and size (own models later)
 const ARENA_HERO=k=>['heracles','perseus','theseus','achilles','penthesilea','orion','meleager','aeneas','autolycus','asclepius','aristaeus','orpheus'].includes(k)?k:'heracles';
 const arenaOK=()=>typeof document!=='undefined'&&F3D.ok!==false&&!!S&&!S.tut&&mySeat()>=0;
 function arenaFrame(){if(F3D.fr)return F3D.fr;
@@ -4331,13 +4364,15 @@ function arenaFight(cfg,cb){const w=arenaFrame();w.classList.add('on');document.
 const applied=()=>!S.online||S.host===ME.uid;            // this device applied the move itself (else it went to the host)
 const clampN=(v,a,b)=>Math.max(a,Math.min(b,v));
 function arenaMon(){const me=mySeat(),pl=S.pl[me],m=S.mons.find(x=>x.h===pl.hx);if(!m)return;const M=MONS[m.t],X=ARENA_MON[m.t]||{};
-  arenaFight({a:ARENA_HERO(pl.hero),b:'minotaur',bn:X.bn||M.n,bc:X.bc||0,bs:X.bs||0,ah:pl.hp/hpMax(me)*100,bh:m.hp/m.max*100,
+  arenaFight({a:ARENA_HERO(pl.hero),b:X.k||'minotaur',bn:X.bn||M.n,bc:X.bc||0,bs:X.bs||0,ah:pl.hp/hpMax(me)*100,bh:m.hp/m.max*100,
     am:clampN((3.5+atk(me)+(dg(me).mon||0))*3/m.max,.45,2.4),bm:clampN((M.atk+2-armor(me))*3/hpMax(me),.3,2.2),t:M.titan?60:45},
     r=>{if(!r){openSheet('battle');return}act(me,'mfight3d',{a:r.a,b:r.b,pf:r.pf,fled:r.fled});ui.mfSeen=-1;openSheet('battle')})}
-function arenaDuel(q){const me=mySeat();
+function duelDefCheck(){const D=S&&S.duel,me=mySeat();if(!D||D.done||S.sub!=='duel'||D.f3d!==2||D.b!==me||ui.d3Open===D.id||!arenaOK())return;
+  ui.d3Open=D.id;toast(`${pname(D.a)} challenges you to a duel!`);setTimeout(()=>arenaDuel(D.a,1),900)}   // a bot (or rival) attacks you: defend in the arena
+function arenaDuel(q,def){const me=mySeat();
   arenaFight({a:ARENA_HERO(S.pl[me].hero),b:ARENA_HERO(S.pl[q].hero),ah:S.pl[me].hp/hpMax(me)*100,bh:S.pl[q].hp/hpMax(q)*100,
     am:clampN((3.5+atk(me)-armor(q))*3/hpMax(q),.4,2.2),bm:clampN((3.5+atk(q)-armor(me))*3/hpMax(me),.4,2.2),t:45},
-    r=>{if(!r){openSheet('duel');return}act(me,'duel3d',{a:r.a,b:r.b,pf:r.pf,fled:r.fled});openSheet('duel')})}
+    r=>{if(!r){openSheet('duel');return}act(me,'duel3d',{a:r.a,b:r.b,pf:r.pf,fled:r.fled});openSheet('duel')})}   // def: same call, this player is the challenged one
 const FIGHT_URL=typeof location!=='undefined'&&/github\.io$/.test(location.hostname)?'fight/':'https://claude.ai/artifact/Vjaz9u5XCR8umuSDQJzVX7';   // TEMP fight test link
 function fitLobby(){                                          // menus fit the screen: shrink a little instead of scrolling; long lists still scroll
   if(typeof document==='undefined'||!document.querySelector)return;const el=document.querySelector('#app>div');if(!el||!el.style||(S&&S.phase))return;el.style.zoom='';el.style.paddingTop='';
@@ -5447,7 +5482,7 @@ function renderGame(){
           ${S.rpg.k?`<span title="Hero level · HP">${ico(HEROES[pl.hero].i,'ic sm')}${hlv(i)}·${pl.hp}</span><span title="Gold">${ico('coin','ic sm')}${pl.gold}</span>`:''}
           <span title="Ambrosia">${ico('ambrosia','ic sm')}${pl.res.ambrosia||0}</span>${nt?`<span title="Secret missions">${ico('flag','ic sm')}${nt}</span>`:''}${pl.goal&&pl.goal.done?'<span class="badge">GOAL</span>':''}</span>
         </div></div>${S.tw&&S.tw.br?`<span class="poff ${S.tw.off[i]?'on':''}" title="${S.tw.off[i]?'Offering made':'No offering yet'}">${S.tw.off[i]?'✦':'·'}</span>`:''}</div>`});
-  const pbar=document.getElementById('players');pbar.classList.toggle('br',!!(S.tw&&S.tw.br));
+  const pbar=document.getElementById('players');pbar.classList.toggle('br',!!(S.tw&&S.tw.br));pbar.classList.toggle('many',!(S.tw&&S.tw.br)&&S.seats.length>4);   // 5–6 players: compact banners
   if(S.tw&&S.tw.br){const mc=me>=0?clanOf(me):0;pbar.innerHTML=[mc,(mc+1)%3,(mc+2)%3].map(c=>`<div class="clanb ${c===mc?'mine':''}" style="--cc:${CLANS[c].c}"><em>${CLANS[c].n}${c===mc?' · YOU':''}</em><div>${S.seats.map((_,i)=>i).filter(i=>clanOf(i)===c).map(i=>bans[i]).join('')}</div></div>`).join('')}   // Battle Royale: banners grouped by clan
   else pbar.innerHTML=bans.join('');
   // tap another player's banner: their full numbers in one line
@@ -6028,7 +6063,7 @@ function drawSheet(){
     const bc=mi>=0?(S.pl[me].bc||[]):[];if(ui.dc>=bc.length)ui.dc=-1;
     h=`<h2>${ico('attack')} ${D.done?'Duel over':`Duel · round ${D.r} of 3`}</h2>
       <div class="darena">${fighter(0)}<b class="vs">VS</b>${fighter(1)}</div>
-      ${D.f3d&&!D.done&&me!==D.a?`<div class="panel"><b>⚔ ${esc(pname(D.a))} is fighting your hero in the arena…</b><p class="note">Your hero fights on its own (AI) for now.</p></div>`:''}
+      ${D.f3d===1&&!D.done&&me!==D.a?`<div class="panel"><b>⚔ ${esc(pname(D.a))} is fighting your hero in the arena…</b><p class="note">Your hero fights on its own (AI) for now.</p></div>`:''}
       ${L&&L.a3d?`<div class="panel"><p class="note">${esc(L.txt)}</p></div>`:L?`<div class="panel"><h3>ROUND ${L.r}</h3><p class="note">${[0,1].map(i=>`<b>${esc(pname(P[i]))}</b>: ${ico(stI[L.st[i]])} ${DSTN[L.st[i]]}${L.c[i]?` + ${BCARD[L.c[i]].n}${L.live[i]?'':' (cancelled)'}`:''}${L.roll[i]?` · rolled ${L.roll[i]} · dealt <b>${L.dmg[i]}</b>`:''}${L.heal[i]?` · healed ${L.heal[i]}`:''}`).join('<br>')}${L.txt?'<br>'+esc(L.txt):''}</p></div>`:''}
       ${D.done?`<div class="panel"><b>${D.w<0?'No winner this time.':esc(pname(D.w))+' wins the duel! Up to 2 gold.'}</b></div><button class="btn" id="x">Close</button>`
       :mine2?`<h3 class="lbl">YOUR STANCE — secret until both lock in</h3><p class="note">Attack beats Feint · Defend beats Attack · Feint beats Defend. Win the stance: +3 damage. Lose it: half damage. The faster hero strikes first.</p>
