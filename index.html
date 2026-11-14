@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Titanomachy"><meta name="theme-color" content="#0b1626">
-<script>window.BUILD='20261113174811'</script>
+<script>window.BUILD='20261113181909'</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Titanomachy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1597,6 +1597,7 @@ html:lang(ru) button,html:lang(uz) button,html:lang(ru) .bchip,html:lang(uz) .bc
 /* armour cosmetics on the hero */
 .harm{animation:harm 2.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}@keyframes harm{from{opacity:.75}to{opacity:1}}
 .bigb #board .hot{animation:none}
+.sheet .sback{display:inline-block!important;width:auto!important;justify-self:start;margin:2px 0 4px;border:1px solid #ffd86a66;background:#1d2a3fcc;color:#ffe08a;border-radius:10px;padding:6px 12px;font:700 13px Cinzel,Georgia,serif}
 #f3d{position:fixed;inset:0;z-index:9000;background:#05080f;display:none}#f3d.on{display:block}
 #f3d p{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#ffe7a3;font:900 18px Cinzel,Georgia,serif;letter-spacing:.06em}
 #f3d iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
@@ -5304,6 +5305,7 @@ const TOUR={
     {i:'ruin',t:'Shades',l:['A fallen hero becomes a <b>Shade</b> for 2 rounds and drops half its cards.','Your clan-mate can <b>pray</b> (1 Ambrosia, their hero’s deed) to raise it at once.','Or run the <b>Labyrinth</b> yourself once per round — win it and you are home.'],tip:'Keep 1 Ambrosia for your clan-mate.'},
   ]};
 function openTour(track,pg){                                 // full-screen walkthrough; works on the home screen and in game
+  if(ui.sheet&&!needSheet())closeSheet();{const t=document.getElementById('tipcard');if(t)t.remove()}   // replaces any open menu instead of stacking on it
   let el=document.getElementById('tour');if(!el){el=document.createElement('div');el.id='tour';el.className='tour';document.body.appendChild(el)}
   const T=TOUR[track],P=T[pg],last=pg===T.length-1;
   el.innerHTML=`<div class="tcard" role="dialog" aria-label="Walkthrough">
@@ -5371,6 +5373,7 @@ function showTip(k,again){
   if(!again){const T=TIPS[k];tipsSeen[k]=1;LS.set('st-tips',tipsSeen);ui.lastTip=Date.now();   // in-game tip = one floating line
     const t=inGame()?feedPush('tip',T.s,k,' <button class="tipx" title="Turn tips off">✕</button>'):note(`<svg class=gi><use href=#g-owl></use></svg> ${T.s}<button class="tipx" title="Turn tips off">✕</button>`,7000,'tipn');
     const tx=t&&t.querySelector('.tipx');if(tx)tx.onclick=e=>{e.stopPropagation();tipsSeen.off=1;LS.set('st-tips',tipsSeen);t.classList.remove('on');toast('Tips off (Guide still has everything)')};return}
+  if(ui.sheet&&!needSheet())closeSheet();['tour','tipcard'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});   // one pop-up at a time
   const T=TIPS[k],el=document.createElement('div');el.id='tipcard';el.className='tipcard';
   el.innerHTML=`<div class="tip-ic">${ico(T.i)}</div><span class="tip-k">${again?'GUIDE':'NEW'}</span><h2>${T.t}</h2><ul>${T.l.map(x=>`<li>${riz(x)}</li>`).join('')}</ul>
     <div class="row"><button class="btn pri" id="tipOk">Got it</button>${again?'':'<button class="btn sm" id="tipOff">Hide tips</button>'}</div>`;
@@ -5801,8 +5804,7 @@ function needSheet(){                                         // the decision sc
 }
 function userClose(){                                         // Close / tap outside: Hero sub-screens go back to Hero
   if(S&&needSheet()===ui.sheet)return toast('Finish this choice first');
-  if(ui.back&&ui.back!==ui.sheet){const b=ui.back;ui.back=null;return openSheet(b)}
-  closeSheet();
+  closeSheet();                                                 // one tap closes the whole thing (no second layer to dismiss)
 }
 // your hand after the trade on screen: every resource with its change (−1 red, +1 green)
 // the other player's side of a deal: their card total before → after, and what moves
@@ -5824,7 +5826,9 @@ function picker(key,max,opts={}){                             // tap a resource 
     <span class="have">${opts.label?opts.label(r):RNAME[r]}</span>
     <button class="minus" data-sub="${key}:${r}" aria-label="Remove ${RNAME[r]}" ${pk[r]?'':'disabled'}>−</button></div>`).join('')}</div>`;
 }
-function openSheet(kind,arg){
+function oneLayer(){if(typeof document==='undefined')return;['tour','tipcard'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});   // never two pop-ups stacked
+  const bn=document.getElementById('banner');if(bn)bn.classList.remove('open');document.querySelectorAll('.rail.open').forEach(r=>r.classList.remove('open'))}
+function openSheet(kind,arg){oneLayer();
   if(ui.sheet==='champ'&&['armory','hero','battle','gold','howto'].includes(kind))ui.back='champ';   // remember where we came from
   else if(!['armory','hero','battle','gold','howto'].includes(kind))ui.back=null;
   ui.sheet=kind;setTimeout(placeCoach,60);ui.arg=arg;ui.pk={a:z(),b:z()};ui.tt=ui.tt??'bank';ui.counter=false;
@@ -6211,8 +6215,9 @@ function drawSheet(){
   // explanation screens get resource pictures inline; pickers already show them
   if(!['discard','yop','mono','tradeui','mresp','market','gold','stats'].includes(kind))h=riz(h);
   const noX=['discard','steal','mono','yop','over','trial','mresp','alch','duel','battle','court','threat'].includes(kind);   // these must be answered
-  sc.innerHTML=`<div class="sheet ${oldSheet?'still':''}" role="dialog" aria-modal="true">${noX?'':'<button class="shx" aria-label="Close" title="Close">✕</button>'}${S&&S.phase!=='over'&&!['over','menu','help','looks','guide','watch','tradeui','gold'].includes(kind)?invStrip():''}${h}</div>`;
+  sc.innerHTML=`<div class="sheet ${oldSheet?'still':''}" role="dialog" aria-modal="true">${noX?'':'<button class="shx" aria-label="Close" title="Close">✕</button>'}${S&&S.phase!=='over'&&!['over','menu','help','looks','guide','watch','tradeui','gold'].includes(kind)?invStrip():''}${ui.back&&ui.back!==kind?'<button class="sback" id="sBack">‹ Back to Hero</button>':''}${h}</div>`;
   sc.querySelectorAll('.shx').forEach(b=>b.onclick=()=>closeSheet());
+  {const bk=sc.querySelector('#sBack');if(bk)bk.onclick=()=>{const b=ui.back;ui.back=null;openSheet(b)}}   // sub-screen → its parent, inside the same sheet
   sheetTabs(sc,kind);                                        // long sheets on phones: one panel at a time
   if(oldSheet)sc.querySelector('.sheet').scrollTop=keepScroll;
   // wiring
